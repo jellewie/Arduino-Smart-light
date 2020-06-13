@@ -1,0 +1,16 @@
+{
+	"name": "Light Control",
+	"short_name": "Light Control",
+	"start_url": ".",
+	"display": "standalone",
+	"description": "",
+	"icons": [
+		{
+			"src": "icon.svg",
+			"type": "image/png",
+			"sizes": "150x150"
+		}
+	],
+	"background_color": "#ffffff",
+	"theme_color": "#ffffff"
+}

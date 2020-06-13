@@ -1,0 +1,11 @@
+{
+   "On":"ON",
+   "Mode":"CLOCK",
+   "BootMode":"DISCO",
+   "RGBL":[{
+         "R":255,
+         "G":50,
+         "B":50,
+         "L":255
+      }]
+}

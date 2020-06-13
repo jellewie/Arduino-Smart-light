@@ -1,0 +1,12 @@
+{
+   "On":"ON",
+   "Mode":"ON",
+   "BootMode":"WIFI",
+   "HourAni":"TRUE",
+   "RGBL":[{
+         "R":255,
+         "G":50,
+         "B":50,
+         "L":255
+      }]
+}
