@@ -102,81 +102,29 @@ String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
 String ConvertModeToString(byte IN) {
-  String Feedback = "OFF";
-  switch (IN) {
-    case ON:
-      Feedback = "ON";
-      break;
-    case WIFI:
-      Feedback = "WIFI";
-      break;
-    case CLOCK:
-      Feedback = "CLOCK";
-      break;
-
-    case MOVE:
-      Feedback = "MOVE";
-      break;
-    case FLASH:
-      Feedback = "FLASH";
-      break;
-    case BLINK:
-      Feedback = "BLINK";
-      break;
-    case RAINBOW:
-      Feedback = "RAINBOW";
-      break;
-    case JUGGLE:
-      Feedback = "JUGGLE";
-      break;
-    case SINELON:
-      Feedback = "SINELON";
-      break;
-    case CONFETTI:
-      Feedback = "CONFETTI";
-      break;
-    case GLITTER:
-      Feedback = "GLITTER";
-      break;
-    case BPM:
-      Feedback = "BPM";
-      break;
-  }
-  return Feedback;
+#ifdef Server_SerialEnabled
+  Serial.print("ConvertModeToString '" + IN + "'");
+#endif //Server_SerialEnabled
+  if (IN < Modes_Amount)
+    return ModesString[IN];
+  return "OFF";
 }
-Modes ConvertModeToInt(String IN) {
-  Modes Feedback = OFF;
+int ConvertModeToInt(String IN) {
+#ifdef Server_SerialEnabled
+  Serial.print("ConvertModeToInt '" + IN + "'");
+#endif //Server_SerialEnabled
+  if (StringisDigit(IN)) {
+    if (IN.toInt() < Modes_Amount)
+      return IN.toInt();
+    else
+      return 0;
+  }
   IN.toUpperCase();
-  if (IN == "ON" or IN == String(ON))
-    Feedback = ON;
-  else if (IN == "RAINBOW" or IN == String(RAINBOW))
-    Feedback = RAINBOW;
-  else if (IN == "WIFI" or IN == String(WIFI))
-    Feedback = WIFI;
-  else if (IN == "RESET" or IN == String(RESET))
-    Feedback = RESET;
-  else if (IN == "CLOCK" or IN == String(CLOCK))
-    Feedback = CLOCK;
-
-  else if (IN == "MOVE" or IN == String(MOVE))
-    Feedback = MOVE;
-  else if (IN == "FLASH" or IN == String(FLASH))
-    Feedback = FLASH;
-  else if (IN == "BLINK" or IN == String(BLINK))
-    Feedback = BLINK;
-  else if (IN == "RAINBOW" or IN == String(RAINBOW))
-    Feedback = RAINBOW;
-  else if (IN == "JUGGLE" or IN == String(JUGGLE))
-    Feedback = JUGGLE;
-  else if (IN == "SINELON" or IN == String(SINELON))
-    Feedback = SINELON;
-  else if (IN == "CONFETTI" or IN == String(CONFETTI))
-    Feedback = CONFETTI;
-  else if (IN == "GLITTER" or IN == String(GLITTER))
-    Feedback = GLITTER;
-  else if (IN == "BPM" or IN == String(BPM))
-    Feedback = BPM;
-  return Feedback;
+  for (byte i = 0; i < Modes_Amount; i++) {
+    if (IN == ModesString[i])
+      return i;
+  }
+  return 0;
 }
 bool IsTrue(String input) {
   input.toLowerCase();
@@ -188,4 +136,11 @@ String IsTrueToString(bool input) {
   if (input)
     return "TRUE";
   return "FALSE";
+}
+bool StringisDigit(String IN) {
+  for (byte i = 0; i < IN.length(); i++) {
+    if (not isDigit(IN.charAt(i)))
+      return false;
+  }
+  return true;
 }

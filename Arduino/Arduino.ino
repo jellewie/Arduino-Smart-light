@@ -10,6 +10,10 @@
 
   -CHECK IF DONE
     If mode change to WIFI, send RGB values
+
+  + Add a way to change/set the double press button action
+  + Maybe add a way for an transition, like slowly turn on for x minutes??
+  + add sinelon2
 */
 //#define SerialEnabled
 
@@ -53,7 +57,7 @@ int AnimationCounter;                     //Time in seconds that a AnimationCoun
 bool DoHourlyAnimation = true;            //If we need to show an animation every hour if we are in CLOCK mode
 bool WIFIconnected;
 byte WIFI_Started;
-Modes BootMode;
+int BootMode;
 
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 CRGB LEDs[TotalLEDs];
@@ -224,6 +228,11 @@ void loopLEDS() {
     case SINELON:
       if (LastMode != Mode)     //If mode changed
         StartAnimation(5, -2);
+      UpdateLEDs = true;
+      break;
+    case SINELON2:
+      if (LastMode != Mode)     //If mode changed
+        StartAnimation(9, -2);
       UpdateLEDs = true;
       break;
   }
