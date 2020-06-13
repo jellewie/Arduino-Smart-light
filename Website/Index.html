@@ -273,6 +273,7 @@
             });
             let bootModeDropdown = new DropDown({ name: "Bootmode", setParamName: "bm", possibleValues: ["OFF", "ON", "WIFI", "CLOCK"] });
             let hourlyAnimDropdown = new DropDown({ name: "Hourly Animation", setParamName: "a", possibleValues: ["FALSE", "TRUE"] });
+			let DoubleModeDropdown = new DropDown({ name: "DoublePressMode", setParamName: "dm", possibleValues: ["WIFI", "CLOCK", "BLINK", "BPM", "CONFETTI", "FLASH", "GLITTER", "JUGGLE", "MOVE", "RAINBOW", "SINELON", "SINELON2"] });
             settingsContainer.appendChild(document.createElement("br"));
             let otaBtn = new RequestButton("Enable OTA", "/ota", "OTA Enabled");
             let timeBtn = new RequestButton("Sync Time", "/time", "Time Updated");
@@ -327,9 +328,10 @@
             async function updateServerStateFromResponse(response) {
                 if (!response.ok) return;
                 let json = await response.json();
-                modeDropdown.value = json.Mode;
-                bootModeDropdown.value = json.BootMode;
-                hourlyAnimDropdown.value = json.HourAni;
+                modeDropdown.value = json.M;
+                bootModeDropdown.value = json.BM;
+                hourlyAnimDropdown.value = json.HA;
+				DoubleModeDropdown.value = json.DM;
                 let col = json.RGBL[0];
                 redSlider.value = col.R;
                 greenSlider.value = col.G;

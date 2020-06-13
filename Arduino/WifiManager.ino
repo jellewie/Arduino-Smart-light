@@ -27,7 +27,7 @@
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -260,6 +260,9 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
     case 4:
       DoHourlyAnimation = IsTrue(WiFiManager_Temp);
       break;
+    case 5:
+      DoublePressMode = ConvertModeToInt(WiFiManager_Temp);
+      break;
   }
   return true;
 }
@@ -285,6 +288,9 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
       break;
     case 4:
       WiFiManager_Temp_Return = IsTrueToString(DoHourlyAnimation);
+      break;
+    case 5:
+      WiFiManager_Temp_Return = ConvertModeToString(DoublePressMode);
       break;
   }
 #ifdef WiFiManager_SerialEnabled

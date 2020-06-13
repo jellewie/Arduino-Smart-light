@@ -57,7 +57,8 @@ int AnimationCounter;                     //Time in seconds that a AnimationCoun
 bool DoHourlyAnimation = true;            //If we need to show an animation every hour if we are in CLOCK mode
 bool WIFIconnected;
 byte WIFI_Started;
-int BootMode;
+int BootMode = OFF;
+int DoublePressMode = RAINBOW;
 
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 CRGB LEDs[TotalLEDs];
@@ -124,7 +125,7 @@ void loop() {
       else
         Mode = OFF;
     }
-    if (Value.StartDoublePress) Mode = RAINBOW;         //Cool RGB color palet mode
+    if (Value.StartDoublePress) Mode = DoublePressMode;         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
       if (WIFI_Started)                               //If WIFI was already started
