@@ -34,6 +34,7 @@ const byte WiFiManager_EEPROM_SIZE_PASS = 16;
 
 bool WiFiManager_WaitOnAPMode = true;       //This holds the flag if we should wait in Apmode for data
 bool WiFiManager_SettingsEnabled = false;   //This holds the flag to enable settings, else it would not responce to settings commands
+bool WiFiManager_connected;
 int  WiFiManager_EEPROM_USED = 0;           //Howmany bytes we have used for data in the EEPROM
 //#define strip_ip, gateway_ip, subnet_mask to use static IP
 
@@ -71,6 +72,7 @@ byte WiFiManager_Start() {
   Serial.print("WM: My ip = ");
   Serial.println(WiFi.localIP()); //Just send it's IP on boot to let you know
 #endif //WiFiManager_SerialEnabled
+  WiFiManager_connected = true;
   return 1;
 }
 byte LoadData() {     //Only load data from EEPROM to memory
@@ -178,6 +180,10 @@ void WiFiManager_handle_Settings() {
     delay(1);
   }
 }
+bool WiFiManager_RunServer() {
+  if (WiFiManager_connected) server.handleClient();
+  return WiFiManager_connected;
+}
 void WiFiManager_StartServer() {
   static bool ServerStarted = false;
   if (!ServerStarted) {             //If the server hasn't started yet
@@ -229,7 +235,7 @@ bool WiFiManager_Connect(int WiFiManager_TimeOutMS) {
   while (WiFi.status() != WL_CONNECTED) {
     if (WiFiManager_StopTime < millis()) {    //If we are in overtime
 #ifdef WiFiManager_SerialEnabled
-      Serial.println("WM: Could not connect withing ='" + String(WiFiManager_TimeOutMS) + "'ms to given WIFI, aborting :" + String(WiFi.status()));
+      Serial.println("WM: Could not connect within " + String(WiFiManager_TimeOutMS) + "ms to given WIFI, aborting with code " + ConvertWifistatus(WiFi.status()));
 #endif //WiFiManager_SerialEnabled
       return false;
     }
@@ -308,6 +314,37 @@ bool TickEveryMS(int _Delay) {
   }
   return false;
 }
+#ifdef WiFiManager_SerialEnabled
+String ConvertWifistatus(byte IN) {
+  switch (IN) {
+    case WL_CONNECTED:
+      return "WL_CONNECTED";
+      break;
+    case WL_NO_SHIELD:
+      return "WL_NO_SHIELD";
+      break;
+    case WL_IDLE_STATUS:
+      return "WL_IDLE_STATUS";
+      break;
+    case WL_NO_SSID_AVAIL:
+      return "WL_NO_SSID_AVAIL";
+      break;
+    case WL_SCAN_COMPLETED:
+      return "WL_SCAN_COMPLETED";
+      break;
+    case WL_CONNECT_FAILED:
+      return "WL_CONNECT_FAILED";
+      break;
+    case WL_CONNECTION_LOST:
+      return "WL_CONNECTION_LOST";
+      break;
+    case WL_DISCONNECTED:
+      return "WL_DISCONNECTED";
+      break;
+  }
+  return "UNKNOWN";
+}
+#endif //WiFiManager_SerialEnabled
 //Some status updates to the user
 #define WiFiManager_LED LED_BUILTIN           //The LED to give feedback on (like blink on error)
 void WiFiManager_Status_Start() {

@@ -195,7 +195,7 @@ void Animationjuggle(byte Delay, byte Amount) { // eight colored dots, weaving i
 bool AnimationSinelon(byte rgb[3], byte DimBy, bool Start, byte BPM) { // a colored dot sweeping back and forth, with fading trails
   //byte rgb[3] = {255, 0, 0};                                      //The color value
   //byte DimBy = 2;                                                 //Delay in ms to fade to black
-//Returns true if this is the start
+  //Returns true if this is the start
   fadeToBlackBy(LEDs, TotalLEDs, DimBy);
 
   int pos = 0;
@@ -204,10 +204,12 @@ bool AnimationSinelon(byte rgb[3], byte DimBy, bool Start, byte BPM) { // a colo
   pos = beatsin8(BPM, 0, TotalLEDs - 1);
   LEDs[pos] += CRGB(rgb[0], rgb[1], rgb[2]);
 
-  static int Lastpot;
-  if (pos == 0 and Lastpot != pos)
-    return true;     //If we are at the start
-  Lastpot = pos;
+  static int Lastpos;
+  if (pos == 0 and Lastpos != pos) {  //If we just ended
+    Lastpos = pos;
+    return true;
+  }
+  Lastpos = pos;
   return false;
 }
 void AnimationConfetti(byte rgb[3], byte DimBy, byte Delay) { // random colored speckles that blink in and fade smoothly

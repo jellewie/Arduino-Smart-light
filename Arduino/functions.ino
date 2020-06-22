@@ -37,7 +37,7 @@ bool StartWIFIstuff() {
   //Returns true if WIFI was already started, returns FALSE if it wasn't
   if (WIFI_Started) return true;     //If WIFI already on, stop and return true
 
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(0,   0, 255)); //turn all LEDs blue  0202
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs blue  0202
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 1th quater red 1202
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 2rd quater red 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
@@ -103,7 +103,7 @@ String IpAddress2String(const IPAddress& ipAddress) {
 }
 String ConvertModeToString(byte IN) {
 #ifdef Server_SerialEnabled
-  Serial.print("ConvertModeToString '" + IN + "'");
+  Serial.println("ConvertModeToString '" + String(IN) + "'");
 #endif //Server_SerialEnabled
   if (IN < Modes_Amount)
     return ModesString[IN];
@@ -111,7 +111,7 @@ String ConvertModeToString(byte IN) {
 }
 int ConvertModeToInt(String IN) {
 #ifdef Server_SerialEnabled
-  Serial.print("ConvertModeToInt '" + IN + "'");
+  Serial.println("ConvertModeToInt '" + IN + "'");
 #endif //Server_SerialEnabled
   if (StringisDigit(IN)) {
     if (IN.toInt() < Modes_Amount)
@@ -128,7 +128,7 @@ int ConvertModeToInt(String IN) {
 }
 bool IsTrue(String input) {
   input.toLowerCase();
-  if (input.toInt() == 1 or input == "true" or input == "yes")
+  if (input.toInt() == 1 or input == "true" or input == "yes" or input == "high")
     return true;
   return false;
 }

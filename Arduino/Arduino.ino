@@ -2,18 +2,8 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json DOIT ESP32 DEVKIT V1
 
   TODO
-  -Sort mode on ABCF
-  -IDEA?? Make it so mode CLOCK doesn't return RGB?
-  -ERROR Clock animation needs to 'clear' the LEDs when staring, now the HHMMSS shines though for a bit
-         UpdateAndShowClock is called one after DoHourlyAnimation has aleady started??
-  -ERROR RGB not set after change while we where in BPM mode?
-
-  -CHECK IF DONE
-    If mode change to WIFI, send RGB values
-
-  + Add a way to change/set the double press button action
-  + Maybe add a way for an transition, like slowly turn on for x minutes??
-  + add sinelon2
+  -ERROR after BMP mode, whitch to WIFI, RGB not send
+  +Maybe add a way for an transition, like slowly turn on for x minutes??
 */
 //#define SerialEnabled
 
@@ -22,7 +12,7 @@
 #define     Server_SerialEnabled
 #define     Time_SerialEnabled
 //#define     TimeExtra_SerialEnabled
-//#deinfe     UpdateLEDs_SerialEnabled
+//#define     UpdateLEDs_SerialEnabled
 #endif //SerialEnabled
 
 #include <FastLED.h>
@@ -110,7 +100,7 @@ void setup() {
 
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed
-  if (WIFIconnected) server.handleClient();           //Do WIFI server stuff if needed
+  WiFiManager_RunServer();                            //Do WIFI server stuff if needed
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
 #ifdef SerialEnabled        //DEBUG, print button state to serial
@@ -144,7 +134,6 @@ void loop() {
 void loopLEDS() {
   if (AnimationCounter != 0)   //Animation needs to be shown
     ShowAnimation(false);
-
   switch (Mode) {
     case OFF:
       if (LastMode != Mode) {

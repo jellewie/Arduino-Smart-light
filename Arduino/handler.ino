@@ -126,7 +126,7 @@ void handle_Getcolors() {
 
   server.send(200, "application/json", ans);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200 Return colors" + ans);
+  Serial.println("SV: 200 Return colors " + ans);
 #endif //Server_SerialEnabled
 }
 void handle_OnConnect() {

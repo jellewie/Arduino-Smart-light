@@ -25,6 +25,7 @@ void UpdateAndShowClock() {
           Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
           StartAnimation(random(0, TotalAnimations), AnimationCounterTime);       //Start a random Animation
+          return;
         }
       }
       if (TimeCurrent.HH > 24)
