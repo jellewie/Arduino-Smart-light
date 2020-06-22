@@ -3,6 +3,7 @@
 
   TODO
   +Maybe add a way for an transition, like slowly turn on for x minutes??
+  +Maybe add a 5 sec ShowIP[2] to ShowIP(). so the whole last 2 bytes can be recieved from it, not just the last one
 */
 //#define SerialEnabled
 
@@ -117,8 +118,10 @@ void loop() {
     if (Value.StartDoublePress) Mode = DoublePressMode;         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WIFI_Started)                               //If WIFI was already started
+      if (WIFI_Started){                               //If WIFI was already started
         ShowIP();
+        LastMode = Mode;
+      }
     };
     if (Value.PressedLong) {                          //If it is/was a long press
       if (Value.PressedTime > Time_ESPrestartMS - 1000) //If we are almost resetting

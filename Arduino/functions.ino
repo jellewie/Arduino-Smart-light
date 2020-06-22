@@ -51,38 +51,31 @@ bool StartWIFIstuff() {
   return false;
 }
 void ShowIP() {
+  //LEDs are devided in 10 sections and then show each char in the arra in RGB 9start counting at 0!)
+  //so when the ip is .150 section 1 will be Red, 5=green, and 0=blue
   IPAddress MyIp = WiFi.localIP();
 #ifdef SerialEnabled
   Serial.print("My IP =" + String(MyIp));
 #endif //SerialEnabled
-  /* To calculate IP: Amount of LEDs blink +
-    if (RED)   then +0
-    if (Green) then +60
-    if (+Blue) then +120   (Note leds can either turn on 1 or 10 at a time)*/
-  CRGB IPColor = CRGB(0, 0, 0);
-  if (MyIp[2] < 60) {
-    IPColor += CRGB(255, 0, 0);
-  } else {
-    if (MyIp[2] > 120) {
-      MyIp[2] = MyIp[2] - 120;
-      IPColor += CRGB(0, 0, 255);
-    }
-    if (MyIp[2] > 60) {
-      MyIp[2] = MyIp[2] - 60;
-      IPColor += CRGB(0, 255, 0);
-    }
-  }
-  FastLED.clear();                        //Clear LED strip
-  for (int i = 0; i < MyIp[3]; i++) {     //For each IP value left
-    MyDelay(500);                         //Wait a bit so we can count it
-    if (i + 9 < MyIp[3]) {                //If there is 10+ leds to do, do them in one go
-      fill_solid(&(LEDs[i]), 10, IPColor); //Turn them on
-      i = i + 9;                          //Adjust the counter (9 since every loop we do +1, meaning next loop is +10)
-    } else {
-      LEDs[i] = IPColor;                  //Turn it on
-    }
-    FastLED.show();                       //Update
-  }
+  FastLED.clear();
+  byte SectionLength = TotalLEDs / 10;
+  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[i] = CRGB(128, 128, 128);
+  byte IP = MyIp[3];
+
+  byte A = IP / 100;
+  A = A * SectionLength + 1;
+  IP = IP % 100;                    //https://www.arduino.cc/en/pmwiki.php?n=Reference/Modulo
+  byte B = IP / 10;
+  B = B * SectionLength + 1;
+  byte C = IP % 10;
+  C = IP * SectionLength + 1;
+
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[A + i] += CRGB(255, 0, 0);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[B + i] += CRGB(0, 255, 0);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[C + i] += CRGB(0, 0, 255);
+
+  FastLED.show();                       //Update
+  UpdateLEDs = false;
   MyDelay(500);
 }
 void MyDelay(int ms) {                    //Just a non-blocking delay
