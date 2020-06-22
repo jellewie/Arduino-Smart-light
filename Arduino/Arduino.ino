@@ -2,7 +2,6 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json DOIT ESP32 DEVKIT V1
 
   TODO
-  -ERROR after BMP mode, whitch to WIFI, RGB not send
   +Maybe add a way for an transition, like slowly turn on for x minutes??
 */
 //#define SerialEnabled

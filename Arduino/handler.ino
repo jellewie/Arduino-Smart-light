@@ -66,6 +66,7 @@ void handle_Set() {
   Serial.println();
 #endif //Server_SerialEnabled
 
+  if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {  //Animation needs to be shown
     if (NewR != -1) RGBColor[0] = NewR;
     if (NewG != -1) RGBColor[1] = NewG;
