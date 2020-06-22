@@ -39,8 +39,8 @@ const byte PDI_Button = 26;               //pulled down with 10k to GND
 #define PotMin PotMinChange + 2           //On howmuch fast pot_value_change to change mode to manual. 0-255. 
 
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
-const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in minutes)
-const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in minutes)
+const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
+const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
 TimeS TimeCurrent = {4};                  //Where we save the time to, set to H=4 so it time syncs on startup
 byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 hours can be UP
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played

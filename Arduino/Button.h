@@ -1,5 +1,5 @@
 /* Written by JelleWho https://github.com/jellewie */
-#define Time_StartLongPressMS 5000    //After howmuch Ms we should consider a press a long press
+#define Time_StartLongPressMS 3000    //After howmuch Ms we should consider a press a long press
 #define Time_ESPrestartMS 15000       //After howmuch Ms we should restart the ESP, note this is only triggered on released, or on a CheckButtons() call
 #define Time_StartDoublePress 200     //Withing howmuch Ms of the last release should the button be pressed for it to be a double press?
 #define Time_RejectStarts 80          //Just some rejection
