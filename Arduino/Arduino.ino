@@ -6,7 +6,7 @@
   +Maybe add a 5 sec ShowIP[2] to ShowIP(). so the whole last 2 bytes can be recieved from it, not just the last one
   //BootMode is now saves as string to EEPROM, this should be in byte form
 */
-#define SerialEnabled
+//#define SerialEnabled
 
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
