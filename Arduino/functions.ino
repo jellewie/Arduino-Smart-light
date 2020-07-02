@@ -58,32 +58,44 @@ void ShowIP() {
   Serial.print("My ip = ");
   Serial.println(WiFi.localIP()); //Just send it's IP on boot to let you know
 #endif //SerialEnabled
-  FastLED.clear();
-  byte SectionLength = TotalLEDs / 10;
-  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[i] = CRGB(128, 128, 128);
-  byte IP = MyIp[3];
 
-  byte A = IP / 100;
-  A = A * SectionLength + 1;
-  IP = IP % 100;                    //https://www.arduino.cc/en/pmwiki.php?n=Reference/Modulo
-  byte B = IP / 10;
-  B = B * SectionLength + 1;
-  byte C = IP % 10;
-  C = IP * SectionLength + 1;
+  ShowIPnumber(MyIp[0]);
+  UpdateLEDs = true;
+  MyDelay(2500);
+  ShowIPnumber(MyIp[1]);
+  UpdateLEDs = true;
+  MyDelay(2500);
+  ShowIPnumber(MyIp[2]);
+  UpdateLEDs = true;
+  MyDelay(2500);
+  ShowIPnumber(MyIp[3]);
+  UpdateLEDs = true;
+}
+void ShowIPnumber(byte Number) {
+#ifdef SerialEnabled
+  Serial.println("ShowIPnumber " + String(Number));
+#endif //SerialEnabled
+  FastLED.clear();
+  const static byte SectionLength = TotalLEDs / 10;
+  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[i] = CRGB(128, 128, 128);
+
+  byte A = (Number / 100) * SectionLength + 1;
+  Number = Number % 100;                              //Modulo (so what is over when we keep deviding by whole 100)
+  byte B = (Number / 10) * SectionLength + 1;
+  byte C = (Number % 10) * SectionLength + 1;
 
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[A + i] += CRGB(255, 0, 0);
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[B + i] += CRGB(0, 255, 0);
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[C + i] += CRGB(0, 0, 255);
-
-  UpdateLEDs = true;
-  MyDelay(500);
 }
 void MyDelay(int ms) {                    //Just a non-blocking delay
   unsigned long StopAtTime = millis() + ms;
   while (millis() < StopAtTime) {
     OTA_loop();                                         //Do OTA stuff if needed
-    if (WIFIconnected) server.handleClient();           //Do WIFI server stuff if needed
-    UpdateBrightness(false);
+    WiFiManager_RunServer();                            //Do WIFI server stuff if needed
+    UpdateBrightness(false);      //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);           //Check if manual input potmeters has changed, if so flag the update
+    ButtonsA.CheckButton();       //Read buttonstate  (Just trash all inputs)
     if (UpdateLEDs) {
 #ifdef UpdateLEDs_SerialEnabled
       Serial.println("Update LEDs");
