@@ -30,12 +30,13 @@ void UpdateAndShowClock() {
       }
       if (TimeCurrent.HH > 24)
         TimeCurrent.HH = 0;
-      static bool TimeUpdated = false;
-      if (TimeCurrent.HH == 4 and !TimeUpdated) {
-        TimeUpdated = true;
-        UpdateTime();                                     //Get a new sync timestamp from the server
+      static bool TimeFlag = false;
+      if (TimeCurrent.HH == 4 and !TimeFlag) {
+        TimeFlag = true;
+        if (!UpdateTime())                                     //Get a new sync timestamp from the server
+          WIFIconnected = false;
       } else
-        TimeUpdated = false;
+        TimeFlag = false;
     }
     //==============================
     //Show the time on the LEDs if needed

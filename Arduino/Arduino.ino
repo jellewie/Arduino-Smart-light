@@ -104,10 +104,10 @@ void loop() {
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
 #ifdef SerialEnabled        //DEBUG, print button state to serial
-    if (Value.StartPress)   Serial.println("StartPress");
-    if (Value.StartPress)   Serial.println("StartLongPress");
-    if (Value.StartPress)   Serial.println("StartDoublePress");
-    if (Value.StartRelease) Serial.println("StartRelease");
+    if (Value.StartPress)       Serial.println("StartPress");
+    if (Value.StartLongPress)   Serial.println("StartLongPress");
+    if (Value.StartDoublePress) Serial.println("StartDoublePress");
+    if (Value.StartRelease)     Serial.println("StartRelease");
 #endif //SerialEnabled
     if (Value.StartPress) {
       if (Mode == OFF)

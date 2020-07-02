@@ -55,7 +55,8 @@ void ShowIP() {
   //so when the ip is .150 section 1 will be Red, 5=green, and 0=blue
   IPAddress MyIp = WiFi.localIP();
 #ifdef SerialEnabled
-  Serial.print("My IP =" + String(MyIp));
+  Serial.print("My ip = ");
+  Serial.println(WiFi.localIP()); //Just send it's IP on boot to let you know
 #endif //SerialEnabled
   FastLED.clear();
   byte SectionLength = TotalLEDs / 10;
@@ -74,8 +75,7 @@ void ShowIP() {
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[B + i] += CRGB(0, 255, 0);
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[C + i] += CRGB(0, 0, 255);
 
-  FastLED.show();                       //Update
-  UpdateLEDs = false;
+  UpdateLEDs = true;
   MyDelay(500);
 }
 void MyDelay(int ms) {                    //Just a non-blocking delay
@@ -84,7 +84,14 @@ void MyDelay(int ms) {                    //Just a non-blocking delay
     OTA_loop();                                         //Do OTA stuff if needed
     if (WIFIconnected) server.handleClient();           //Do WIFI server stuff if needed
     UpdateBrightness(false);
-    if (UpdateLEDs) FastLED.show();
+    if (UpdateLEDs) {
+#ifdef UpdateLEDs_SerialEnabled
+      Serial.println("Update LEDs");
+#endif //UpdateLEDs_SerialEnabled
+      UpdateLEDs = false;
+      FastLED.show();                         //Update
+    }
+    yield();
     FastLED.delay(1);
   }
 }
