@@ -65,7 +65,7 @@ byte WiFiManager_Start() {
       if (WiFiManager_Connect(WiFiManager_ConnectionTimeOutMS)) //try to connected to ssid password
         WiFiManager_Connected = true;
       else
-        FlagApMode = true;                  //Flag so we will enter AP mode 
+        FlagApMode = true;                  //Flag so we will enter AP mode
     }
   }
   WiFiManager_Status_Done();
@@ -296,13 +296,13 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
       }
       break;
     case 3:
-      WiFiManager_Temp_Return = ConvertModeToString(BootMode);
+      WiFiManager_Temp_Return = BootMode;
       break;
     case 4:
-      WiFiManager_Temp_Return = IsTrueToString(DoHourlyAnimation);
+      WiFiManager_Temp_Return = DoHourlyAnimation;
       break;
     case 5:
-      WiFiManager_Temp_Return = ConvertModeToString(DoublePressMode);
+      WiFiManager_Temp_Return = DoublePressMode;
       break;
   }
 #ifdef WiFiManager_SerialEnabled
@@ -363,7 +363,7 @@ void WiFiManager_Status_Done() {
 void WiFiManager_Status_Blink() {
   digitalWrite(WiFiManager_LED, !digitalRead(WiFiManager_LED));
 }
-bool WiFiManager_HandleAP() {                 //Called when in the While loop in APMode, this so you can exit it.
+bool WiFiManager_HandleAP() {                 //Called when in the While loop in APMode, this so you can exit it
 #define TimeOutApMode 15 * 60 * 1000;     //Example for a timeout, re-enable these 3 lines to apply. (time in ms)
   unsigned long StopApAt = millis() + TimeOutApMode;
   if (millis() > StopApAt) return true;     //If we are running for to long, then flag we need to exit APMode
