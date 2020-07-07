@@ -46,7 +46,6 @@ byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the 
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 bool DoHourlyAnimation = true;            //If we need to show an animation every hour if we are in CLOCK mode
 bool WIFIconnected;
-byte WIFI_Started;
 int BootMode = OFF;
 int DoublePressMode = RAINBOW;
 
@@ -118,7 +117,7 @@ void loop() {
     if (Value.StartDoublePress) Mode = DoublePressMode;         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WIFI_Started){                               //If WIFI was already started
+      if (WIFIconnected){                               //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }
