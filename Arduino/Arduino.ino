@@ -3,8 +3,9 @@
 
   TODO
   +Maybe add a way for an transition, like slowly turn on for x minutes??
-  +Maybe add a 5 sec ShowIP[2] to ShowIP(). so the whole last 2 bytes can be recieved from it, not just the last one
-  //BootMode is now saves as string to EEPROM, this should be in byte form
+  
+  SOLVED: +Maybe add a 5 sec ShowIP[2] to ShowIP(). so the whole last 2 bytes can be recieved from it, not just the last one
+  CHECK/SHOULD BE SOLVED: BootMode is now saves as string to EEPROM, this should be in byte form
 */
 //#define SerialEnabled
 
@@ -17,8 +18,6 @@
 #endif //SerialEnabled
 
 #include <FastLED.h>
-#define AnalogResolution 9                //howmany bits an analog read is
-#define AnalogScaler ((AnalogResolution - 8)*2)
 #include "StableAnalog.h"
 #include "Button.h"
 #include "functions.h"
