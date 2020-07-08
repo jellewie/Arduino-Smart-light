@@ -34,7 +34,7 @@ const byte WiFiManager_EEPROM_SIZE_PASS = 16;
 
 bool WiFiManager_WaitOnAPMode = true;       //This holds the flag if we should wait in Apmode for data
 bool WiFiManager_SettingsEnabled = false;   //This holds the flag to enable settings, else it would not responce to settings commands
-bool WiFiManager_connected;
+//bool WiFiManager_connected;                 //If the ESP is connected to WIFI
 int  WiFiManager_EEPROM_USED = 0;           //Howmany bytes we have used for data in the EEPROM
 //#define strip_ip, gateway_ip, subnet_mask to use static IP
 

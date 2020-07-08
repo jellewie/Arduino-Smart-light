@@ -34,7 +34,7 @@ void UpdateAndShowClock() {
       if (TimeCurrent.HH == 4 and !TimeFlag) {
         TimeFlag = true;
         if (!UpdateTime())                                     //Get a new sync timestamp from the server
-          WIFIconnected = false;
+          WiFiManager_connected = false;
       } else
         TimeFlag = false;
     }

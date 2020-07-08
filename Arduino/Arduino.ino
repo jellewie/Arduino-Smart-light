@@ -3,8 +3,8 @@
 
   TODO
   +Maybe add a way for an transition, like slowly turn on for x minutes??
+  +Add timeout on clock sync request? seems to go for ever now
   
-  SOLVED: +Maybe add a 5 sec ShowIP[2] to ShowIP(). so the whole last 2 bytes can be recieved from it, not just the last one
   CHECK/SHOULD BE SOLVED: BootMode is now saves as string to EEPROM, this should be in byte form
 */
 //#define SerialEnabled
@@ -17,6 +17,7 @@
 //#define     UpdateLEDs_SerialEnabled
 #endif //SerialEnabled
 
+bool WiFiManager_connected;                 //If the ESP is connected to WIFI
 #include <FastLED.h>
 #include "StableAnalog.h"
 #include "Button.h"
@@ -45,7 +46,6 @@ TimeS TimeCurrent = {4};                  //Where we save the time to, set to H=
 byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 hours can be UP
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 bool DoHourlyAnimation = true;            //If we need to show an animation every hour if we are in CLOCK mode
-bool WIFIconnected;
 int BootMode = OFF;
 int DoublePressMode = RAINBOW;
 
@@ -117,7 +117,7 @@ void loop() {
     if (Value.StartDoublePress) Mode = DoublePressMode;         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WIFIconnected){                               //If WIFI was already started
+      if (WiFiManager_connected){                               //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }

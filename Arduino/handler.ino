@@ -131,8 +131,8 @@ void handle_Getcolors() {
 #endif //Server_SerialEnabled
 }
 void handle_OnConnect() {
-  if (!WIFIconnected) {
-    WiFiManager_handle_Connect();
+  if (!WiFiManager_connected) {
+    WiFiManager_handle_Connect();       //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
   /*HTML USEFULL STEPS:
