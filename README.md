@@ -3,7 +3,7 @@ This project is working, but technically still Work In Process. I am trying to g
 if you have intrest in buying one and live in The Netherlands, feel free to contact me.
 
 # Smart light
-A smart 3D printed light bulb, its a 15Watt smart light that includes for example; wifi and manual control, Clock mode, and multiple animations.
+A smart 3D printed light bulb, its a smart light that includes for example; wifi and manual control, Clock mode, and multiple animations.
 
 # What you need
 [The hardware like for example the ESP32](https://dl.espressif.com/dl/package_esp32_index.json)
