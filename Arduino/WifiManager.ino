@@ -59,8 +59,10 @@ byte WiFiManager_Start() {
   bool WiFiManager_Connected = false;
   bool FlagApMode = false;
   while (!WiFiManager_Connected) {
-    if ((strlen(ssid) == 0 or strlen(password) == 0 or FlagApMode))
-      WiFiManager_APMode();                 //No good ssid or password, entering APmode
+    if ((strlen(ssid) == 0 or strlen(password) == 0 or FlagApMode)) {
+      FlagApMode = false;
+      WiFiManager_APMode();                 //No ssid or password given, or ssid not found. Entering APmode
+    }
     else {
       if (WiFiManager_Connect(WiFiManager_ConnectionTimeOutMS)) //try to connected to ssid password
         WiFiManager_Connected = true;
@@ -155,7 +157,7 @@ void WiFiManager_handle_Settings() {
   if (!WiFiManager_SettingsEnabled)   //If settingscommand are disabled
     return;                           //Stop right away, and do noting
   String WiFiManager_MSG = "";
-  int   WiFiManager_Code = 200;
+  int    WiFiManager_Code = 200;
   for (int i = 0; i < server.args(); i++) {
     String WiFiManager_ArguName = server.argName(i);
     String WiFiManager_ArgValue = server.arg(i);
@@ -180,6 +182,7 @@ void WiFiManager_handle_Settings() {
     server.handleClient();
     delay(1);
   }
+  WiFiManager_connected = false;      //Flag that WIFI is off, and we need to reconnect (In case user requested to switch WIFI)
 }
 void WiFiManager_StartServer() {
   static bool ServerStarted = false;
@@ -195,10 +198,14 @@ bool WiFiManager_RunServer() {
 void WiFiManager_EnableSetup(bool WiFiManager_TEMP_State) {
 #ifdef WiFiManager_SerialEnabled
   if (WiFiManager_TEMP_State) {
-    Serial.print("WM: Settings page online ip=");
-    Serial.println(WiFi.softAPIP());
+    if (WiFiManager_connected)
+      Serial.print("WM: Settings page online");
+    else {
+      Serial.print("WM: Settings page online ip=");
+      Serial.println(WiFi.softAPIP());
+    }
   } else
-    Serial.print("WM: Settings page offline");
+    Serial.println("WM: Settings page offline");
 #endif //WiFiManager_SerialEnabled
   WiFiManager_SettingsEnabled = WiFiManager_TEMP_State;
 }
@@ -220,10 +227,16 @@ byte WiFiManager_APMode() {
     if (TickEveryMS(100)) WiFiManager_Status_Blink(); //Let the LED blink to show we are not connected
     server.handleClient();
     if (WiFiManager_HandleAP()) {
+#ifdef SerialEnabled        //DEBUG, print button state to serial
+      Serial.println("WM: Manual leaving APMode");
+#endif //SerialEnabled
       WiFiManager_EnableSetup(false);   //Flag to stop responce to settings commands
       return 3;
     }
   }
+#ifdef WiFiManager_SerialEnabled
+  Serial.println("WM: Leaving APmode");
+#endif //WiFiManager_SerialEnabled
   WiFiManager_WaitOnAPMode = true;      //reset flag for next time
   WiFiManager_EnableSetup(false);  //Flag to stop responce to settings commands
   return 1;
@@ -241,7 +254,7 @@ bool WiFiManager_Connect(int WiFiManager_TimeOutMS) {
   while (WiFi.status() != WL_CONNECTED) {
     if (WiFiManager_StopTime < millis()) {    //If we are in overtime
 #ifdef WiFiManager_SerialEnabled
-      Serial.println("WM: Could not connect within " + String(WiFiManager_TimeOutMS) + "ms to given WIFI, aborting with code " + ConvertWifistatus(WiFi.status()));
+      Serial.println("WM: Could not connect within " + String(WiFiManager_TimeOutMS) + "ms to given SSID, aborting with code " + ConvertWifistatus(WiFi.status()));
 #endif //WiFiManager_SerialEnabled
       return false;
     }
@@ -371,13 +384,12 @@ bool WiFiManager_HandleAP() {                 //Called when in the While loop in
   Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
   if (Value.StartLongPress) {
 #ifdef SerialEnabled        //DEBUG, print button state to serial
-    Serial.println("StartLongPress; reset BootMode and restart");
+    Serial.println("WM: StartLongPress; reset BootMode and restart");
 #endif //SerialEnabled
     BootMode = OFF;                                           //Change bootmode (so we wont enable WIFI on startup)
     WiFiManager_WriteEEPROM();
     ESP.restart();                                            //Restart the ESP
   }
-
   return false;
 }
 //Some debug functions

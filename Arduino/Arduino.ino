@@ -24,7 +24,7 @@ bool WiFiManager_connected;                 //If the ESP is connected to WIFI
 #include "StableAnalog.h"
 #include "Button.h"
 #include "functions.h"
-#include "time.h"                         //We need this for the clock function to get the time
+#include "time.h"                         //We need this for the clock function to get the time (Time library)
 #include <WiFi.h>                         //we need this for wifi stuff (duh)
 #include <WebServer.h>
 WebServer server(80);
