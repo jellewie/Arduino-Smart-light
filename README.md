@@ -1,6 +1,5 @@
 # WIP
-This project is working, but technically still WIP.
-I am trying to get all files together, so where might be things or descriptions missing.
+This project is working, but technically still Work In Process. I am trying to get all files together, but there might be some things missing.
 if you have intrest in buying one and live in The Netherlands, feel free to contact me.
 
 # Smart light
@@ -35,14 +34,21 @@ Please refer the in the appendix - Firmware for the source code. Not you need to
 # Features
 ## Button
 Although these options change a bit over time, here is a list of 3 actions what the button generally does, these can also change in different modes.
-1.	StartPress Triggered when you start a press, will be rejected if sooner than Time_RejectStarts (80ms) of the last press).
-	Will toggle the lamp ON/OFF
-2.	StartDoublePress Triggered when you start a second press between Time_RejectStarts (80) and Time_StartDoublePress (200) ms after the last one ended.
-	Will change the mode to `DoublePressMode' (RAINBOW by default)
-3.	StartLongPress Triggered when you press the button longer than Time_StartLongPressMS (5000) but shorter than Time_ESPrestartMS (15000) ms.
-	If in APmode it will cancel and reboot.
-	If it was connected to WI-FI it will show its IP. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1. Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue
-	If it isn't connected to WI-FI it will start connecting to WI-FI (and possible go into AP mode, that is explained in 3.4 WI-FI page. 
+>1.	StartPress Triggered when you start a press, will be rejected if sooner than Time_RejectStarts (80ms) of the last press).
+
+>> Will toggle the lamp ON/OFF
+
+>2.	StartDoublePress Triggered when you start a second press between Time_RejectStarts (80) and Time_StartDoublePress (200) ms after the last one ended.
+
+>> Will change the mode to `DoublePressMode' (RAINBOW by default)
+
+>3.	StartLongPress Triggered when you press the button longer than Time_StartLongPressMS (5000) but shorter than Time_ESPrestartMS (15000) ms.
+
+> If in APmode it will cancel and reboot.
+
+> If it was connected to WI-FI it will show its IP. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1. Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue
+
+>> If it isn't connected to WI-FI it will start connecting to WI-FI (and possible go into AP mode, that is explained in 3.4 WI-FI page. 
 ## Pot meter
 The 4 pot meters are Red, Green, Blue and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
 ## WI-FI page
@@ -55,20 +61,20 @@ Leave fields blank (or for the password leaving only stars) to not update those 
 By default the SSID and password is limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 64. Going over these values results in unexpected behaviour. 
 ###Control
 The control page is the default landing page the user will land on when the lamp is connected to Wi-Fi.
-	The brightness slider will always change the brightness no matter in what mode it is in (except for AP since that is not a defined mode), these values are only send and updated on releasing the slide bar.
-	The RGB sliders will either (try) change the animation accent to the given RGB colour, or switch the mode to Wi-Fi control and set the RGB color.
-	Mode is the current mode the light is in.
-	Bootmode is the mode the light will go into on start-up.
-	Hourly animation is when the light is in the clock mode an hourly animation needs to be played.
-	DoublePressMode is the mode the light will switch to when a double press on the button is made.
-	Enable OTA will enable Arduino Over The Air updates, so the firmware can be updated remotely with the Arduino IDE.
-	Sync Time will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
-	Reset will fully restart the ESP
+* The brightness slider will always change the brightness no matter in what mode it is in (except for AP since that is not a defined mode), these values are only send and updated on releasing the slide bar.
+* The RGB sliders will either (try) change the animation accent to the given RGB colour, or switch the mode to Wi-Fi control and set the RGB color.
+* Mode is the current mode the light is in.
+* Bootmode is the mode the light will go into on start-up.
+* Hourly animation is when the light is in the clock mode an hourly animation needs to be played.
+* DoublePressMode is the mode the light will switch to when a double press on the button is made.
+* Enable OTA will enable Arduino Over The Air updates, so the firmware can be updated remotely with the Arduino IDE.
+* Sync Time will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
+* Reset will fully restart the ESP
 
 # Appendix
-## Firmware
+* Firmware
 https://github.com/jellewie/Arduino-Smart-light
-## PCB & schematic
+* PCB & schematic
 https://easyeda.com/jellewietsma/smart-light
-## 3D models
+* 3D models
 At the time of writing these are in this folde included
