@@ -63,6 +63,7 @@ void UpdateAndShowClock() {
 }
 
 bool UpdateTime() {
+  if (!WiFiManager_connected) return false; //If WIFI not connected, stop directly
 #ifdef Time_SerialEnabled
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled

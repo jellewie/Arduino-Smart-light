@@ -3,9 +3,10 @@
 
   TODO
   +Maybe add a way for an transition, like slowly turn on for x minutes??
+  +Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
   +Add timeout on clock sync request? seems to go for ever now
   
-  CHECK/SHOULD BE SOLVED: BootMode is now saves as string to EEPROM, this should be in byte form
+  CHECK/SHOULD BE SOLVED: Maybe add when (Mode=ClockMode and DoublePressMode=ClockMode), then sync time?
 */
 //#define SerialEnabled
 
@@ -115,7 +116,10 @@ void loop() {
       else
         Mode = OFF;
     }
-    if (Value.StartDoublePress) Mode = DoublePressMode;         //Cool RGB color palet mode
+    if (Value.StartDoublePress) {
+      if (Mode == CLOCK and DoublePressMode == CLOCK) UpdateTime();  //If in ClockMode and double press to ClockMode. then update the clock
+      Mode = DoublePressMode;         //Cool RGB color palet mode
+    }
     if (Value.StartLongPress) {
       Mode = WIFI;
       if (WiFiManager_connected){                               //If WIFI was already started
