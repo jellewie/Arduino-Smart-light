@@ -71,7 +71,7 @@ byte WiFiManager_Start() {
   WiFiManager_Status_Done();
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: connected; SSID=" + String(ssid) + " ip=");
-  Serial.print(WiFi.localIP());
+  Serial.println(WiFi.localIP());
 #endif //WiFiManager_SerialEnabled
   WiFiManager_connected = true;
   return 1;
