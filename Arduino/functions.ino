@@ -112,17 +112,17 @@ String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
 String ConvertModeToString(byte IN) {
-#ifdef Server_SerialEnabled
+#ifdef Convert_SerialEnabled
   Serial.println("ConvertModeToString '" + String(IN) + "'");
-#endif //Server_SerialEnabled
+#endif //Convert_SerialEnabled
   if (IN < Modes_Amount)
     return ModesString[IN];
   return "OFF";
 }
 int ConvertModeToInt(String IN) {
-#ifdef Server_SerialEnabled
+#ifdef Convert_SerialEnabled
   Serial.println("ConvertModeToInt '" + IN + "'");
-#endif //Server_SerialEnabled
+#endif //Convert_SerialEnabled
   if (StringisDigit(IN)) {
     if (IN.toInt() < Modes_Amount)
       return IN.toInt();

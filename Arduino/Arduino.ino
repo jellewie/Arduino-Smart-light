@@ -15,6 +15,7 @@
 #define     Time_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
+//#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
 bool WiFiManager_connected;                 //If the ESP is connected to WIFI
