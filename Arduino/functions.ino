@@ -59,16 +59,12 @@ void ShowIP() {
 #endif //SerialEnabled
 
   ShowIPnumber(MyIp[0]);
-  UpdateLEDs = true;
   MyDelay(2500);
   ShowIPnumber(MyIp[1]);
-  UpdateLEDs = true;
   MyDelay(2500);
   ShowIPnumber(MyIp[2]);
-  UpdateLEDs = true;
   MyDelay(2500);
   ShowIPnumber(MyIp[3]);
-  UpdateLEDs = true;
 }
 void ShowIPnumber(byte Number) {
 #ifdef SerialEnabled
@@ -76,16 +72,17 @@ void ShowIPnumber(byte Number) {
 #endif //SerialEnabled
   FastLED.clear();
   const static byte SectionLength = TotalLEDs / 10;
-  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[i] = CRGB(128, 128, 128);
+  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);
 
   byte A = (Number / 100) * SectionLength + 1;
   Number = Number % 100;                              //Modulo (so what is over when we keep deviding by whole 100)
   byte B = (Number / 10) * SectionLength + 1;
   byte C = (Number % 10) * SectionLength + 1;
 
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[A + i] += CRGB(255, 0, 0);
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[B + i] += CRGB(0, 255, 0);
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[C + i] += CRGB(0, 0, 255);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(A + i)] += CRGB(255, 0, 0);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(B + i)] += CRGB(0, 255, 0);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255);
+  UpdateLEDs = true;
 }
 void MyDelay(int ms) {                    //Just a non-blocking delay
   unsigned long StopAtTime = millis() + ms;
