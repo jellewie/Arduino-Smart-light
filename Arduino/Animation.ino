@@ -44,7 +44,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
       Animationjuggle(20, 8);                                                 //void Animationjuggle(byte Delay, byte Amount)
       break;
     case 5:
-      AnimationSinelon(RGBColor, 2, Start, 13);                               //void AnimationSinelon(byte rgb[3], byte DimBy, bool Return)
+      AnimationSinelon(RGBColor, 10, Start, 13);                               //void AnimationSinelon(byte rgb[3], byte DimBy, bool Return)
       break;
     case 6:
       SetNewColor();
