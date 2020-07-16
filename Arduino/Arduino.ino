@@ -122,13 +122,11 @@ void loop() {
       else
         Mode = OFF;
     }
-    if (Value.StartDoublePress) {
-      if (Mode == CLOCK and DoublePressMode == CLOCK) UpdateTime();  //If in ClockMode and double press to ClockMode. then update the clock
+    if (Value.StartDoublePress)
       Mode = DoublePressMode;         //Cool RGB color palet mode
-    }
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WiFiManager_connected){                               //If WIFI was already started
+      if (WiFiManager_connected) {                              //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }
