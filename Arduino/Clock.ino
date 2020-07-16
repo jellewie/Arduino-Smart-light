@@ -24,7 +24,7 @@ void UpdateAndShowClock() {
 #ifdef Time_SerialEnabled
           Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
-          StartAnimation(random(0, TotalAnimations), AnimationCounterTime);       //Start a random Animation
+          StartAnimation(random(0, TotalAnimations), AnimationCounterTime); //Start a random Animation
           return;
         }
       }
@@ -33,7 +33,7 @@ void UpdateAndShowClock() {
       static bool TimeFlag = false;
       if (TimeCurrent.HH == 4 and !TimeFlag) {
         TimeFlag = true;
-        if (!UpdateTime())                                     //Get a new sync timestamp from the server
+        if (!UpdateTime())                    //Get a new sync timestamp from the server
           WiFiManager_connected = false;
       } else
         TimeFlag = false;
@@ -41,29 +41,29 @@ void UpdateAndShowClock() {
     //==============================
     //Show the time on the LEDs if needed
     //==============================
-    static byte LastSec = TimeCurrent.SS;                 //Store 'second' as a 'update alread done' state. so if the seconds counter changes we update and else we skip updating
+    static byte LastSec = TimeCurrent.SS;     //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
     if (LastSec != TimeCurrent.SS) {
       LastSec = TimeCurrent.SS;
       FastLED.clear();
-      byte LEDss = TimeCurrent.SS + ClockOffset;
-      while (LEDss >= 60)
-        LEDss -= 60;
-      LEDs[LEDss] += CRGB(0, 0, 255);
-      byte LEDmm = TimeCurrent.MM + ClockOffset;
-      while (LEDmm >= 60)
-        LEDmm -= 60;
-      LEDs[LEDmm] += CRGB(0, 255, 0);
-      byte LEDhh = TimeCurrent.HH * 5 + ClockOffset;
-      while (LEDhh >= 60)
-        LEDhh -= 60;
-      LEDs[LEDhh] += CRGB(255, 0, 0);
+      LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
+      LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 0, 255);
+      LEDs[LEDtoPosition(TimeCurrent.HH * 5)] += CRGB(0, 0, 255);
       UpdateLEDs = true;
     }
   }
 }
 
+byte LEDtoPosition(byte LEDID) {
+  //Takes ClockOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
+  //Basicly adding ClockOffset to the LED and wrapping LEDS around
+  LEDID += ClockOffset;
+  while (LEDID >= TotalLEDs)
+    LEDID -= TotalLEDs;
+  return LEDID;
+}
+
 bool UpdateTime() {
-  if (!WiFiManager_connected) return false; //If WIFI not connected, stop directly
+  if (!WiFiManager_connected) return false;   //If WIFI not connected, stop right away
 #ifdef Time_SerialEnabled
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled
