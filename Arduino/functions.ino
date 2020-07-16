@@ -49,7 +49,7 @@ bool StartWIFIstuff() {
   return false;
 }
 void ShowIP() {
-  //The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1. 
+  //The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1.
   //Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10
   //so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue
   IPAddress MyIp = WiFi.localIP();

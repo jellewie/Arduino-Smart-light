@@ -5,11 +5,13 @@
   +Maybe add a way for an transition, like slowly turn on for x minutes??
   +Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
   +Add timeout on clock sync request? seems to go for ever now
-  
-  CHECK/SHOULD BE SOLVED: Maybe add when (Mode=ClockMode and DoublePressMode=ClockMode), then sync time?
+  +Test pin 36 and 39 are analog compatible (should be ADC2) and if we can use it for a LDR sensor. Also add LDR programming code to have a global AutoBrightness
+  +Can we higher the analog read resolution and scale it down more to get a more acurate/stable signal?
+
+  CHECK: Make it so ShowIP takes ClockOffset into account (ADDED LEDtoPosition)
+  CAN NEVER OCCUR: Maybe add when (Mode=ClockMode and DoublePressMode=ClockMode), then sync time?
 */
 //#define SerialEnabled
-
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
 #define     Server_SerialEnabled
@@ -19,17 +21,18 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-bool WiFiManager_connected;                 //If the ESP is connected to WIFI
+bool WiFiManager_connected;               //If the ESP is connected to WIFI
 #include <FastLED.h>
 #include "StableAnalog.h"
 #include "Button.h"
 #include "functions.h"
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
-#include <WiFi.h>                         //we need this for wifi stuff (duh)
+#include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
 WebServer server(80);
-
-const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
+//========================================//
+//User Variables
+//========================================//
 const byte PAO_LED = 25;                  //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                    //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                    //
@@ -37,29 +40,32 @@ const byte PAI_B = 34;                    //
 const byte PAI_Brightness = 35;           //
 const byte PDI_Button = 26;               //pulled down with 10k to GND
 
-#define PotMinChange 2                    //Howmuch the pot_value needs to change before we process it 
-#define PotStick PotMinChange + 1         //if this close to HIGH or LOW stick to it
-#define PotMin PotMinChange + 2           //On howmuch fast pot_value_change to change mode to manual. 0-255. 
-
+const byte PotMinChange = 2;              //How much the pot_value needs to change before we process it
+const byte PotStick = PotMinChange + 1;   //If this close to HIGH or LOW stick to it
+const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to change, to set mode to manual
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
-TimeS TimeCurrent = {4};                  //Where we save the time to, set to H=4 so it time syncs on startup
-byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 hours can be UP
+byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 hours can be UP. does NOT work in Animations
+//========================================//
+//End of User Variables
+//========================================//
+const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
+bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
+bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to physically update the LEDs
+byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
+byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
+byte Mode;                                //Holds in which mode the light is currently in
+byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
-bool DoHourlyAnimation = true;            //If we need to show an animation every hour if we are in CLOCK mode
-int BootMode = OFF;
-int DoublePressMode = RAINBOW;
 
-Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 CRGB LEDs[TotalLEDs];
+TimeS TimeCurrent = {4};                  //Where we save the time to, set to H=4 so it time syncs on startup
+Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
-bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
-byte Mode;                                //Holds the currentmode the light is in
-byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 
 void setup() {
 #ifdef SerialEnabled
