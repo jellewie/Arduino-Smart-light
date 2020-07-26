@@ -282,6 +282,9 @@
                 let r = redSlider.value01 * brightnessSlider.value01 * 255;
                 let g = greenSlider.value01 * brightnessSlider.value01 * 255;
                 let b = blueSlider.value01 * brightnessSlider.value01 * 255;
+				r = Math.pow(r,1/2.2) * 255;
+				g = Math.pow(g,1/2.2) * 255;
+				b = Math.pow(b,1/2.2) * 255;
                 let selectedColor = `rgb(${r},${g},${b})`;
                 let perceivedBrightness = Math.round((r * 299 + g * 587 + b * 114) / 1000);
                 let uiBrightness = perceivedBrightness > 125 ? 0 : 255;
