@@ -166,17 +166,18 @@ void WiFiManager_handle_Settings() {
     int j = WiFiManager_ArguName.toInt();
     if (j > 0 and j < 255 and WiFiManager_ArgValue != "") {
       if (WiFiManager_Set_Value(j, WiFiManager_ArgValue))
-        WiFiManager_MSG += "Succesfull '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'" + char(13);
+        WiFiManager_MSG += "Succesfull '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'\n";
       else
-        WiFiManager_MSG += "ERROR Set; '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'" + char(13);
+        WiFiManager_MSG += "ERROR Set; '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'\n";
     } else {
       WiFiManager_Code = 422;   //Flag we had a error
-      WiFiManager_MSG += "ERROR ID; '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'" + char(13);
+      WiFiManager_MSG += "ERROR ID; '" + WiFiManager_ArguName + "'='" + WiFiManager_ArgValue + "'\n";
     }
   }
   WiFiManager_WaitOnAPMode = false;     //Flag we have input data, and we can stop waiting in APmode on data
   WiFiManager_WriteEEPROM();
-  WiFiManager_MSG += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used";
+  WiFiManager_MSG += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used\n";
+  WiFiManager_MSG += "Code version " +  String(CompileDate);
   server.send(WiFiManager_Code, "text/plain", WiFiManager_MSG);
   for (byte i = 50; i > 0; i--) {   //Add some delay here, to send feedback to the client, i is delay in MS to still wait
     server.handleClient();

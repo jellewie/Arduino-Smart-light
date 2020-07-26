@@ -10,7 +10,7 @@
   +Add compile date to EEPROM so the version can be checked, needs to be accesable from a webpage
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
 */
-#define SerialEnabled
+//#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
 #define     Server_SerialEnabled
@@ -54,6 +54,7 @@ byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the 
 //========================================//
 //End of User Variables
 //========================================//
+const String CompileDate = String(__DATE__) + " " + String(__TIME__); //Set Compile date to the date we compile this
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
 byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
@@ -97,6 +98,7 @@ void setup() {
   server.on("/ota",         handle_EnableOTA);
   server.on("/time",        handle_UpdateTime);
   server.on("/task",        handle_GetTasks);
+  server.on("/version",     handle_Version);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode

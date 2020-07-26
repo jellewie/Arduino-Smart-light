@@ -18,7 +18,7 @@
 //      else if (ArguName == PreFixAnimationtime)
 //        AnimationTime = ArgValue;
 //      else
-//        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'" + char(13);
+//        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
 //    }
 //  }
 //  StartAnimation(AnimationID, AnimationTime);       //Start a random Animation

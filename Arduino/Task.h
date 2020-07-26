@@ -116,7 +116,7 @@ String GetTaskList() {
   String R;
   for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
     if (TaskList[i].ID > 0) {                   //If there is a task
-      if (R != "") R += char(13);               //If there is already an entry, start a new line
+      if (R != "") R += "\n";               //If there is already an entry, start a new line
       R += "T:" + String(i) + " ID=" + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt - millis()) + "ms with values " + String(TaskList[i].VariableA) + " and " + String(TaskList[i].VariableB) + " and " + String(TaskList[i].VariableC);
     }
   }
