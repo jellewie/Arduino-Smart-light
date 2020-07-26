@@ -14,7 +14,7 @@
 
    You can use "strip_ip, gateway_ip, subnet_mask" to set a static connection
 
-   HOW TO ADD CUSTOM CALUES
+   HOW TO ADD CUSTOM VALUES
    -"WiFiManager_VariableNames" Add the 'AP settings portal' name
    -"WiFiManager_EEPROM_SIZE"   [optional] Make sure it is big enough for your needs, SIZE_SSID+SIZE_PASS+YourValues (1 byte = 1 character)
    -"WiFiManager_Set_Value"     Set the action on what to do on startup with this value

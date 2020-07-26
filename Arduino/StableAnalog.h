@@ -1,6 +1,6 @@
 /* Written by JelleWho https://github.com/jellewie */
 #define AverageAmount 16                  //On how much points to take the average from      
-#define AnalogResolution 9                //howmany bits an analog read is
+#define AnalogResolution 12               //howmany bits an analog read is
 #define AnalogScaler pow(2,(AnalogResolution - 8))
 
 struct POT {

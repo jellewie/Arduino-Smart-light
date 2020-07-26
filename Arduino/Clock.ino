@@ -46,8 +46,8 @@ void UpdateAndShowClock() {
       LastSec = TimeCurrent.SS;
       FastLED.clear();
       LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
-      LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 0, 255);
-      LEDs[LEDtoPosition(TimeCurrent.HH * 5)] += CRGB(0, 0, 255);
+      LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
+      LEDs[LEDtoPosition(TimeCurrent.HH * 5)] += CRGB(255, 0, 0);
       UpdateLEDs = true;
     }
   }

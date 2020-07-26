@@ -6,27 +6,31 @@
   +Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
   +Add timeout on clock sync request? seems to go for ever now
   +Test pin 36 and 39 are analog compatible (should be ADC2) and if we can use it for a LDR sensor. Also add LDR programming code to have a global AutoBrightness
-  +Can we higher the analog read resolution and scale it down more to get a more acurate/stable signal?
-
-  CHECK: Make it so ShowIP takes ClockOffset into account (ADDED LEDtoPosition)
-  CAN NEVER OCCUR: Maybe add when (Mode=ClockMode and DoublePressMode=ClockMode), then sync time?
+  +Is it posible to adjust brightness in WIFI connnect/APmode???
+  +Add compile date to EEPROM so the version can be checked, needs to be accesable from a webpage
+  +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
 */
-//#define SerialEnabled
+#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
 #define     Server_SerialEnabled
 #define     Time_SerialEnabled
+#define     Task_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
 bool WiFiManager_connected;               //If the ESP is connected to WIFI
+byte Mode;                                //Holds in which mode the light is currently in
+bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to physically update the LEDs
+
 #include <FastLED.h>
 #include "StableAnalog.h"
 #include "Button.h"
 #include "functions.h"
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
+#include "Task.h"
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
 WebServer server(80);
@@ -46,16 +50,14 @@ const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
-byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 hours can be UP. does NOT work in Animations
+byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 //========================================//
 //End of User Variables
 //========================================//
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
-bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to physically update the LEDs
 byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
-byte Mode;                                //Holds in which mode the light is currently in
 byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 
@@ -77,7 +79,7 @@ void setup() {
   //Init LED and let them shortly blink
   //==============================
   pinMode(PAO_LED, OUTPUT);
-  FastLED.addLeds<WS2812, PAO_LED, GRB>(LEDs, TotalLEDs);
+  FastLED.addLeds<WS2813, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
     fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));
@@ -94,6 +96,7 @@ void setup() {
   server.on("/get",         handle_Getcolors);
   server.on("/ota",         handle_EnableOTA);
   server.on("/time",        handle_UpdateTime);
+  server.on("/task",        handle_GetTasks);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode
@@ -104,10 +107,10 @@ void setup() {
   Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
 }
-
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed
   WiFiManager_RunServer();                            //Do WIFI server stuff if needed
+  ExecuteTask();
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
 #ifdef SerialEnabled        //DEBUG, print button state to serial
@@ -126,23 +129,23 @@ void loop() {
       Mode = DoublePressMode;         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WiFiManager_connected) {                              //If WIFI was already started
+      if (WiFiManager_connected) {    //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }
     };
-    if (Value.PressedLong) {                          //If it is/was a long press
+    if (Value.PressedLong) {          //If it is/was a long press
       if (Value.PressedTime > Time_ESPrestartMS - 1000) //If we are almost resetting
         Mode = RESET;
     }
-    UpdateBrightness(false);      //Check if manual input potmeters has changed, if so flag the update
-    UpdateColor(false);           //Check if manual input potmeters has changed, if so flag the update
+    UpdateBrightness(false);          //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);               //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
 }
 
 void loopLEDS() {
-  if (AnimationCounter != 0)   //Animation needs to be shown
+  if (AnimationCounter != 0)      //Animation needs to be shown
     ShowAnimation(false);
   switch (Mode) {
     case OFF:

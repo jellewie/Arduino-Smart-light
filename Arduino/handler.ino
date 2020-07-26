@@ -19,6 +19,17 @@
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
+//<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
+#define PreFixMode  "t"   //a=Add r=Remove
+#define PreFixID    "i"   //Task ID
+#define PreFixA     "a"   //Task VariableA
+#define PreFixB     "b"   //Task VariableB
+#define PreFixC     "c"   //Task VariableB
+
+#define PreFixTimeS "s"   //In how much seconds the task needs to be executed
+#define PreFixTimeM "m"   //In how much minutes the task needs to be executed
+#define PreFixTimeH "h"   //In how much hours   the task needs to be executed
+
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
   bool DoWriteToEEPROM = false;
@@ -178,20 +189,20 @@ void handle_UpdateTime() {
         TimeUpdated = true;
         TimeCurrent.SS = ArgValue;
       } else
-        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'" + char(13);
+        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
     }
   } else {                                    //If no manual time given, just get it from a time server
     if (UpdateTime())         //Update the time, and if not posible..
       TimeUpdated = true;
     else
-      ERRORMSG += "Could not get updated time from the server" + char(13);
+      ERRORMSG += "Could not get updated time from the server\n";
   }
 
   if (TimeUpdated)    //If time has updated
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   else {
     if (ERRORMSG == "")
-      ERRORMSG = "Nothing to update the time to" + char(13);
+      ERRORMSG = "Nothing to update the time to\n";
     message = "Current time is " + message;
   }
 
@@ -204,18 +215,94 @@ void handle_UpdateTime() {
   Serial.println("SV: 200/400 " + ERRORMSG + message);
 #endif //Server_SerialEnabled
 }
+void handle_GetTasks() {
+  String ERRORMSG = "";
+  String Message;
+  if (server.args() > 0) {                      //If manual time given
+    TASK TempTask;
+    byte TaskMode;
+    for (int i = 0; i < server.args(); i++) {
+      String ArguName = server.argName(i);
+      ArguName.toLowerCase();
+      int ArgValue = server.arg(i).toInt();
+      if (ArguName == PreFixMode) {
+        TaskMode = ArgValue;
+      } else if (ArguName == PreFixID) {
+        TempTask.ID = ArgValue;
+      } else if (ArguName == PreFixA) {
+        TempTask.VariableA = ArgValue;
+      } else if (ArguName == PreFixB) {
+        TempTask.VariableB = ArgValue;
+      } else if (ArguName == PreFixC) {
+        TempTask.VariableC = ArgValue;
+      } else if (ArguName == PreFixTimeS) {
+        TempTask.ExectuteAt = ArgValue * 1000;
+      } else if (ArguName == PreFixTimeM) {
+        TempTask.ExectuteAt = ArgValue * 60000;
+      } else if (ArguName == PreFixTimeH) {
+        TempTask.ExectuteAt = ArgValue * 3600000;
+      } else
+        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
+    }
+    if (TempTask.ExectuteAt == 0) {
+      ERRORMSG += "No Task time given\n";
+    } else {
+      if (TempTask.ID == 0) {
+        ERRORMSG += "No Task ID given\n";
+      } else {
+        TempTask.ExectuteAt += millis();
+        switch (TaskMode) {
+          case 0:
+            ERRORMSG += "No Task mode given\n";
+            break;
+          case 1:
+            if (!AddTask(TempTask))
+              ERRORMSG += "No more room to add tasks\n";
+            break;
+          case 3:
+            if (!RemoveTask(TempTask.ID))
+              ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
+            break;
+        }
+      }
+    }
+  }
+  Message += GetTaskList();
+  //    for (byte i = 0; i < TaskLimit; i++) {         //For each task in the list
+  //      if (TaskList[i].ID > 0) {                   //If there is a task
+  //        if (R != "") R += "\n";               //If there is already an entry, start a new line
+  //        //
+  //      }
+  //    }
+
+  if (ERRORMSG != "")
+    server.send(400, "text/plain", ERRORMSG + Message);
+  else
+    server.send(200, "text/plain", Message);
+
+#ifdef Server_SerialEnabled
+  Serial.println("SV: 200/400 " + ERRORMSG + Message);
+#endif //Server_SerialEnabled
+}
+
+
+
+
+
+
+
 void handle_NotFound() {
-  String message = "ERROR URL NOT FOUND: '";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += server.uri();
-  if (server.args() > 0) message += "?";
+  String Message = "ERROR URL NOT FOUND: '";
+  Message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  Message += server.uri();
+  if (server.args() > 0) Message += "?";
   for (byte i = 0; i < server.args(); i++) {
     if (i != 0)
-      message += "&";
-    message += server.argName(i) + "=" + server.arg(i);
+      Message += "&";
+    Message += server.argName(i) + "=" + server.arg(i);
   }
-  server.send(404, "text/plain", message);
+  server.send(404, "text/plain", Message);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 404 " + message);
+  Serial.println("SV: 404 " + Message);
 #endif //Server_SerialEnabled
 }

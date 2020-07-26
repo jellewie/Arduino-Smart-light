@@ -13,7 +13,8 @@ A smart 3D printed light bulb, its a smart light that includes for example; wifi
 just as a quick hint; make sure to upload the sketch to ESP before embedding it in.
 
 =========================================================
-
+Below data is an old written version of the Word document made on 2020-07-16, please reffer the Word document for more up-to-date information
+=========================================================
 # Quick start guide
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful. The power supply is either 5V or 12V and the lamp will consume 18 watts at maximum, so as an example for 5V a 3.6A power supply is required to allow full brightness. 
@@ -46,14 +47,17 @@ Although these options change a bit over time, here is a list of 3 actions what 
 
 > If in APmode it will cancel and reboot.
 
-> If it was connected to WI-FI it will show its IP. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1. Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue
+> If it was connected to WI-FI it will show its IP. that is explained in 3.4 WI-FI page - Getting it’s IP.
 
->> If it isn't connected to WI-FI it will start connecting to WI-FI (and possible go into AP mode, that is explained in 3.4 WI-FI page. 
+> If it isn’t connected to WI-FI it will start connecting to WI-FI (and possible go into AP mode, that is explained in 3.4 WI-FI page - Setup. 
 ## Pot meter
 The 4 pot meters are Red, Green, Blue and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
 ## WI-FI page
 Here are the 2 most important pages listed with their descriptions. Keep in mind more functions could be added or a different layout could be used, but the intention should be the same as these.
 Some special functions like manual updating time (IP/time?h=2&m=4&s=1) are not listed here. If important things missing feel free to contact me, but all functions can be found in the code. 
+## Getting it’s IP
+To trigger this menu please see 3.2 Button, this part is just about how to read it.
+The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue
 ###Setup
 The setup page will be accessible and shown in APmode, but can also be access by going to `IP/setup'.
 The password is replaced with starts, and cannot be received without changing the firmware. 
