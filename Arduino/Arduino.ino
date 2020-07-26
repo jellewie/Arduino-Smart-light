@@ -2,12 +2,11 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json DOIT ESP32 DEVKIT V1
 
   TODO
-  +Maybe add a way for an transition, like slowly turn on for x minutes??
-  +Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
-  +Add timeout on clock sync request? seems to go for ever now
+  +[Working on it] Maybe add a way for an transition, like slowly turn on for x minutes??
+  +[Working on it] Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
   +Test pin 36 and 39 are analog compatible (should be ADC2) and if we can use it for a LDR sensor. Also add LDR programming code to have a global AutoBrightness
+  +Add timeout on clock sync request? seems to go for ever now
   +Is it posible to adjust brightness in WIFI connnect/APmode???
-  +Add compile date to EEPROM so the version can be checked, needs to be accesable from a webpage
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
 */
 //#define SerialEnabled
