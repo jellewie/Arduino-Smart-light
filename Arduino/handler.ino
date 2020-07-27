@@ -22,9 +22,9 @@
 //<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixMode  "t"   //a=Add r=Remove
 #define PreFixID    "i"   //Task ID
-#define PreFixA     "a"   //Task VariableA
-#define PreFixB     "b"   //Task VariableB
-#define PreFixC     "c"   //Task VariableB
+#define PreFixA     "a"   //Task A
+#define PreFixB     "b"   //Task B
+#define PreFixC     "c"   //Task B
 
 #define PreFixTimeS "s"   //In how much seconds the task needs to be executed
 #define PreFixTimeM "m"   //In how much minutes the task needs to be executed
@@ -256,11 +256,11 @@ void handle_GetTasks() {
       } else if (ArguName == PreFixID) {
         TempTask.ID = ArgValue;
       } else if (ArguName == PreFixA) {
-        TempTask.VariableA = ArgValue;
+        TempTask.A = ArgValue;
       } else if (ArguName == PreFixB) {
-        TempTask.VariableB = ArgValue;
+        TempTask.B = ArgValue;
       } else if (ArguName == PreFixC) {
-        TempTask.VariableC = ArgValue;
+        TempTask.C = ArgValue;
       } else if (ArguName == PreFixTimeS) {
         TempTask.ExectuteAt.SS = ArgValue;
       } else if (ArguName == PreFixTimeM) {

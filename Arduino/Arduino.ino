@@ -132,6 +132,7 @@ void setup() {
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed
   WiFiManager_RunServer();                            //Do WIFI server stuff if needed
+  if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
@@ -206,7 +207,7 @@ void loopLEDS() {
         StartWIFIstuff();                     //Start WIFI if we haven't
       }
       if (AnimationCounter == 0)            //If no (hourly) animation is playing
-        UpdateAndShowClock();
+        UpdateAndShowClock(true);
       break;
 
     //Animations
