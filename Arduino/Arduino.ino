@@ -55,7 +55,8 @@ const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
-byte ClockOffset = 30;                    //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
+const byte ClockOffset = 30;              //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
+#define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
 //========================================//
 //End of User Variables
 //========================================//
@@ -85,7 +86,7 @@ void setup() {
   //Init LED and let them shortly blink
   //==============================
   pinMode(PAO_LED, OUTPUT);
-  FastLED.addLeds<WS2813, PAO_LED, GRB>(LEDs, TotalLEDs);
+  FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
     fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));
