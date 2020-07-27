@@ -309,8 +309,9 @@ void handle_GetTasks() {
 #endif //Server_SerialEnabled
 }
 
-void handle_Version() {
-  String Message = "Code version " + String(CompileDate);
+void handle_Info() {
+  String Message = "Code compiled on " +  String(CompileDate) + "/n"
+                   "MAC adress = " +  String(WiFi.macAddress());
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 " + Message);

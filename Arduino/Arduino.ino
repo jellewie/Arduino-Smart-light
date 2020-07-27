@@ -10,7 +10,7 @@
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
   +Add MDNS
   +Check if we can do something about the timeinterfall of boradkast SSID in Apmode
-  +Add MAC-adres to setup-page
+  +[Check it] Add MAC-adres to setup-page
 */
 //#define SerialEnabled
 #ifdef SerialEnabled
@@ -103,7 +103,7 @@ void setup() {
   server.on("/ota",         handle_EnableOTA);
   server.on("/time",        handle_UpdateTime);
   server.on("/task",        handle_GetTasks);
-  server.on("/version",     handle_Version);
+  server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode

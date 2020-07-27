@@ -150,7 +150,9 @@ void WiFiManager_handle_Connect() {
   for (byte i = 1; i < WiFiManager_Settings + 1; i++)
     WiFiManager_Temp_HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + "</label><input type=\"text\" name=\"" + i + "\" value=\"" + WiFiManager_Get_Value(i, false) + "\"></div>";
   WiFiManager_Temp_HTML += "<button>Send</button></form>";
-  WiFiManager_Temp_HTML += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used";
+  WiFiManager_Temp_HTML += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used/n";
+  WiFiManager_Temp_HTML += "Code compiled on " +  String(CompileDate) + "/n";
+  WiFiManager_Temp_HTML += "MAC adress = " +  String(WiFi.macAddress());
   server.send(200, "text/html", WiFiManager_Temp_HTML);
 }
 void WiFiManager_handle_Settings() {
@@ -176,8 +178,7 @@ void WiFiManager_handle_Settings() {
   }
   WiFiManager_WaitOnAPMode = false;     //Flag we have input data, and we can stop waiting in APmode on data
   WiFiManager_WriteEEPROM();
-  WiFiManager_MSG += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used\n";
-  WiFiManager_MSG += "Code version " +  String(CompileDate);
+  WiFiManager_MSG += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used";
   server.send(WiFiManager_Code, "text/plain", WiFiManager_MSG);
   for (byte i = 50; i > 0; i--) {   //Add some delay here, to send feedback to the client, i is delay in MS to still wait
     server.handleClient();
