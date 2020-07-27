@@ -8,7 +8,7 @@
   +Add timeout on clock sync request? seems to go for ever now
   +Is it posible to adjust brightness in WIFI connnect/APmode???
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
-  +Add MDNS
+  +[Check it] Add MDNS
   +Check if we can do something about the timeinterfall of boradkast SSID in Apmode
   +[Check it] Add MAC-adres to setup-page
 */
@@ -35,6 +35,7 @@ bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to phy
 #include "Task.h"
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
+#include <ESPmDNS.h>
 WebServer server(80);
 //========================================//
 //User Variables
@@ -57,6 +58,7 @@ const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
 const byte ClockOffset = 30;              //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
+const char mDNSname[] = "esp32";          //On what url the ESP can also be accesed on (besides the ip) for example 'www.esp32.local'
 //========================================//
 //End of User Variables
 //========================================//
@@ -114,6 +116,17 @@ void setup() {
 #ifdef SerialEnabled
   Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
+  //==============================
+  //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
+  //==============================
+  bool MDNSStatus = MDNS.begin(mDNSname);             //Start mDNS with the given domain name
+  if (MDNSStatus) MDNS.addService("http", "tcp", 80); //Add service to MDNS-SD
+#ifdef SerialEnabled
+  if (MDNSStatus)
+    Serial.println("Error setting up MDNS responder!");
+  else
+    Serial.println("mDNS responder started");
+#endif
 }
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed
