@@ -23,14 +23,16 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-bool WiFiManager_connected;               //If the ESP is connected to WIFI
-byte Mode;                                //Holds in which mode the light is currently in
 bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to physically update the LEDs
+bool WiFiManager_connected;               //If the ESP is connected to WIFI
+bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+byte Mode;                                //Holds in which mode the light is currently in
 
 #include <FastLED.h>
 #include "StableAnalog.h"
 #include "Button.h"
 #include "functions.h"
+TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
 #include "Task.h"
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
@@ -71,7 +73,6 @@ byte LastMode = -1;                       //Just to keep track if we are steppin
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 
 CRGB LEDs[TotalLEDs];
-TimeS TimeCurrent = {4};                  //Where we save the time to, set to H=4 so it time syncs on startup
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);

@@ -83,5 +83,6 @@ bool UpdateTime() {
     TimeCurrent.MM = timeinfo.tm_min;
     TimeCurrent.SS = timeinfo.tm_sec;
   }
+  TimeSet = true;
   return true;
 }

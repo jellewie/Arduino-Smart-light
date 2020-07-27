@@ -20,15 +20,16 @@ struct TASK {
   byte VariableA = 0;           //If you want to add some data to the task, for example a pin number
   byte VariableB = 0;           //If you want to add even more data to the task, for example a pin state
   int  VariableC = 0;           //If you want to add even more data to the task, for example a time interfal
-  unsigned long ExectuteAt = 0; //The time in millis to execute this task
+  TimeS ExectuteAt = {0, 0, 0, 0}; //The time in millis to execute this task
 };
+
 TASK TaskList[TaskLimit];
 bool AddTask(TASK Item) {
   for (int i = 0; i < TaskLimit; i++) { //For each pin that is allowed
     if (TaskList[i].ID == 0) {          //If there is no task
       TaskList[i] = Item;
 #ifdef Task_SerialEnabled
-      Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt - millis()) + "ms");
+      Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms");
 #endif //Task_SerialEnabled
       return true;
     }
@@ -41,7 +42,8 @@ bool AddTask(TASK Item) {
 bool DoTask(TASK Item) {
   bool returnValue = true;
 #ifdef Task_SerialEnabled
-  Serial.println("T: DoTask " + String(Item.ID) + " a=" + String(Item.VariableA) + " b=" + String(Item.VariableB) + " at=" + String(Item.ExectuteAt) + " now=" + String(millis()));
+  Serial.println("T: DoTask " + String(Item.ID) + " a=" + String(Item.VariableA) + " b=" + String(Item.VariableB)+ " c=" + String(Item.VariableC));
+  
 #endif //Task_SerialEnabled
   switch (Item.ID) {
     case SWITCHMODE:
@@ -64,7 +66,7 @@ bool DoTask(TASK Item) {
           BRI = BRI - Item.VariableA;
           if (Item.VariableC > 0) {     //If we need to go further, and need to create another task
             TASK TempTask = Item;
-            TempTask.ExectuteAt = millis() + Item.VariableC;
+            TempTask.ExectuteAt.Ticks = millis() + Item.VariableC;
             AddTask(TempTask);
           }
         }
@@ -85,7 +87,7 @@ bool DoTask(TASK Item) {
           Now += Item.VariableA;
           if (Item.VariableC > 0) {
             TASK TempTask = Item;
-            TempTask.ExectuteAt = millis() + Item.VariableC;
+            TempTask.ExectuteAt.Ticks = millis() + Item.VariableC;
             AddTask(TempTask);
           }
         }
@@ -105,9 +107,16 @@ bool DoTask(TASK Item) {
 void ExecuteTask() {
   for (int i = 0; i < TaskLimit; i++) {         //For each task in the list
     if (TaskList[i].ID > 0) {                   //If there is a task
-      if (TaskList[i].ExectuteAt <= millis()) { //If the execute time has pasted
-        DoTask(TaskList[i]);                    //Execute this task entry
-        TaskList[i].ID = 0;                     //Clear this task entry
+      if (TaskList[i].ExectuteAt.Ticks > 0) {
+        if (TaskList[i].ExectuteAt.Ticks <= millis()) { //If the execute time has pasted
+          DoTask(TaskList[i]);                    //Execute this task entry
+          TaskList[i].ID = 0;                     //Clear this task entry
+        }
+      } else if (TimeSet and (TaskList[i].ExectuteAt.SS > 0 or TaskList[i].ExectuteAt.MM > 0 or TaskList[i].ExectuteAt.HH > 0)) {
+        if (TaskList[i].ExectuteAt.SS == TimeCurrent.SS and TaskList[i].ExectuteAt.MM == TimeCurrent.MM and TaskList[i].ExectuteAt.HH == TimeCurrent.HH) {
+          DoTask(TaskList[i]);                    //Execute this task entry
+          TaskList[i].ID = 0;                     //Clear this task entry
+        }
       }
     }
   }
@@ -117,7 +126,7 @@ String GetTaskList() {
   for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
     if (TaskList[i].ID > 0) {                   //If there is a task
       if (R != "") R += "\n";               //If there is already an entry, start a new line
-      R += "T:" + String(i) + " ID=" + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt - millis()) + "ms with values " + String(TaskList[i].VariableA) + " and " + String(TaskList[i].VariableB) + " and " + String(TaskList[i].VariableC);
+      R += "T:" + String(i) + " ID=" + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms with values " + String(TaskList[i].VariableA) + " and " + String(TaskList[i].VariableB) + " and " + String(TaskList[i].VariableC);
     }
   }
   if (R == "") R = "No task in the tasklist";

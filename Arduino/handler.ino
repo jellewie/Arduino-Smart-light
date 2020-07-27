@@ -223,9 +223,10 @@ void handle_UpdateTime() {
       ERRORMSG += "Could not get updated time from the server\n";
   }
 
-  if (TimeUpdated)    //If time has updated
+  if (TimeUpdated) {   //If time has updated
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
-  else {
+    TimeSet = true;
+  } else {
     if (ERRORMSG == "")
       ERRORMSG = "Nothing to update the time to\n";
     message = "Current time is " + message;
@@ -261,28 +262,34 @@ void handle_GetTasks() {
       } else if (ArguName == PreFixC) {
         TempTask.VariableC = ArgValue;
       } else if (ArguName == PreFixTimeS) {
-        TempTask.ExectuteAt = ArgValue * 1000;
+        TempTask.ExectuteAt.SS = ArgValue;
       } else if (ArguName == PreFixTimeM) {
-        TempTask.ExectuteAt = ArgValue * 60000;
+        TempTask.ExectuteAt.MM = ArgValue;
       } else if (ArguName == PreFixTimeH) {
-        TempTask.ExectuteAt = ArgValue * 3600000;
+        TempTask.ExectuteAt.HH = ArgValue;
       } else
         ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
     }
-    if (TempTask.ExectuteAt == 0) {
+    if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.SS == 0 and TempTask.ExectuteAt.MM == 0 and TempTask.ExectuteAt.HH == 0) {
       ERRORMSG += "No Task time given\n";
     } else {
       if (TempTask.ID == 0) {
         ERRORMSG += "No Task ID given\n";
       } else {
-        TempTask.ExectuteAt += millis();
+        if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
+          TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
+          TempTask.ExectuteAt.SS = 0;             //Reset the time, we dont use these
+          TempTask.ExectuteAt.MM = 0;
+          TempTask.ExectuteAt.HH = 0;
+        } else if (TimeSet)
+          ERRORMSG += "Warning time is not yet set/synced\n";
         switch (TaskMode) {
           case 0:
             ERRORMSG += "No Task mode given\n";
             break;
           case 1:
             if (!AddTask(TempTask))
-              ERRORMSG += "No more room to add tasks\n";
+              ERRORMSG += "Could not add tasks\n";
             break;
           case 3:
             if (!RemoveTask(TempTask.ID))
