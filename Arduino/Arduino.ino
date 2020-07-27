@@ -39,6 +39,9 @@ WebServer server(80);
 //========================================//
 //User Variables
 //========================================//
+#if !defined(ESP32)
+#error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
+#endif
 const byte PAO_LED = 25;                  //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                    //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                    //
