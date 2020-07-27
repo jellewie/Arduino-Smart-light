@@ -8,6 +8,9 @@
   +Add timeout on clock sync request? seems to go for ever now
   +Is it posible to adjust brightness in WIFI connnect/APmode???
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
+  +Add MDNS
+  +Check if we can do something about the timeinterfall of boradkast SSID in Apmode
+  +Add MAC-adres to setup-page
 */
 //#define SerialEnabled
 #ifdef SerialEnabled
