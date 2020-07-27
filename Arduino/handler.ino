@@ -317,8 +317,9 @@ void handle_GetTasks() {
 }
 
 void handle_Info() {
-  String Message = "Code compiled on " +  String(CompileDate) + "/n"
-                   "MAC adress = " +  String(WiFi.macAddress());
+  String Message = "Code compiled on " +  String(CompileDate) + "\n"
+                   "MAC adress = " +  String(WiFi.macAddress()) + "\n"
+                   "IP adress = " + String(WiFi.localIP());
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 " + Message);

@@ -150,8 +150,7 @@ void WiFiManager_handle_Connect() {
   for (byte i = 1; i < WiFiManager_Settings + 1; i++)
     WiFiManager_Temp_HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + "</label><input type=\"text\" name=\"" + i + "\" value=\"" + WiFiManager_Get_Value(i, false) + "\"></div>";
   WiFiManager_Temp_HTML += "<button>Send</button></form>";
-  WiFiManager_Temp_HTML += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used/n";
-  WiFiManager_Temp_HTML += "Code compiled on " +  String(CompileDate) + "/n";
+  WiFiManager_Temp_HTML += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used\n";
   WiFiManager_Temp_HTML += "MAC adress = " +  String(WiFi.macAddress());
   server.send(200, "text/html", WiFiManager_Temp_HTML);
 }
