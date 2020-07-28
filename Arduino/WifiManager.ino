@@ -22,7 +22,7 @@
 */
 
 #define WiFiManager_ConnectionTimeOutMS 10000
-#define WiFiManager_APSSID "ESP32"
+#define WiFiManager_APSSID "smart-light"
 #define WiFiManager_EEPROM_SIZE 64            //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback

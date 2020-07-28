@@ -58,7 +58,7 @@ const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
 const byte ClockOffset = 30;              //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
-const char mDNSname[] = "esp32";          //On what url the ESP can also be accesed on (besides the ip) for example 'www.esp32.local'
+const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'www.esp32.local'
 //========================================//
 //End of User Variables
 //========================================//
@@ -69,6 +69,16 @@ byte BootMode = OFF;                      //SOFT_SETTING In which mode to start 
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
 byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
+
+#if LED_TYPE == WS2813                    //Just here to make it so <IP>/info would show you the LED type
+#define SLED_TYPE = "WS2813"
+#endif
+#if LED_TYPE == WS2812B
+#define SLED_TYPE "WS2812B"
+#endif
+#ifndef SLED_TYPE
+#define SLED_TYPE = "UNK"
+#endif
 
 CRGB LEDs[TotalLEDs];
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
@@ -87,7 +97,6 @@ void setup() {
   //Init LED and let them shortly blink
   //==============================
   pinMode(PAO_LED, OUTPUT);
-  FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
     fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));

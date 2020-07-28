@@ -319,7 +319,19 @@ void handle_GetTasks() {
 void handle_Info() {
   String Message = "Code compiled on " +  String(CompileDate) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
-                   "IP adress = " + IpAddress2String(WiFi.localIP());
+                   "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
+                   "mDNS name = " + String(mDNSname) + "\n"
+                   "LED_TYPE = " + SLED_TYPE + "\n"
+                   "ClockOffset = " + String(ClockOffset) + "\n"
+                   "gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
+                   "daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
+                   "PotMinChange = " + String(PotMinChange) + "\n"
+                   "PotStick = " + String(PotStick) + "\n"
+                   "PotMin = " + String(PotMin);
+#ifdef SerialEnabled
+  Message += "\n" + "Serial is enabled"
+#endif //SerialEnabled
+                   
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 " + Message);
