@@ -14,7 +14,7 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-bool UpdateLEDs;                          //SOFT_SETTING Holds if we need to physically update the LEDs
+bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
 bool WiFiManager_connected;               //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                //Holds in which mode the light is currently in
