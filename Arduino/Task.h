@@ -33,7 +33,10 @@ bool AddTask(TASK Item) {
     if (TaskList[i].ID == 0) {          //If there is no task
       TaskList[i] = Item;
 #ifdef Task_SerialEnabled
-      Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms");
+      if (TaskList[i].ExectuteAt.Ticks > 0)
+        Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms");
+      else
+        Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " on " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS));
 #endif //Task_SerialEnabled
       return true;
     }
@@ -50,19 +53,19 @@ bool DoTask(TASK Item) {
   if (Item.ExectuteAt.Ticks > 0)
     Serial.println(" due to Ticks, scheduled for " + String(Item.ExectuteAt.Ticks) + " now=" + String(millis()));
   else
-    Serial.println(" due to Time, scheduled for " + String(Item.ExectuteAt.HH) + " : " + String(Item.ExectuteAt.MM) + " : " + String(Item.ExectuteAt.SS));
+    Serial.println(" due to Time, scheduled for " + String(Item.ExectuteAt.HH) + ":" + String(Item.ExectuteAt.MM) + ":" + String(Item.ExectuteAt.SS));
 #endif //Task_SerialEnabled
   switch (Item.ID) {
     case SWITCHMODE:
-      Serial.print("SWITCHMODE");
+      Serial.println("T: SWITCHMODE");
       Mode = ConvertModeToInt(String(Item.A));
       break;
     case DIMMING: {
         //A = Stepsize
         //B = GoTo
-        //C = TimeInterfal
+        //C = TimeInterfall in ms
 #ifdef Task_SerialEnabled
-        Serial.println("DIMMING from " + String(FastLED.getBrightness()) + " a " + String(Item.A) + " a " + String(Item.B) + " a " + String(Item.C));
+        Serial.println("T: DIMMING from " + String(FastLED.getBrightness()) + " a " + String(Item.A) + " a " + String(Item.B) + " a " + String(Item.C));
 #endif //Task_SerialEnabled
 
         byte BRI = FastLED.getBrightness();
@@ -84,7 +87,7 @@ bool DoTask(TASK Item) {
     case BRIGHTEN: {
         //A = Stepsize
         //B = GoTo
-        //C = TimeInterfal
+        //C = TimeInterfal in ms
         byte Now = FastLED.getBrightness();
         byte To = 255;
         if (Item.B > 0) To = Item.B;
@@ -99,7 +102,7 @@ bool DoTask(TASK Item) {
           }
         }
 #ifdef Task_SerialEnabled
-        Serial.println("BRIGHTEN from " + String(FastLED.getBrightness()) + " to " + String(Now));
+        Serial.println("T: BRIGHTEN from " + String(FastLED.getBrightness()) + " to " + String(Now));
 #endif //Task_SerialEnabled
         FastLED.setBrightness(Now);
         UpdateLEDs = true;
@@ -139,8 +142,13 @@ String GetTaskList() {
   String R;
   for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
     if (TaskList[i].ID > 0) {                   //If there is a task
-      if (R != "") R += "\n";               //If there is already an entry, start a new line
-      R += "T : " + String(i) + " ID = " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms with values " + String(TaskList[i].A) + " and " + String(TaskList[i].B) + " and " + String(TaskList[i].C);
+      if (R != "") R += "\n";                   //If there is already an entry, start a new line
+      R += "T: " + String(i) + " ID = " + String(TaskList[i].ID);
+      if (TaskList[i].ExectuteAt.Ticks > 0)
+        R += " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms";
+      else
+        R += " on " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS);
+      R += " with values " + String(TaskList[i].A) + " and " + String(TaskList[i].B) + " and " + String(TaskList[i].C);
     }
   }
   if (R == "") R = "No task in the tasklist";
@@ -149,7 +157,7 @@ String GetTaskList() {
 bool RemoveTask(byte ID) {
   if (TaskList[ID].ID > 0) {                   //If there is a task
     TaskList[ID].ID = 0;                       //Clear this task entry
-    return true;                              //EXIT, task removed
+    return true;                               //EXIT, task removed
   }
   return false;
 }

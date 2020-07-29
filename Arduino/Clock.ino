@@ -5,7 +5,7 @@ void UpdateAndShowClock(bool ShowClock) {
   //==============================
   while (TimeCurrent.Ticks + 1000 <= millis()) {
 #ifdef TimeExtra_SerialEnabled
-    Serial.println("TM: Time= " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + " " + String(TimeCurrent.Ticks) + " now=" + String(millis()));
+    Serial.println("TM: Time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + " " + String(TimeCurrent.Ticks) + " now=" + String(millis()));
 #endif //TimeExtra_SerialEnabled
     TimeCurrent.Ticks += 1000;
     TimeCurrent.SS++;

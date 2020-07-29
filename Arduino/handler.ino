@@ -291,28 +291,32 @@ void handle_GetTasks() {
     if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.SS == 0 and TempTask.ExectuteAt.MM == 0 and TempTask.ExectuteAt.HH == 0) {
       ERRORMSG += "No Task time given\n";
     } else {
-      if (TempTask.ID == 0) {
-        ERRORMSG += "No Task ID given\n";
+      if (TaskMode == 0) {
+        ERRORMSG += "No Task Mode given\n";
       } else {
-        if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
-          TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
-          TempTask.ExectuteAt.SS = 0;             //Reset the time, we dont use these
-          TempTask.ExectuteAt.MM = 0;
-          TempTask.ExectuteAt.HH = 0;
-        } else if (TimeSet)
-          ERRORMSG += "Warning time is not yet set/synced\n";
-        switch (TaskMode) {
-          case 0:
-            ERRORMSG += "No Task mode given\n";
-            break;
-          case 1:
-            if (!AddTask(TempTask))
-              ERRORMSG += "Could not add tasks\n";
-            break;
-          case 3:
-            if (!RemoveTask(TempTask.ID))
-              ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
-            break;
+        if (TempTask.ID == 0) {
+          ERRORMSG += "No Task ID given\n";
+        } else {
+          if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
+            TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
+            TempTask.ExectuteAt.SS = 0;             //Reset the time, we dont use these
+            TempTask.ExectuteAt.MM = 0;
+            TempTask.ExectuteAt.HH = 0;
+          } else if (!TimeSet)
+            ERRORMSG += "Warning time is not yet set/synced\n";
+          switch (TaskMode) {
+            case 0:
+              ERRORMSG += "No Task mode given\n";
+              break;
+            case 1:
+              if (!AddTask(TempTask))
+                ERRORMSG += "Could not add tasks\n";
+              break;
+            case 3:
+              if (!RemoveTask(TempTask.ID))
+                ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
+              break;
+          }
         }
       }
     }
