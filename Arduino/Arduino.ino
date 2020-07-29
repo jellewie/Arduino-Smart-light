@@ -1,22 +1,7 @@
 /*Program written by JelleWho
   Board: https://dl.espressif.com/dl/package_esp32_index.json DOIT ESP32 DEVKIT V1
 
-  TODO
-  +[Working on it] Maybe add a way for an transition, like slowly turn on for x minutes??
-  +[Working on it] Maybe add a way for a tasklist, like 'Execute task X on Y time' to allow Alarm clock mode
-  +Test pin 36 and 39 are analog compatible (should be ADC2) and if we can use it for a LDR sensor. Also add LDR programming code to have a global AutoBrightness
-  +Add timeout on clock sync request? seems to go for ever now
-  +Is it posible to adjust brightness in WIFI connnect/APmode???
-  +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
-  +Check if we can do something about the timeinterfall of boradkast SSID in Apmode
-  +Can we add a CaptivePortal to APmode? https://github.com/espressif/arduino-esp32/blob/master/libraries/DNSServer/examples/CaptivePortal/CaptivePortal.ino
-    #include <DNSServer.h>
-    DNSServer dnsServer;
-    ? IPAddress apIP(192, 168, 1, 1);
-    ? WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    dnsServer.start(53, "*", apIP); // if DNSServer is started with "*" for domain name, it will reply with provided IP to all DNS request
-    dnsServer.processNextRequest();
-
+  TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
 */
 //#define SerialEnabled
 #ifdef SerialEnabled
