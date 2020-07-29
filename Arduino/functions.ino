@@ -92,13 +92,11 @@ void MyDelay(int ms) {                    //Just a non-blocking delay
     UpdateBrightness(false);      //Check if manual input potmeters has changed, if so flag the update
     UpdateColor(false);           //Check if manual input potmeters has changed, if so flag the update
     ButtonsA.CheckButton();       //Read buttonstate  (Just trash all inputs)
-    if (UpdateLEDs) {
-#ifdef UpdateLEDs_SerialEnabled
-      Serial.println("Update LEDs");
-#endif //UpdateLEDs_SerialEnabled
-      UpdateLEDs = false;
-      FastLED.show();                         //Update
-    }
+    WiFiManager_RunServer();                  //Do WIFI server stuff if needed
+    UpdateBrightness(false);                  //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);                       //Check if manual input potmeters has changed, if so flag the update
+    if (TrashButtons) ButtonsA.CheckButton(); //Read buttonstate  (Just trash all inputs)
+    UpdateLEDs();
     yield();
     FastLED.delay(1);
   }

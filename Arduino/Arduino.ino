@@ -9,6 +9,14 @@
   +Is it posible to adjust brightness in WIFI connnect/APmode???
   +Secure OTA; Make it so you need to press a physical button to enable OTA. maybe with a new mode it's posible?
   +Check if we can do something about the timeinterfall of boradkast SSID in Apmode
+  +Can we add a CaptivePortal to APmode? https://github.com/espressif/arduino-esp32/blob/master/libraries/DNSServer/examples/CaptivePortal/CaptivePortal.ino
+    #include <DNSServer.h>
+    DNSServer dnsServer;
+    ? IPAddress apIP(192, 168, 1, 1);
+    ? WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    dnsServer.start(53, "*", apIP); // if DNSServer is started with "*" for domain name, it will reply with provided IP to all DNS request
+    dnsServer.processNextRequest();
+
 */
 //#define SerialEnabled
 #ifdef SerialEnabled
@@ -270,6 +278,9 @@ void loopLEDS() {
       break;
   }
   LastMode = Mode;
+  UpdateLED();
+}
+void UpdateLED() {
   if (UpdateLEDs) {
 #ifdef UpdateLEDs_SerialEnabled
     Serial.println("Update LEDs");
