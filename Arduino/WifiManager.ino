@@ -23,11 +23,11 @@
 
 #define WiFiManager_ConnectionTimeOutMS 10000
 #define WiFiManager_APSSID "smart-light"
-#define WiFiManager_EEPROM_SIZE 64            //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
+#define WiFiManager_EEPROM_SIZE 128           //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness" , "AutoBrightnessN" , "AutoBrightnessP"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -289,6 +289,15 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
     case 5:
       DoublePressMode = ConvertModeToInt(WiFiManager_Temp);
       break;
+    case 6:
+      AutoBrightness = IsTrue(WiFiManager_Temp);
+      break;
+    case 7:
+      AutoBrightnessN = ConvertModeToInt(WiFiManager_Temp);
+      break;
+    case 8:
+      AutoBrightnessP = ConvertModeToInt(WiFiManager_Temp);
+      break;
   }
   return true;
 }
@@ -317,6 +326,15 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
       break;
     case 5:
       WiFiManager_Temp_Return = DoublePressMode;
+      break;
+    case 6:
+      WiFiManager_Temp_Return = AutoBrightness;
+      break;
+    case 7:
+      WiFiManager_Temp_Return = AutoBrightnessN;
+      break;
+    case 8:
+      WiFiManager_Temp_Return = AutoBrightnessP;
       break;
   }
 #ifdef WiFiManager_SerialEnabled

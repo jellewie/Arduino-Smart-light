@@ -17,6 +17,9 @@
 bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
 bool WiFiManager_connected;               //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
+byte AutoBrightnessN = 0;                 //SOFT_SETTING Brigntness = M*X+N
+byte AutoBrightnessP = 1;                 //SOFT_SETTING ^
 byte Mode;                                //Holds in which mode the light is currently in
 
 #include <FastLED.h>
@@ -42,6 +45,7 @@ const byte PAI_G = 33;                    //
 const byte PAI_B = 34;                    //
 const byte PAI_Brightness = 35;           //
 const byte PDI_Button = 26;               //pulled down with 10k to GND
+const byte PAI_LIGHT = 39;
 
 const byte PotMinChange = 2;              //How much the pot_value needs to change before we process it
 const byte PotStick = PotMinChange + 1;   //If this close to HIGH or LOW stick to it
@@ -79,6 +83,7 @@ StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
+StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 
 void setup() {
 #ifdef SerialEnabled
@@ -129,6 +134,7 @@ void setup() {
   else
     Serial.println("mDNS responder started");
 #endif
+  Serial.begin(115200);
 }
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed

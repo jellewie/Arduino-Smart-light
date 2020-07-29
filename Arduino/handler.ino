@@ -9,6 +9,9 @@
 #define PreFixSetColorValueGreen "g"
 #define PreFixSetColorValueBlue "b"
 #define PreFixSetBrightness "l"
+#define PreFixSetAutoBrightness "i"
+#define PreFixSetAutoBrightnessN "n"
+#define PreFixSetAutoBrightnessP "p"
 #define PreFixSetModeTo "m"
 #define PreFixSetBootMode "bm"
 #define PreFixSetDoHourlyAnimation "a"
@@ -25,10 +28,9 @@
 #define PreFixA     "a"   //Task A
 #define PreFixB     "b"   //Task B
 #define PreFixC     "c"   //Task B
-
-#define PreFixTimeS "s"   //In how much seconds the task needs to be executed
-#define PreFixTimeM "m"   //In how much minutes the task needs to be executed
-#define PreFixTimeH "h"   //In how much hours   the task needs to be executed
+#define PreFixTimeS "s"   //On which time the task needs to be executed
+#define PreFixTimeM "m"   //^
+#define PreFixTimeH "h"   //^
 
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
@@ -57,6 +59,14 @@ void handle_Set() {
       Mode = ConvertModeToInt(ArgValue);
     } else if (ArguName == PreFixSetBrightness) {
       NewBrightness = constrain((ArgValue.toInt()), 1, 255);
+      AutoBrightness = false;
+    } else if (ArguName == PreFixSetAutoBrightness) {
+      AutoBrightness = IsTrue(ArgValue);
+      UpdateBrightness(true);
+    } else if (ArguName == PreFixSetAutoBrightnessN) {
+      AutoBrightnessN = constrain((ArgValue.toInt()), 1, 255);
+    } else if (ArguName == PreFixSetAutoBrightnessP) {
+      AutoBrightnessP = constrain((ArgValue.toInt()), 1, 255);
     } else if (ArguName == PreFixSetBootMode) {
       BootMode = ConvertModeToInt(ArgValue);
       DoWriteToEEPROM = true;
@@ -126,6 +136,7 @@ void handle_Getcolors() {
   ans += "\"BM\":\"" + ConvertModeToString(BootMode) + "\",";
   ans += "\"HA\":\"" + IsTrueToString(DoHourlyAnimation) + "\",";
   ans += "\"DM\":\"" + ConvertModeToString(DoublePressMode) + "\",";
+  ans += "\"A\":\"" + IsTrueToString(AutoBrightness) + "\",";
 
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
@@ -161,6 +172,7 @@ void handle_OnConnect() {
                        "let bootModeDropdown=new DropDown({name:\"Bootmode\",setParamName:\"bm\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\"]});"
                        "let hourlyAnimDropdown=new DropDown({name:\"Hourly Animation\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let DoubleModeDropdown=new DropDown({name:\"DoublePressMode\",setParamName:\"dm\",possibleValues:[\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"]});settingsContainer.appendChild(document.createElement(\"br\"));"
+                       "let AutoBrightnessDropdown=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let otaBtn=new RequestButton(\"Enable OTA\",\"/ota\",\"OTA Enabled\");"
                        "let timeBtn=new RequestButton(\"Sync Time\",\"/time\",\"Time Updated\");"
                        "let resetBtn=new RequestButton(\"Reset\",\"/set?m=RESET\",\"ESP restarting\");"
@@ -181,7 +193,13 @@ void handle_OnConnect() {
                        "colorVarsEl.textContent=`:root{--selected-color:${selectedColor};--ui-color:${uiColor};--ui-color-trans1:${uiColorTrans1};--ui-color-trans2:${uiColorTrans2};}`;}"
 
                        "updateCssColor();async function getServerState(){let response=await fetch(\"/get\");await updateServerStateFromResponse(response);}getServerState();setInterval(async(_)=>{getServerState();},10*1000);function getServerStateMessageData(forceRgb=true){let state={l:brightnessSlider.value};if(modeDropdown.value==\"WIFI\"||forceRgb){state={...state,r:redSlider.value,g:greenSlider.value,b:blueSlider.value};}return state;}async function setServerState(forceRgb=true){let state=getServerStateMessageData(forceRgb);await sendServerState(state);}async function sendServerState(params,endPoint=\"/set\"){let searchParams=new URLSearchParams(params);try{let response=await fetch(endPoint+\"?\"+searchParams);if(response.ok){await updateServerStateFromResponse(response);return true;}else{doToastMessage(await response.body(),true);}}catch(e){doToastMessage(\"Failed to connect\",true);}}"
-                       "async function updateServerStateFromResponse(response){if(!response.ok)return;let json=await response.json();modeDropdown.value=json.M;bootModeDropdown.value=json.BM;hourlyAnimDropdown.value=json.HA;DoubleModeDropdown.value=json.DM;let col=json.RGBL[0];redSlider.value=col.R;greenSlider.value=col.G;blueSlider.value=col.B;brightnessSlider.value=col.L;}async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue(\"top\");}async function doToastMessage(message,error=false){let el=document.createElement(\"div\");el.classList.add(\"toast\",\"hidden\");el.classList.toggle(\"error\",error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove(\"hidden\");await timeout(5000);el.classList.add(\"hidden\");await timeout(200);el.parentElement.removeChild(el);}async function installSw(){if(!(\"serviceWorker\"in window.navigator))return;await navigator.serviceWorker.register(\"sw.js\");}installSw();</script></body></html>";
+                       "async function updateServerStateFromResponse(response){if(!response.ok)return;let json=await response.json();"
+                       "modeDropdown.value=json.M;"
+                       "bootModeDropdown.value=json.BM;"
+                       "hourlyAnimDropdown.value=json.HA;"
+                       "DoubleModeDropdown.value=json.DM;"
+                       "AutoBrightnessDropdown.value=json.A;"
+                       "let col=json.RGBL[0];redSlider.value=col.R;greenSlider.value=col.G;blueSlider.value=col.B;brightnessSlider.value=col.L;}async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue(\"top\");}async function doToastMessage(message,error=false){let el=document.createElement(\"div\");el.classList.add(\"toast\",\"hidden\");el.classList.toggle(\"error\",error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove(\"hidden\");await timeout(5000);el.classList.add(\"hidden\");await timeout(200);el.parentElement.removeChild(el);}async function installSw(){if(!(\"serviceWorker\"in window.navigator))return;await navigator.serviceWorker.register(\"sw.js\");}installSw();</script></body></html>";
   server.send(200, "text/html", html);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 (User has connected)");
@@ -331,7 +349,7 @@ void handle_Info() {
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
 #endif //SerialEnabled
-                   
+
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 " + Message);
