@@ -51,7 +51,7 @@ const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
 const byte ClockOffset = 30;              //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
-const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'www.esp32.local'
+const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
 //========================================//
 //End of User Variables
 //========================================//
@@ -90,6 +90,7 @@ void setup() {
   //Init LED and let them shortly blink
   //==============================
   pinMode(PAO_LED, OUTPUT);
+  FastLED.addLeds<LED_TYPE, PAO_LED, RGB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
     fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));

@@ -329,7 +329,7 @@ void handle_Info() {
                    "PotStick = " + String(PotStick) + "\n"
                    "PotMin = " + String(PotMin);
 #ifdef SerialEnabled
-  Message += "\n" + "Serial is enabled"
+  Message += "\nSerial is enabled";
 #endif //SerialEnabled
                    
   server.send(200, "text/plain", Message);
