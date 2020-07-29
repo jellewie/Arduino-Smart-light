@@ -96,7 +96,7 @@ void MyDelay(int ms) {                    //Just a non-blocking delay
     UpdateBrightness(false);                  //Check if manual input potmeters has changed, if so flag the update
     UpdateColor(false);                       //Check if manual input potmeters has changed, if so flag the update
     if (TrashButtons) ButtonsA.CheckButton(); //Read buttonstate  (Just trash all inputs)
-    UpdateLEDs();
+    UpdateLED();
     yield();
     FastLED.delay(1);
   }
