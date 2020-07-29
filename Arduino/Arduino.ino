@@ -95,7 +95,7 @@ void setup() {
   //Init LED and let them shortly blink
   //==============================
   pinMode(PAO_LED, OUTPUT);
-  FastLED.addLeds<LED_TYPE, PAO_LED, RGB>(LEDs, TotalLEDs);
+  FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
     fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));
