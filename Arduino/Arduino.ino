@@ -67,16 +67,6 @@ byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to 
 byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 
-#if LED_TYPE == WS2813                    //Just here to make it so <IP>/info would show you the LED type
-#define SLED_TYPE = "WS2813"
-#endif
-#if LED_TYPE == WS2812B
-#define SLED_TYPE "WS2812B"
-#endif
-#ifndef SLED_TYPE
-#define SLED_TYPE = "UNK"
-#endif
-
 CRGB LEDs[TotalLEDs];
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);

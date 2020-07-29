@@ -339,7 +339,6 @@ void handle_Info() {
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "mDNS name = " + String(mDNSname) + "\n"
-                   "LED_TYPE = " + SLED_TYPE + "\n"
                    "ClockOffset = " + String(ClockOffset) + "\n"
                    "gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
                    "daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
