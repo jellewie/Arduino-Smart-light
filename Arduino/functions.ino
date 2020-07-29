@@ -59,11 +59,11 @@ void ShowIP() {
 #endif //SerialEnabled
 
   ShowIPnumber(MyIp[0]);
-  MyDelay(2500);
+  MyDelay(30000, true);
   ShowIPnumber(MyIp[1]);
-  MyDelay(2500);
+  MyDelay(30000, true);
   ShowIPnumber(MyIp[2]);
-  MyDelay(2500);
+  MyDelay(30000, true);
   ShowIPnumber(MyIp[3]);
 }
 void ShowIPnumber(byte Number) {
@@ -84,18 +84,17 @@ void ShowIPnumber(byte Number) {
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255);
   UpdateLEDs = true;
 }
-void MyDelay(int ms) {                    //Just a non-blocking delay
+void MyDelay(int ms, bool ReturnOnButtonPress) {                    //Just a non-blocking delay
   unsigned long StopAtTime = millis() + ms;
   while (millis() < StopAtTime) {
-    OTA_loop();                                         //Do OTA stuff if needed
-    WiFiManager_RunServer();                            //Do WIFI server stuff if needed
-    UpdateBrightness(false);      //Check if manual input potmeters has changed, if so flag the update
-    UpdateColor(false);           //Check if manual input potmeters has changed, if so flag the update
-    ButtonsA.CheckButton();       //Read buttonstate  (Just trash all inputs)
     WiFiManager_RunServer();                  //Do WIFI server stuff if needed
     UpdateBrightness(false);                  //Check if manual input potmeters has changed, if so flag the update
     UpdateColor(false);                       //Check if manual input potmeters has changed, if so flag the update
-    if (TrashButtons) ButtonsA.CheckButton(); //Read buttonstate  (Just trash all inputs)
+    if (ReturnOnButtonPress) {
+      if (ButtonsA.CheckButton().StartPress)  //Read buttonstate and return early when the button is pressed
+        return;
+    } else
+      ButtonsA.CheckButton();                 //Read buttonstate  (Just trash all inputs)
     UpdateLED();
     yield();
     FastLED.delay(1);
