@@ -124,7 +124,6 @@ void setup() {
   else
     Serial.println("mDNS responder started");
 #endif
-  Serial.begin(115200);
 }
 void loop() {
   OTA_loop();                                         //Do OTA stuff if needed
