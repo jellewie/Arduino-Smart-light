@@ -7,8 +7,8 @@
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
 #define     Server_SerialEnabled
-#define     Time_SerialEnabled
 #define     Task_SerialEnabled
+#define     Time_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
 //#define     Convert_SerialEnabled
@@ -17,6 +17,7 @@
 bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
 bool WiFiManager_connected;               //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
 byte AutoBrightnessN = 0;                 //SOFT_SETTING Brigntness = M*X+N
 byte AutoBrightnessP = 1;                 //SOFT_SETTING ^

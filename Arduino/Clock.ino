@@ -42,6 +42,10 @@ void UpdateAndShowClock(bool ShowClock) {
     if (LastSec != TimeCurrent.SS) {
       LastSec = TimeCurrent.SS;
       FastLED.clear();
+      if (ClockHourLines) {
+        for (int i = 0; i <= 55; i += 5)                         //Create the (12) hourly stripes
+          LEDs[i] += CRGB(ClockHourLines, ClockHourLines, ClockHourLines);
+      }
       LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
       LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
       LEDs[LEDtoPosition(TimeCurrent.HH * 5)] += CRGB(255, 0, 0);
