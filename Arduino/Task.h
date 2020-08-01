@@ -34,9 +34,9 @@ bool AddTask(TASK Item) {
       TaskList[i] = Item;
 #ifdef Task_SerialEnabled
       if (TaskList[i].ExectuteAt.Ticks > 0)
-        Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms");
+        Serial.println("T:" + String(i) + " AddTask " + String(TaskList[i].ID) + " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms");
       else
-        Serial.println("T:" + String(i) + " add " + String(TaskList[i].ID) + " on " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS));
+        Serial.println("T:" + String(i) + " AddTask " + String(TaskList[i].ID) + " on " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS));
 #endif //Task_SerialEnabled
       return true;
     }
