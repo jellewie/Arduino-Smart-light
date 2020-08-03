@@ -65,7 +65,7 @@ byte LEDtoPosition(byte LEDID) {
 
 bool UpdateTime() {
   if (!WiFiManager_connected) return false;   //If WIFI not connected, stop right away
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs blue    0202
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs Purple  0202
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //turn 1th quater green 1202
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //turn 2rd quater green 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
