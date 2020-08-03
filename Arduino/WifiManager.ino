@@ -102,15 +102,17 @@ String WiFiManager_LoadEEPROM() {
 #endif //WiFiManager_SerialEnabled
   for (int i = 0; i < WiFiManager_EEPROM_SIZE; i++) {
     byte WiFiManager_Input = EEPROM.read(i);
-    WiFiManager_EEPROM_USED = WiFiManager_Value.length();
     if (WiFiManager_Input == 255) {             //If at the end of data
 #ifdef WiFiManager_SerialEnabled
       Serial.println();
 #endif //WiFiManager_SerialEnabled
+      WiFiManager_EEPROM_USED = WiFiManager_Value.length();
       return WiFiManager_Value;                 //Stop and return all data stored
     }
-    if (WiFiManager_Input == 0)                 //If no data found (NULL)
+    if (WiFiManager_Input == 0) {                //If no data found (NULL)
+       WiFiManager_EEPROM_USED = WiFiManager_Value.length();
       return String(WiFiManager_EEPROM_Seperator);
+    }
     WiFiManager_Value += char(WiFiManager_Input);
 #ifdef WiFiManager_SerialEnabled
     Serial.print("_" + String(char(WiFiManager_Input)) + "_");
@@ -119,6 +121,7 @@ String WiFiManager_LoadEEPROM() {
 #ifdef WiFiManager_SerialEnabled
   Serial.println();
 #endif //WiFiManager_SerialEnabled
+  WiFiManager_EEPROM_USED = WiFiManager_Value.length();
   return String(WiFiManager_EEPROM_Seperator);  //ERROR; [maybe] not enough space
 }
 bool WiFiManager_WriteEEPROM() {
