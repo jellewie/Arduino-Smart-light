@@ -48,7 +48,10 @@ void UpdateAndShowClock(bool ShowClock) {
       }
       LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
       LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
-      LEDs[LEDtoPosition(TimeCurrent.HH * 5)] += CRGB(255, 0, 0);
+      byte ClockHH = TimeCurrent.HH * 5;
+      if (ClockHourAnalog)
+        ClockHH += (TimeCurrent.MM / 15);
+      LEDs[LEDtoPosition(ClockHH)] += CRGB(255, 0, 0);
       UpdateLEDs = true;
     }
   }
