@@ -59,8 +59,7 @@ byte WiFiManager_Start() {
     if ((strlen(ssid) == 0 or strlen(password) == 0 or FlagApMode)) {
       FlagApMode = false;
       WiFiManager_APMode();                 //No ssid or password given, or ssid not found. Entering APmode
-    }
-    else {
+    } else {
       if (WiFiManager_Connect(WiFiManager_ConnectionTimeOutMS)) //try to connected to ssid password
         WiFiManager_Connected = true;
       else

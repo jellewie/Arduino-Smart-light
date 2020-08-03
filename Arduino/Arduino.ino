@@ -21,9 +21,9 @@ byte Mode;                                //Holds in which mode the light is cur
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
 bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
-byte AutoBrightnessN = 0;                 //SOFT_SETTING Brigntness = M*X+N
+byte AutoBrightnessN = 0;                 //SOFT_SETTING Brightness = M*X+N
 byte AutoBrightnessP = 1;                 //SOFT_SETTING ^
-byte ClockOffset = 30;                    //SOFT_SETTING Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
+byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 
 #include <FastLED.h>
 #include "StableAnalog.h"
