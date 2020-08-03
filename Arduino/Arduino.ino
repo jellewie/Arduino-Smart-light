@@ -17,11 +17,13 @@
 bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
 bool WiFiManager_connected;               //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+byte Mode;                                //Holds in which mode the light is currently in
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
+bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
 byte AutoBrightnessN = 0;                 //SOFT_SETTING Brigntness = M*X+N
 byte AutoBrightnessP = 1;                 //SOFT_SETTING ^
-byte Mode;                                //Holds in which mode the light is currently in
+byte ClockOffset = 30;                    //SOFT_SETTING Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 
 #include <FastLED.h>
 #include "StableAnalog.h"
@@ -54,7 +56,6 @@ const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
 const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
-const byte ClockOffset = 30;              //Amount of LEDs to offset/rotate the clock, so 12 o'clock would be UP. does NOT work in Animations
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
 const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
 //========================================//
