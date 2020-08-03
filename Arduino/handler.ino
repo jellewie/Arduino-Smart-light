@@ -66,10 +66,13 @@ void handle_Set() {
     } else if (ArguName == PreFixSetAutoBrightness) {
       AutoBrightness = IsTrue(ArgValue);
       UpdateBrightness(true);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetAutoBrightnessN) {
       AutoBrightnessN = constrain((ArgValue.toInt()), 1, 255);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetAutoBrightnessP) {
       AutoBrightnessP = constrain((ArgValue.toInt()), 1, 255);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetBootMode) {
       BootMode = ConvertModeToInt(ArgValue);
       DoWriteToEEPROM = true;
@@ -81,10 +84,13 @@ void handle_Set() {
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockHourLines) {
       ClockHourLines = constrain((ArgValue.toInt()), 0, 255);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockHourAnalog) {
       ClockHourAnalog = IsTrue(ArgValue);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockOffset) {
       ClockOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
+      DoWriteToEEPROM = true;
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
   }
@@ -145,7 +151,7 @@ void handle_Getcolors() {
                "\"dm\":\"" + ConvertModeToString(DoublePressMode) + "\","
                "\"a\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
                "\"i\":\"" + IsTrueToString(AutoBrightness) + "\","
-               "\"hl\":\"" + IsTrueToString(ClockHourLines) + "\","
+               "\"hl\":\"" + ClockHourLines + "\","
                "\"ha\":\"" + IsTrueToString(ClockHourAnalog) + "\",";
                
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
@@ -185,7 +191,7 @@ void handle_OnConnect() {
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
                        "let DDa=new DropDown({name:\"Hourly animation\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let DDi=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
-                       "let DDhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "let DDhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
                        "let DDha=new DropDown({name:\"Analog hours\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
@@ -214,6 +220,7 @@ void handle_OnConnect() {
                        "DDbm.value=json.bm;"
                        "DDdm.value=json.dm;"
                        "DDa.value=json.a;"
+                       "DDi.value=json.i;"
                        "DDhl.value=json.hl;"
                        "DDha.value=json.ha;"
                        "let col=json.RGBL[0];redSlider.value=col.R;greenSlider.value=col.G;blueSlider.value=col.B;brightnessSlider.value=col.L;}async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue(\"top\");}async function doToastMessage(message,error=false){let el=document.createElement(\"div\");el.classList.add(\"toast\",\"hidden\");el.classList.toggle(\"error\",error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove(\"hidden\");await timeout(5000);el.classList.add(\"hidden\");await timeout(200);el.parentElement.removeChild(el);}async function installSw(){if(!(\"serviceWorker\"in window.navigator))return;await navigator.serviceWorker.register(\"sw.js\");}installSw();</script></body></html>";

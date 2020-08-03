@@ -36,10 +36,13 @@ class StableAnalog {
       //note this only does skip the first x after the first run. never again after that
       byte New = Read();
       POT RV;
-      if (InitCount < SkipFirst) {        //If we havn't yet a valid average (to few points)
+      if (InitCount < SkipFirst) {        //If we have not yet a valid average (to few points)
         InitCount += 1;
         Old = New;                        //  Update value
         return RV;
+      } else if (InitCount == SkipFirst){  //If we are done, and the first update needs to be send
+        InitCount += 1;
+        Old = New - 100;            //  Throw the value off, so we force an update
       }
       if (abs(New - Old) > MinChange) {   //If we have a big enough change
         RV.Changed = abs(New - Old);

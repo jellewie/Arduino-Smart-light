@@ -81,7 +81,6 @@ void setup() {
 #ifdef SerialEnabled
   Serial.begin(115200);
 #endif //SerialEnabled
-  analogReadResolution(AnalogResolution);
   attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
   //==============================
   //Init LED and let them shortly blink
@@ -108,6 +107,12 @@ void setup() {
   server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
   //==============================
+  //Set AnalogResolution, and init the potmeters
+  //==============================
+  analogReadResolution(AnalogResolution);
+  for (int i = 0; i < AverageAmount + 2; i++)
+    UpdateColor(false);                                 //Take enough analog samples, so we get a good average
+  //==============================
   //Load data from EEPROM, so we can apply the set bootmode
   //==============================
   LoadData();
@@ -118,13 +123,13 @@ void setup() {
   //==============================
   //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
   //==============================
-  bool MDNSStatus = MDNS.begin(mDNSname);             //Start mDNS with the given domain name
-  if (MDNSStatus) MDNS.addService("http", "tcp", 80); //Add service to MDNS-SD
+  bool MDNSStatus = MDNS.begin(mDNSname);               //Start mDNS with the given domain name
+  if (MDNSStatus) MDNS.addService("http", "tcp", 80);   //Add service to MDNS-SD
 #ifdef SerialEnabled
   if (MDNSStatus)
-    Serial.println("Error setting up MDNS responder!");
-  else
     Serial.println("mDNS responder started");
+  else
+    Serial.println("Error setting up MDNS responder!");
 #endif
 }
 void loop() {
@@ -177,19 +182,19 @@ void loopLEDS() {
       }
       break;
     case ON:
-      if (LastMode != Mode) {    //If mode changed
+      if (LastMode != Mode) {     //If mode changed
         AnimationCounter = 0;
         UpdateColor(true);
       }
       break;
     case WIFI:
-      if (LastMode != Mode) {    //If mode changed
+      if (LastMode != Mode) {     //If mode changed
         AnimationCounter = 0;
-        StartWIFIstuff();
+        StartWIFIstuff();         //Start WIFI if we haven't
       }
       break;
     case RESET:
-      if (LastMode != Mode) {    //If mode changed
+      if (LastMode != Mode) {     //If mode changed
         AnimationCounter = 0;
       }
       if (TickEveryMS(50)) {
@@ -200,9 +205,9 @@ void loopLEDS() {
         UpdateLEDs = true;
       }
     case CLOCK:
-      if (LastMode != Mode) {    //If mode changed
+      if (LastMode != Mode) {     //If mode changed
         AnimationCounter = 0;
-        StartWIFIstuff();                     //Start WIFI if we haven't
+        StartWIFIstuff();         //Start WIFI if we haven't
       }
       if (AnimationCounter == 0)            //If no (hourly) animation is playing
         UpdateAndShowClock(true);

@@ -7,18 +7,20 @@ void UpdateColor(bool ForceUpdate) {
   //    R.Value = 1 + constrain(BN, 0, 254);
   //  }     //Tried to turn on LED strip soft red when all colors are invisble.
   if (R.Changed or G.Changed or B.Changed or ForceUpdate) {
-    if (Mode == ON or (R.Changed > PotMin or G.Changed > PotMin or B.Changed > PotMin)) {
+    if (Mode == ON or (R.Changed > PotMin or G.Changed > PotMin or B.Changed > PotMin) or ForceUpdate) {
+      if (!ForceUpdate and Mode != ON)
+        Mode = ON;
+      fill_solid(&(LEDs[0]), TotalLEDs, CRGB(R.Value, G.Value, B.Value));
+      UpdateLEDs = true;
 #ifdef SerialEnabled
-      Serial.println("Manual color changed to " +
+      String MSG = "Manual";
+      if (ForceUpdate) MSG = "ForceUpdate";
+      Serial.println(MSG + " color changed to " +
                      String(R.Value) + "(" + String(R.Changed) + ")," +
                      String(G.Value) + "(" + String(G.Changed) + ")," +
                      String(B.Value) + "(" + String(B.Changed) + ")");
-      if (Mode != ON)
-        Serial.println(" Mode changed from " + String(Mode) + "=" + ConvertModeToString(Mode) + " to ON/manual");
+      if (!ForceUpdate) Serial.println(MSG + " mode changed from " + ConvertModeToString(Mode) + " to ON/manual");
 #endif //SerialEnabled
-      Mode = ON;
-      fill_solid(&(LEDs[0]), TotalLEDs, CRGB(R.Value, G.Value, B.Value));
-      UpdateLEDs = true;
     }
   }
 }
@@ -56,10 +58,11 @@ bool StartWIFIstuff() {
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 1th quater red 1202
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 2rd quater red 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
-  if (WiFiManager_Start() == 1) {                                       //run the wifi startup (and save results)
-    WiFiManager_StartServer();                //Enable responce to web request
-    WiFiManager_EnableSetup(true);            //Enable the setup page, disable for more security
-    UpdateLEDs = false;
+  if (WiFiManager_Start() == 1) {                                       //run the wifi startup
+    WiFiManager_StartServer();                                          //Enable responce to web request
+    WiFiManager_EnableSetup(true);                                      //Enable the setup page, disable for more security
+    fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //turn all LEDs green
+    UpdateLEDs = true;
   }
   return false;
 }
