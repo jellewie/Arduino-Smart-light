@@ -38,7 +38,6 @@
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
   bool DoWriteToEEPROM = false;
-  byte NewBrightness = 0;         //0=dont change
   int NewR = -1, NewG = -1, NewB = -1;
 #ifdef Server_SerialEnabled
   Serial.print("SV: /SET?");
@@ -61,8 +60,9 @@ void handle_Set() {
       LastMode = -1;                                   //Make sure we init the new mode
       Mode = ConvertModeToInt(ArgValue);
     } else if (ArguName == PreFixSetBrightness) {
-      NewBrightness = constrain((ArgValue.toInt()), 1, 255);
+      if (Mode == ON) Mode = WIFI;      //If we are on manual, switch to WIFI
       AutoBrightness = false;
+      FastLED.setBrightness(constrain((ArgValue.toInt()), 1, 255));
     } else if (ArguName == PreFixSetAutoBrightness) {
       AutoBrightness = IsTrue(ArgValue);
       UpdateBrightness(true);
@@ -93,10 +93,6 @@ void handle_Set() {
       DoWriteToEEPROM = true;
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
-  }
-  if (NewBrightness != 0) {
-    if (Mode == ON) Mode = WIFI;      //If we are on manual, switch to WIFI
-    FastLED.setBrightness(NewBrightness);
   }
 #ifdef Server_SerialEnabled
   Serial.println();
@@ -153,7 +149,7 @@ void handle_Getcolors() {
                "\"i\":\"" + IsTrueToString(AutoBrightness) + "\","
                "\"hl\":\"" + ClockHourLines + "\","
                "\"ha\":\"" + IsTrueToString(ClockHourAnalog) + "\",";
-               
+
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
     r = RGBColor[0];
