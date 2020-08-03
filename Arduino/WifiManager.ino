@@ -296,19 +296,19 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
       AutoBrightness = IsTrue(WiFiManager_Temp);
       break;
     case 7:
-      AutoBrightnessN = ConvertModeToInt(WiFiManager_Temp);
+      AutoBrightnessN = WiFiManager_Temp.toInt();
       break;
     case 8:
-      AutoBrightnessP = ConvertModeToInt(WiFiManager_Temp);
+      AutoBrightnessP = WiFiManager_Temp.toInt();
       break;
     case 9:
-      ClockHourLines = ConvertModeToInt(WiFiManager_Temp);
+      ClockHourLines = WiFiManager_Temp.toInt();
       break;
     case 10:
       ClockHourAnalog = IsTrue(WiFiManager_Temp);
       break;
     case 11:
-      ClockOffset = ConvertModeToInt(WiFiManager_Temp);
+      ClockOffset = WiFiManager_Temp.toInt();
       break;
   }
   return true;
