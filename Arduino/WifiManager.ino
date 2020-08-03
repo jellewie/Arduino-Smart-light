@@ -110,7 +110,7 @@ String WiFiManager_LoadEEPROM() {
       return WiFiManager_Value;                 //Stop and return all data stored
     }
     if (WiFiManager_Input == 0) {                //If no data found (NULL)
-       WiFiManager_EEPROM_USED = WiFiManager_Value.length();
+      WiFiManager_EEPROM_USED = WiFiManager_Value.length();
       return String(WiFiManager_EEPROM_Seperator);
     }
     WiFiManager_Value += char(WiFiManager_Input);
@@ -127,7 +127,7 @@ String WiFiManager_LoadEEPROM() {
 bool WiFiManager_WriteEEPROM() {
   String WiFiManager_StringToWrite;                                   //Save to mem: <SSID>
   for (byte i = 0; i < WiFiManager_Settings; i++) {
-    WiFiManager_StringToWrite += WiFiManager_Get_Value(i + 1, true);  //^            <Seperator>
+    WiFiManager_StringToWrite += WiFiManager_Get_Value(i + 1, true, false);  //^            <Seperator>
     if (WiFiManager_Settings - i > 1)
       WiFiManager_StringToWrite += WiFiManager_EEPROM_Seperator;      //^            <Value>  (only if there more values)
   }
@@ -148,7 +148,7 @@ void WiFiManager_handle_Connect() {
     return;                           //Stop right away, and do noting
   String WiFiManager_Temp_HTML = "<strong>" + String(WiFiManager_APSSID) + " settings</strong><br><br><form action=\"/setup?\" method=\"get\">";
   for (byte i = 1; i < WiFiManager_Settings + 1; i++)
-    WiFiManager_Temp_HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + "</label><input type=\"text\" name=\"" + i + "\" value=\"" + WiFiManager_Get_Value(i, false) + "\"></div>";
+    WiFiManager_Temp_HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + " </label><input type=\"text\" name=\"" + i + "\" value=\"" + WiFiManager_Get_Value(i, false, true) + "\"></div>";
   WiFiManager_Temp_HTML += "<button>Send</button></form>";
   WiFiManager_Temp_HTML += String(WiFiManager_EEPROM_USED) + "/" + String(WiFiManager_EEPROM_SIZE) + " Bytes used<br>";
   WiFiManager_Temp_HTML += "MAC adress = " +  String(WiFi.macAddress());
@@ -314,10 +314,10 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
   }
   return true;
 }
-String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
+String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bool WiFiManager_Convert) {
   //WiFiManager_Safe == true will return the real password,
 #ifdef WiFiManager_SerialEnabled
-  Serial.print("WM: Get current value of: " + String(WiFiManager_ValueID));
+  Serial.print("WM: Get current value of: " + String(WiFiManager_ValueID) + " safe=" + String(WiFiManager_Safe) + " conv=" + String(WiFiManager_Convert));
 #endif //WiFiManager_SerialEnabled
   String WiFiManager_Temp_Return = "";                //Make sure to return something, if we return bad data of NULL, the HTML page will break
   switch (WiFiManager_ValueID) {
@@ -333,16 +333,28 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
       }
       break;
     case 3:
-      WiFiManager_Temp_Return = BootMode;
+      if (WiFiManager_Convert)
+        WiFiManager_Temp_Return = ConvertModeToString(BootMode);
+      else
+        WiFiManager_Temp_Return = BootMode;
       break;
     case 4:
-      WiFiManager_Temp_Return = DoHourlyAnimation;
+      if (WiFiManager_Convert)
+        WiFiManager_Temp_Return = IsTrueToString(DoHourlyAnimation);
+      else
+        WiFiManager_Temp_Return = DoHourlyAnimation;
       break;
     case 5:
-      WiFiManager_Temp_Return = DoublePressMode;
+      if (WiFiManager_Convert)
+        WiFiManager_Temp_Return = ConvertModeToString(DoublePressMode);
+      else
+        WiFiManager_Temp_Return = DoublePressMode;
       break;
     case 6:
-      WiFiManager_Temp_Return = AutoBrightness;
+      if (WiFiManager_Convert)
+        WiFiManager_Temp_Return = IsTrueToString(AutoBrightness);
+      else
+        WiFiManager_Temp_Return = AutoBrightness;
       break;
     case 7:
       WiFiManager_Temp_Return = AutoBrightnessN;
@@ -354,7 +366,10 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe) {
       WiFiManager_Temp_Return = ClockHourLines;
       break;
     case 10:
-      WiFiManager_Temp_Return = ClockHourAnalog;
+      if (WiFiManager_Convert)
+        WiFiManager_Temp_Return = IsTrueToString(ClockHourAnalog);
+      else
+        WiFiManager_Temp_Return = ClockHourAnalog;
       break;
     case 11:
       WiFiManager_Temp_Return = ClockOffset;
