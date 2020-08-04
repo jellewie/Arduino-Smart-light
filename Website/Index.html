@@ -307,27 +307,27 @@
                     });
                 }
             }
-            let brightnessSlider = new Slider("Brightness", false);
-            let redSlider = new Slider("Red");
-            let greenSlider = new Slider("Green");
-            let blueSlider = new Slider("Blue");
-            let DDm = new DropDown({
+            let Sl = new Slider("Brightness", false);
+            let Sr = new Slider("Red");
+            let Sg = new Slider("Green");
+            let Sb = new Slider("Blue");
+            let Dm = new DropDown({
                 name: "Mode",
                 setParamName: "m",
                 possibleValues: ["OFF", "ON", "WIFI", "CLOCK", "BLINK", "BPM", "CONFETTI", "FLASH", "GLITTER", "JUGGLE", "MOVE", "RAINBOW", "SINELON", "SINELON2"],
                 modifySendParams: (oldParams) =>{
-                    if (DDm.value == "WIFI"){
+                    if (Dm.value == "WIFI"){
                         let extraData = this.getServerStateMessageData(true);
                         return{ ...oldParams, ...extraData };
                     }
                 },
             });
-            let DDbm = new DropDown({ name: "Bootmode", setParamName: "bm", possibleValues: ["OFF", "ON", "WIFI", "CLOCK"] });
-            let DDdm = new DropDown({ name: "DoublePressMode", setParamName: "dm", possibleValues: ["WIFI", "CLOCK", "BLINK", "BPM", "CONFETTI", "FLASH", "GLITTER", "JUGGLE", "MOVE", "RAINBOW", "SINELON", "SINELON2"] });
+            let Dbm = new DropDown({ name: "Bootmode", setParamName: "bm", possibleValues: ["OFF", "ON", "WIFI", "CLOCK"] });
+            let Ddm = new DropDown({ name: "DoublePressMode", setParamName: "dm", possibleValues: ["WIFI", "CLOCK", "BLINK", "BPM", "CONFETTI", "FLASH", "GLITTER", "JUGGLE", "MOVE", "RAINBOW", "SINELON", "SINELON2"] });
 
             settingsContainer.appendChild(document.createElement("br"));
-            let DDa = new DropDown({ name: "Auto brightness", setParamName: "i", possibleValues: ["FALSE", "TRUE"] });
-            let DDha = new DropDown({ name: "Hourly Animation", setParamName: "a", possibleValues: ["FALSE", "TRUE"] });
+            let Da = new DropDown({ name: "Auto brightness", setParamName: "i", possibleValues: ["FALSE", "TRUE"] });
+            let Dha = new DropDown({ name: "Hourly Animation", setParamName: "a", possibleValues: ["FALSE", "TRUE"] });
 
             settingsContainer.appendChild(document.createElement("br"));
             let Bo = new RequestButton("Enable OTA", "/ota", "OTA Enabled");
@@ -342,12 +342,9 @@
             }
 
             function updateCssColor(){
-                let r = redSlider.value01 * brightnessSlider.value01;
-                let g = greenSlider.value01 * brightnessSlider.value01;
-                let b = blueSlider.value01 * brightnessSlider.value01;
-                r = Math.pow(r, 1 / 2.2) * 255;
-                g = Math.pow(g, 1 / 2.2) * 255;
-                b = Math.pow(b, 1 / 2.2) * 255;
+                let r = Math.pow(Sr.value01 * Sl.value01, 1 / 2.2) * 255;
+                let g = Math.pow(Sg.value01 * Sl.value01, 1 / 2.2) * 255;
+                let b = Math.pow(Sb.value01 * Sl.value01, 1 / 2.2) * 255;
                 let selectedColor = `rgb(${r},${g},${b})`;
                 let perceivedBrightness = Math.round((r * 299 + g * 587 + b * 114) / 1000);
                 let uiBrightness = perceivedBrightness > 125 ? 0 : 255;
@@ -368,9 +365,9 @@
                 getServerState();
             }, 10 * 1000);
             function getServerStateMessageData(forceRgb = true){
-                let state ={ l: brightnessSlider.value };
-                if (DDm.value == "WIFI" || forceRgb){
-                    state ={ ...state, r: redSlider.value, g: greenSlider.value, b: blueSlider.value };
+                let state ={ l: Sb.value };
+                if (Dm.value == "WIFI" || forceRgb){
+                    state ={ ...state, r: Sr.value, g: Sg.value, b: Sb.value };
                 }
                 return state;
             }
@@ -395,16 +392,16 @@
             async function updateServerStateFromResponse(response){
                 if (!response.ok) return;
                 let json = await response.json();
-                DDm.value = json.M;
-                DDbm.value = json.BM;
-                DDha.value = json.HA;
-                DDdm.value = json.DM;
-                DDa.value = json.A;
+                Dm.value = json.M;
+                Dbm.value = json.BM;
+                Dha.value = json.HA;
+                Ddm.value = json.DM;
+                Da.value = json.A;
                 let col = json.RGBL[0];
-                redSlider.value = col.R;
-                greenSlider.value = col.G;
-                blueSlider.value = col.B;
-                brightnessSlider.value = col.L;
+                Sr.value = col.R;
+                Sg.value = col.G;
+                Sb.value = col.B;
+                Sb.value = col.L;
             }
             async function timeout(ms){
                 await new Promise((r) => setTimeout(r, ms));
