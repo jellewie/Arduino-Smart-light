@@ -307,6 +307,13 @@
                     });
                 }
             }
+            class LinkButton extends Button{
+                constructor(label, url){
+                    super(label, _ => {
+                        window.open(url, "_blank");
+                    });
+                }
+            }
             let Sl = new Slider("Brightness", false);
             let Sr = new Slider("Red");
             let Sg = new Slider("Green");
@@ -333,6 +340,7 @@
             let Bo = new RequestButton("Enable OTA", "/ota", "OTA Enabled");
             let Bt = new RequestButton("Sync Time", "/time", "Time Updated");
             let Br = new RequestButton("Reset", "/set?m=RESET", "ESP restarting");
+            new LinkButton("Info", "/info");
 
             curtainEl.addEventListener("click", _ => this.setSettingsVisibility(false));
             settingsBtn.addEventListener("click", _ => this.setSettingsVisibility(true));
