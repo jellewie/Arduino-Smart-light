@@ -121,7 +121,7 @@ void setup() {
   //==============================
   LoadData();
   Mode = BootMode;                                      //Set the startup mode
-  UpdateBrightness(true);
+  UpdateBrightness(true);                               //Force Update the brightness
 #ifdef SerialEnabled
   Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
