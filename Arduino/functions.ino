@@ -24,29 +24,35 @@ void UpdateColor(bool ForceUpdate) {
     }
   }
 }
+byte GetAutoBrightness(byte Value) {
+  if (Value < 1) Value = 1;
+  float Answer = (Value - AutoBrightnessN) * AutoBrightnessP - AutoBrightnessO;
+  return 255 - constrain(Answer, 0, 254);
+}
+
 void UpdateBrightness(bool ForceUpdate) {
+  POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
   if (AutoBrightness) {
-    POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
     if (L.Changed or ForceUpdate) {
-      if (L.Value < 1) L.Value = 1;
-      int NewBrightness = L.Value * AutoBrightnessP + AutoBrightnessN;
-      if (NewBrightness > 255) NewBrightness = 255;
-      FastLED.setBrightness(NewBrightness);
+      FastLED.setBrightness(GetAutoBrightness(L.Value));
       UpdateLEDs = true;
 #ifdef SerialEnabled
-      Serial.println("Automaticly brightness changed to " + String(FastLED.getBrightness()) + " analog=" + String(L.Value) + "");
+      String MSG = "Automaticly";
+      if (ForceUpdate) MSG = "ForceUpdate";
+      Serial.println(MSG + " Auto brightness changed to " + String(FastLED.getBrightness()) + " raw=" + String(L.Value) + "");
 #endif //SerialEnabled
     }
     ForceUpdate = false;
   }
-  POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, 0);
+  POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
-    if (Brightness.Value < 1) Brightness.Value = 1;
-    FastLED.setBrightness(Brightness.Value);
+    FastLED.setBrightness(constrain(Brightness.Value, 1, 255));
     AutoBrightness = false;
     UpdateLEDs = true;
 #ifdef SerialEnabled
-    Serial.println("Manual brightness changed to " + String(FastLED.getBrightness()) + "(" + String(Brightness.Changed) + ")");
+    String MSG = "Automaticly";
+    if (ForceUpdate) MSG = "ForceUpdate";
+    Serial.println(MSG + " Manual brightness changed to " + String(FastLED.getBrightness()) + "(" + String(Brightness.Changed) + ")");
 #endif //SerialEnabled
   }
 }

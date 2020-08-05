@@ -14,10 +14,10 @@
 #define PreFixSetAutoBrightnessP "p"
 #define PreFixSetModeTo "m"
 #define PreFixSetBootMode "bm"
-#define PreFixSetDoHourlyAnimation "a"
+#define PreFixSetDoHourlyAnimation "ha"
 #define PreFixSetDoublePressMode "dm"
 #define PreFixSetClockHourLines "hl"
-#define PreFixSetClockHourAnalog "ha"
+#define PreFixSetClockHourAnalog "a"
 #define PreFixSetClockOffset "o"
 
 //<ip>/time[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
@@ -145,10 +145,10 @@ void handle_Getcolors() {
   String ans = "{\"m\":\"" + ConvertModeToString(Mode) + "\","
                "\"bm\":\"" + ConvertModeToString(BootMode) + "\","
                "\"dm\":\"" + ConvertModeToString(DoublePressMode) + "\","
-               "\"a\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
+               "\"ha\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
                "\"i\":\"" + IsTrueToString(AutoBrightness) + "\","
                "\"hl\":\"" + ClockHourLines + "\","
-               "\"ha\":\"" + IsTrueToString(ClockHourAnalog) + "\",";
+               "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\",";
 
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
@@ -215,26 +215,36 @@ void handle_OnConnect() {
                        "class DropDown{constructor({ name = \"\", setParamName = \"\", possibleValues = [], modifySendParams = null } ={}){let labelEl = document.createElement(\"label\");labelEl.classList.add(\"selectLabel\");labelEl.textContent = name + \":\";settingsContainerEl.appendChild(labelEl);this.name = name;this._value = \"\";this.setParamName = setParamName;this.modifySendParams = modifySendParams;let selectContainer = document.createElement(\"div\");selectContainer.classList.add(\"selectContainer\");labelEl.appendChild(selectContainer);this.el = document.createElement(\"select\");selectContainer.appendChild(this.el);this.el.addEventListener(\"change\", (_) =>{this.onChange();});for (const val of possibleValues){let optionEl = document.createElement(\"option\");optionEl.value = optionEl.textContent = val;this.el.appendChild(optionEl);}this.el.value = \"\";this.fakeValueEl = document.createElement(\"div\");this.fakeValueEl.classList.add(\"dropdownFakeValue\");selectContainer.appendChild(this.fakeValueEl);}async onChange(){this.value = this.el.value;this.el.value = \"\";let sendParams ={};sendParams[this.setParamName] = this.value;if (this.modifySendParams){let newSendParams = this.modifySendParams(sendParams);if (newSendParams) sendParams = newSendParams;}let success = await sendServerState(sendParams);if (success){doToastMessage(this.name + \" Updated\");}}get value(){return this._value;}set value(v){this._value = v;this.fakeValueEl.textContent = v;}}"
                        "class Button{constructor(label, cb){this.el = document.createElement(\"button\");this.el.textContent = label;settingsContainer.appendChild(this.el);this.el.addEventListener(\"click\", (_) =>{cb();});}}"
                        "class RequestButton extends Button{constructor(label, endpoint, successMessage){super(label, async (_) =>{try{let response = await fetch(endpoint);if (response.ok){doToastMessage(successMessage);} else{doToastMessage(await response.body(), true);}} catch (_){doToastMessage(\"Failed to connect\", true);}});}}"
+                       "class LinkButton extends Button{constructor(label,url){super(label,_=>{window.open(url,\"_blank\");});}}"
 
                        "let Sl=new Slider(\"Brightness\",false);"
                        "let Sr=new Slider(\"Red\");"
                        "let Sg=new Slider(\"Green\");"
                        "let Sb=new Slider(\"Blue\");"
-                       "let DDm=new DropDown({name:\"Mode\",setParamName:\"m\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"],modifySendParams:(oldParams)=>{if(DDm.value==\"WIFI\"){let extraData=this.getServerStateMessageData(true);return{...oldParams,...extraData};}},});"
-                       "let DDbm=new DropDown({name:\"Bootmode\",setParamName:\"bm\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\"]});"
-                       "let DDdm=new DropDown({name:\"Doublepress mode\",setParamName:\"dm\",possibleValues:[\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"]});"
+
+                       "let Dm=new DropDown({name:\"Mode\",setParamName:\"m\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"],modifySendParams:(oldParams)=>{if(Dm.value==\"WIFI\"){let extraData=this.getServerStateMessageData(true);return{...oldParams,...extraData};}},});"
+                       "let Dbm=new DropDown({name:\"Bootmode\",setParamName:\"bm\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\"]});"
+                       "let Ddm=new DropDown({name:\"Doublepress mode\",setParamName:\"dm\",possibleValues:[\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"]});"
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "let DDa=new DropDown({name:\"Hourly animation\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
-                       "let DDi=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
-                       "let DDhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
-                       "let DDha=new DropDown({name:\"Analog hours\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "let Di=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       
+                       "settingsContainer.appendChild(document.createElement(\"br\"));"
+                       "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "let Dhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
+                       "let Da=new DropDown({name:\"Analog hours\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
                        "let Bo=new RequestButton(\"Enable OTA\",\"/ota\",\"OTA enabled\");"
                        "let Bt=new RequestButton(\"Sync time\",\"/time\",\"Time updated\");"
                        "let Br=new RequestButton(\"Reset\",\"/set?m=RESET\",\"ESP restarting\");"
 
+                       "settingsContainer.appendChild(document.createElement(\"br\"));"
+                       "new LinkButton(\"Info\",\"/info\");"
+                       "new LinkButton(\"Taks\",\"/task\");"
+                       "new LinkButton(\"Saved settings\",\"/ip\");"
+
+                       "curtainEl.addEventListener(\"click\",_=>this.setSettingsVisibility(false));settingsBtn.addEventListener(\"click\",_=>this.setSettingsVisibility(true));function setSettingsVisibility(visible){curtainEl.classList.toggle(\"hidden\",!visible);settingsContainerEl.classList.toggle(\"hidden\",!visible);}"
                        "function updateCssColor(){"
                        "let r=Math.pow(Sr.value01*Sl.value01,1/2.2)*255;"
                        "let g=Math.pow(Sg.value01*Sl.value01,1/2.2)*255;"
@@ -247,17 +257,17 @@ void handle_OnConnect() {
                        "let uiColorTrans2=`rgba(${uiColRGB},0.5)`;"
                        "colorVarsEl.textContent=`:root{--selected-color:${selectedColor};--ui-color:${uiColor};--ui-color-trans1:${uiColorTrans1};--ui-color-trans2:${uiColorTrans2};}`;}"
 
-                       "updateCssColor();async function getServerState(){let response=await fetch(\"/get\");await updateServerStateFromResponse(response);}getServerState();setInterval(async(_)=>{getServerState();},10*1000);function getServerStateMessageData(forceRgb=true){let state={l:Sb.value};if(DDm.value==\"WIFI\"||forceRgb){state={...state,r:Sr.value,g:Sg.value,b:Sb.value};}return state;}async function setServerState(forceRgb=true){let state=getServerStateMessageData(forceRgb);await sendServerState(state);}async function sendServerState(params,endPoint=\"/set\"){let searchParams=new URLSearchParams(params);try{let response=await fetch(endPoint+\"?\"+searchParams);if(response.ok){await updateServerStateFromResponse(response);return true;}else{doToastMessage(await response.body(),true);}}catch(e){doToastMessage(\"Failed to connect\",true);}}"
+                       "updateCssColor();async function getServerState(){let response=await fetch(\"/get\");await updateServerStateFromResponse(response);}getServerState();setInterval(async(_)=>{getServerState();},10*1000);function getServerStateMessageData(forceRgb=true){let state={l:Sl.value};if(Dm.value==\"WIFI\"||forceRgb){state={...state,r:Sr.value,g:Sg.value,b:Sb.value};}return state;}async function setServerState(forceRgb=true){let state=getServerStateMessageData(forceRgb);await sendServerState(state);}async function sendServerState(params,endPoint=\"/set\"){let searchParams=new URLSearchParams(params);try{let response=await fetch(endPoint+\"?\"+searchParams);if(response.ok){await updateServerStateFromResponse(response);return true;}else{doToastMessage(await response.body(),true);}}catch(e){doToastMessage(\"Failed to connect\",true);}}"
                        "async function updateServerStateFromResponse(response){if(!response.ok)return;let json=await response.json();"
-                       "DDm.value=json.m;"
-                       "DDbm.value=json.bm;"
-                       "DDdm.value=json.dm;"
-                       "DDa.value=json.a;"
-                       "DDi.value=json.i;"
-                       "DDhl.value=json.hl;"
-                       "DDha.value=json.ha;"
-                       "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sb.value=col.L;}"
-                       
+                       "Dm.value=json.m;"
+                       "Dbm.value=json.bm;"
+                       "Ddm.value=json.dm;"
+                       "Da.value=json.a;"
+                       "Di.value=json.i;"
+                       "Dhl.value=json.hl;"
+                       "Dha.value=json.ha;"
+                       "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sl.value=col.L;}"
+
                        "async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}"
                        "function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue(\"top\");}"
                        "async function doToastMessage(message,error=false){let el=document.createElement(\"div\");el.classList.add(\"toast\",\"hidden\");el.classList.toggle(\"error\",error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove(\"hidden\");await timeout(5000);el.classList.add(\"hidden\");await timeout(200);el.parentElement.removeChild(el);}"
@@ -401,16 +411,27 @@ void handle_GetTasks() {
 }
 
 void handle_Info() {
+  POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
+
   String Message = "Code compiled on " +  String(CompileDate) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "mDNS name = " + String(mDNSname) + "\n"
+
                    "ClockOffset = " + String(ClockOffset) + "\n"
                    "gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
                    "daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
+
                    "PotMinChange = " + String(PotMinChange) + "\n"
                    "PotStick = " + String(PotStick) + "\n"
-                   "PotMin = " + String(PotMin);
+                   "PotMin = " + String(PotMin) + "\n"
+
+                   "AutoBrightness N = " + String(AutoBrightnessN) + "\n"
+                   "AutoBrightness P = " + String(AutoBrightnessP) + "\n"
+                   "AutoBrightness O = " + String(AutoBrightnessO) + "\n"
+                   "AutoBrightness Value raw = " + String(L.Value) + "\n"
+                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + "\n"
+                   "";
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
 #endif //SerialEnabled

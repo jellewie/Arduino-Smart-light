@@ -27,7 +27,7 @@
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "ClockHourLines", "ClockHourAnalog", "ClockOffset"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -182,7 +182,14 @@ void WiFiManager_handle_Settings() {
     server.handleClient();
     delay(1);
   }
-  WiFiManager_connected = false;      //Flag that WIFI is off, and we need to reconnect (In case user requested to switch WIFI)
+  static String OldSSID = ssid;
+  if (OldSSID != String(ssid)) {
+#ifdef WiFiManager_SerialEnabled
+    Serial.println("WM: Auto disconnect, new SSID recieved, from " + OldSSID + " to " + String(ssid));
+#endif //WiFiManager_SerialEnabled
+    OldSSID = String(ssid);
+    WiFiManager_connected = false;      //Flag that WIFI is off, and we need to reconnect (In case user requested to switch WIFI)
+  }
 }
 void WiFiManager_StartServer() {
   static bool ServerStarted = false;
@@ -299,15 +306,18 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
       AutoBrightnessN = WiFiManager_Temp.toInt();
       break;
     case 8:
-      AutoBrightnessP = WiFiManager_Temp.toInt();
+      AutoBrightnessP = WiFiManager_Temp.toFloat();
       break;
     case 9:
-      ClockHourLines = WiFiManager_Temp.toInt();
+      AutoBrightnessO = WiFiManager_Temp.toInt();
       break;
     case 10:
-      ClockHourAnalog = IsTrue(WiFiManager_Temp);
+      ClockHourLines = WiFiManager_Temp.toInt();
       break;
     case 11:
+      ClockHourAnalog = IsTrue(WiFiManager_Temp);
+      break;
+    case 12:
       ClockOffset = WiFiManager_Temp.toInt();
       break;
   }
@@ -362,15 +372,18 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
       WiFiManager_Temp_Return = AutoBrightnessP;
       break;
     case 9:
-      WiFiManager_Temp_Return = ClockHourLines;
+      WiFiManager_Temp_Return = AutoBrightnessO;
       break;
     case 10:
+      WiFiManager_Temp_Return = ClockHourLines;
+      break;
+    case 11:
       if (WiFiManager_Convert)
         WiFiManager_Temp_Return = IsTrueToString(ClockHourAnalog);
       else
         WiFiManager_Temp_Return = ClockHourAnalog;
       break;
-    case 11:
+    case 12:
       WiFiManager_Temp_Return = ClockOffset;
       break;
   }

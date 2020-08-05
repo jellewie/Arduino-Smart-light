@@ -19,10 +19,11 @@ bool WiFiManager_connected;               //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                //Holds in which mode the light is currently in
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
-bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
 bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
-byte AutoBrightnessN = 0;                 //SOFT_SETTING Brightness = M*X+N
-byte AutoBrightnessP = 1;                 //SOFT_SETTING ^
+bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
+float AutoBrightnessP = 1.7;              //SOFT_SETTING Brightness = Y=(X-N)*P+O         [1-(AutoBrightnessN/255)] https://www.desmos.com/calculator/gpr6bwjleg
+byte AutoBrightnessN = 105;               //SOFT_SETTING ^ (signed byte so -127 to 128)   [Just the lowest raw sensor value you can find]
+byte AutoBrightnessO = 8;                 //SOFT_SETTING ^                                [Just an brigtness offset, so it can be set to be globaly more bright]
 byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 
 #include <FastLED.h>
@@ -110,13 +111,17 @@ void setup() {
   //Set AnalogResolution, and init the potmeters
   //==============================
   analogReadResolution(AnalogResolution);
-  for (int i = 0; i < AverageAmount + 2; i++)
-    UpdateColor(false);                                 //Take enough analog samples, so we get a good average
+  for (int i = 0; i < AverageAmount + 2; i++) {
+    UpdateColor(false);                                 //Trash some measurements, so we get a good average on start
+    UpdateBrightness(false);
+  }
+  FastLED.setBrightness(1);                             //Set boot Brightness
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode
   //==============================
   LoadData();
   Mode = BootMode;                                      //Set the startup mode
+  UpdateBrightness(true);
 #ifdef SerialEnabled
   Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
