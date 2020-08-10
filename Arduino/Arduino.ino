@@ -3,6 +3,9 @@
 
   TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
 */
+#if !defined(ESP32)
+#error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
+#endif
 //#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
@@ -40,16 +43,13 @@ WebServer server(80);
 //========================================//
 //User Variables
 //========================================//
-#if !defined(ESP32)
-#error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
-#endif
 const byte PAO_LED = 25;                  //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                    //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                    //
 const byte PAI_B = 34;                    //
 const byte PAI_Brightness = 35;           //
-const byte PDI_Button = 26;               //pulled down with 10k to GND
-const byte PAI_LIGHT = 39;
+const byte PDI_Button = 26;               //Pulled down with 10k to GND
+const byte PAI_LIGHT = 39;                //Pulled down with a GL5528 to GND, and pulled up with 10k, This sensor is for AutoBrightness
 
 const byte PotMinChange = 2;              //How much the pot_value needs to change before we process it
 const byte PotStick = PotMinChange + 1;   //If this close to HIGH or LOW stick to it

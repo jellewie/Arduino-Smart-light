@@ -42,8 +42,8 @@ char ssid[WiFiManager_EEPROM_SIZE_SSID] = "";
 char password[WiFiManager_EEPROM_SIZE_PASS] = "";
 
 #include <EEPROM.h>
-#include <DNSServer.h>
-DNSServer dnsServer;
+//#include <DNSServer.h>
+//DNSServer dnsServer;
 
 byte WiFiManager_Start() {
   WiFiManager_Status_Start();
@@ -226,7 +226,7 @@ byte WiFiManager_APMode() {
     return 2;
   WiFiManager_EnableSetup(true);              //Flag we need to responce to settings commands
   WiFiManager_StartServer();                  //start server (if we havn't already)
-  dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));  //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
+  //dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));  //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: APMode on; SSID=" + String(WiFiManager_APSSID) + " ip=");
   Serial.println(WiFi.softAPIP());
@@ -234,17 +234,17 @@ byte WiFiManager_APMode() {
   while (WiFiManager_WaitOnAPMode) {
     if (TickEveryMS(100)) WiFiManager_Status_Blink(); //Let the LED blink to show we are not connected
     server.handleClient();
-    dnsServer.processNextRequest();
+    //dnsServer.processNextRequest();
     if (WiFiManager_HandleAP()) {
 #ifdef SerialEnabled        //DEBUG, print button state to serial
       Serial.println("WM: Manual leaving APMode");
 #endif //SerialEnabled
       WiFiManager_EnableSetup(false);   //Flag to stop responce to settings commands
-      dnsServer.stop();
+      //dnsServer.stop();
       return 3;
     }
   }
-  dnsServer.stop();
+  //dnsServer.stop();
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: Leaving APmode");
 #endif //WiFiManager_SerialEnabled
