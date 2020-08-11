@@ -80,5 +80,6 @@ The control page is the default landing page the user will land on when the lamp
 https://github.com/jellewie/Arduino-Smart-light
 * PCB & schematic
 https://easyeda.com/jellewietsma/smart-light
+https://easyeda.com/jellewietsma/smart-clock
 * 3D models
 At the time of writing these are in this folde included
