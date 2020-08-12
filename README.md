@@ -124,6 +124,7 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 The power supply is either 5V or 12V. The difference in the voltage is the used LED strip. If the WS2812B (older model) is used it would need to be 5V, but if the WS2815 are used then 12V is required. The newer model WS2815 with redundant data lines is 12V. 
 
 <img align="right" src="Images/positive polarity.png" alt="positive polarity">
+
 The pinout of the DC jack has by default positive polarity. Meaning the outer tube, as shown in the figure right, is the ground connection. The lamp will fail to work otherwise (but is able to handle the shock).
 ## Power consumption
 The lamp will consume 18Watts at maximum, so as an example for 12V an 1.5A (or 5V at 3.6A) power supply is required to allow full brightness. Although actual measurements came closer to 12Watt.
