@@ -51,17 +51,17 @@ Although these options change a bit over time, here is a list of 3 actions what 
 3.	**StartLongPress** Triggered when you press the button longer than Time_StartLongPressMS (5000) but shorter than Time_ESPrestartMS (15000) ms.
 - If in APmode it will cancel and reboot.
 - If it was connected to WIFI it will show its IP, Which is explained in [WIFI page](#wifi-page) - Getting it’s IP.
-- If it isn’t connected to WIFI it will start connecting to WIFI (and possible go into AP mode, that is explained in 
+- If it isn’t connected to WIFI it will start connecting to WIFI (and possibly go into AP mode, that is explained in 
 
 ## Pot meter
 The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
 ## WIFI page
 Here are the 2 most important pages listed with their descriptions. Keep in mind more functions could be added or a different layout could be used, but the intention should be the same as these.
-Some special functions like manual updating time (IP/time?h=2&m=4&s=1) are not listed here. If important things missing feel free to contact me, but all functions can be found in the code
+Some special functions might not be listed here. If important things missing feel free to contact me!
 ### Setup
 <img align="right" src="Images/ip.png" alt="WIFI page /ip">
 
-The setup page will be accessible and shown in APmode, but can also be access by going to ‘<IP>/ip’. An example of this page is shown in the figure on the right.
+The setup page will be accessible and shown in APmode, but can also be access by going to [smart-light.local/ip](http://smart-light.local/ip). An example of this page is shown in the figure on the right.
 The password is replaced with starts, and cannot be received without changing the firmware. 
 Leave fields blank (or for the password leaving only stars) to not update those values upon sending this forum.
 By default the SSID and password is limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 128. Going over these values results in unexpected behaviour. 
@@ -70,14 +70,14 @@ By default the SSID and password is limited to 16 characters by the firmware, an
 To trigger this menu please see [Button](#Button), this part is just about how to read it. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a x100 multiplication and green will have x10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue. This is shown in the figure below
 
 <img src="Images/ShowIP.png" alt="ShowIP 198.168.1.150">
-But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to optain it's IP.
+But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to optain its IP.
 
 ### Control
 <img align="right" src="Images/Home.png" alt="Home page" width=50%>
 The control page is the default landing page the user will land on. An example of this page is shown in the figure on the right.
 
 - **The brightness slider** will always change the brightness no matter in what mode it is in (except for AP since that is not a defined mode), these values are only send and updated on releasing the slide bar. This will also turn off auto brightness.
-- **The RGB sliders** will either (try) change the animation accent to the given RGB colour, or switch the mode to Wi-Fi control and set the RGB color.
+- **The RGB sliders** will either (try) change the animation accent to the given RGB colour, or switch the mode to Wi-Fi control and set the RGB colour.
 - **Settings button** The gear on the right lower corner will open the settings page.
 
 <img align="right" src="Images/Settings.png" alt="Settings page" width=50%>
@@ -86,20 +86,20 @@ An example of the settings page is shown in the figure on the right.
 - **Mode** is the current mode the light is in.
 - **Bootmode** is the mode the light will go into on start-up.
 - **Doublepress mode** is the mode the light will switch to when a double press on the button is made.
-- **Auto brightness** will set the brightness automaticly.
+- **Auto brightness** will set the brightness automatically.
 - **Hourly animation** is when the light is in the clock mode an hourly animation needs to be played.
-- **Hourly lines** when in clock mode, will add lines to each hour, the value is the amount on a byte scale (0-255) dimmed by the brightness itzelf.
+- **Hourly lines** when in clock mode, will add lines to each hour, the value is the amount on a byte scale (0-255) dimmed by the brightness itself.
 - **Analog hours** will let the hour indicator take 60 instead of 12 steps, so it will not stick to the whole hours indication.
 - **Enable OTA** will enable Arduino Over The Air updates, so the firmware can be updated remotely with the Arduino IDE.
 - **Sync time** will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
 - **Reset** will fully restart the ESP.
 - **Info** will open the info page with some information like the version compile date
 - **Task** WIP this will show an task menu, so tasks can be scheduled, removed, changed, and listed.
-- **Saved settings** just redirects you to <IP>/ip to show you the values saved in the EEPROM
+- **Saved settings** just redirects you to [smart-light.local/ip](http://smart-light.local/ip) to show you the values saved in the EEPROM
 
 ### Soft settings
-There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded. 
-The most up-to-date values can be find in the top of the ‘handler.ino’ source file. Some settings can only be set in [smart-light.local/ip](http://smart-light.local/ip), others can be done by the settings menu in the main screen.
+There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
+The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-light.local/ip](http://smart-light.local/ip).
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimation** If it needs to show hourly animations when in CLOCK mode
 - **DoublePressMode** In what mode to go into when the button is double pressed
@@ -111,6 +111,14 @@ The most up-to-date values can be find in the top of the ‘handler.ino’ sourc
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just 12
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 
+### Clock mode
+For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 
+
+Clock mode can only be started when WIFI has been connected and the user switches mode, after switching to Clockmode the lamp will turn PURPLE/GREEN/PURPLE/GREEN this means it is getting the time from a time server.
+
+Also the clock can be manual updated with [smart-light.local/time?h=2&m=4&s=1](http://smart-light.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also updates automatically every day at 4:00
+
+Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#Soft%20settings)
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
@@ -127,15 +135,15 @@ The power supply is either 5V or 12V. The difference in the voltage is the used 
 
 The pinout of the DC jack has by default positive polarity. Meaning the outer tube, as shown in the figure right, is the ground connection. The lamp will fail to work otherwise (but is able to handle the shock).
 ## Power consumption
-The lamp will consume 18Watts at maximum, so as an example for 12V an 1.5A (or 5V at 3.6A) power supply is required to allow full brightness. Although actual measurements came closer to 12Watt.
+The lamp will consume 18Watts at maximum, so as an example for 12V a 1.5A (or 5V at 3.6A) power supply is required to allow full brightness. Although actual measurements came closer to 12Watt.
 
 The idle power consumption is about 0.65Watt (measured with LEDs turned off, and WIFI turned on)
 
 # Appendix
 * Firmware
-[This is included in this repo](Arduino)
+[This is included in this repository](Arduino)
 * PCB & schematic
 [Smart light](https://easyeda.com/jellewietsma/smart-light)
 [Smart clock](https://easyeda.com/jellewietsma/smart-clock)
 * 3D models
-[These are included in this repo](3DModel)
+[These are included in this repository](3DModel)
