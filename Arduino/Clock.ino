@@ -9,11 +9,11 @@ void UpdateAndShowClock(bool ShowClock) {
 #endif //TimeExtra_SerialEnabled
     TimeCurrent.Ticks += 1000;
     TimeCurrent.SS++;
-    if (TimeCurrent.SS > 59) {
+    if (TimeCurrent.SS >= 60) {
       TimeCurrent.SS = 0;
       TimeCurrent.MM++;
     }
-    if (TimeCurrent.MM > 59) {
+    if (TimeCurrent.MM >= 60) {
       TimeCurrent.MM = 0;
       TimeCurrent.HH++;
       if (ShowClock and DoHourlyAnimation) {
@@ -21,10 +21,10 @@ void UpdateAndShowClock(bool ShowClock) {
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
         StartAnimation(random(0, TotalAnimations), AnimationCounterTime); //Start a random Animation
-        return;
+        ShowClock = false;                       //Do not show the clock, an animation will be shown
       }
     }
-    if (TimeCurrent.HH > 24)
+    if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
     static bool TimeFlag = false;
     if (TimeCurrent.HH == 4 and !TimeFlag) {
@@ -94,5 +94,7 @@ bool UpdateTime() {
     TimeCurrent.SS = timeinfo.tm_sec;
   }
   TimeSet = true;
+  FastLED.clear();
+  UpdateLEDs = true;
   return true;
 }

@@ -336,7 +336,7 @@ void handle_GetTasks() {
   String Message;
   if (server.args() > 0) {                      //If manual time given
     TASK TempTask;
-    byte TaskMode;
+    byte TaskMode = 0;
     for (int i = 0; i < server.args(); i++) {
       String ArguName = server.argName(i);
       ArguName.toLowerCase();
