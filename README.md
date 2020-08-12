@@ -4,12 +4,13 @@ if you have interest in buying one and live in The Netherlands, feel free to con
 
 # Smart clock
 A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI and manual control, Clock mode, multiple animations, and transitions.
-<img src="Images/Desk%20clock.jpeg" alt="Desk clock image">
-<img src="Images/Desk%20lamp.jpeg" alt="Desk lamp image">
+
+<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
+<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 
 # What you need to make one
 ## Hardware
-- a[PCB lamp](https://easyeda.com/jellewietsma/smart-light) or [PCB wall](https://easyeda.com/jellewietsma/smart-clock)
+- a [PCB lamp](https://easyeda.com/jellewietsma/smart-light) or [PCB wall](https://easyeda.com/jellewietsma/smart-clock)
 - All parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
 - Others things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
 ## Firmware (To compile)
@@ -72,14 +73,14 @@ To trigger this menu please see [Button](#Button), this part is just about how t
 But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to optain it's IP.
 
 ### Control
-<img align="right" src="Images/Home.png" alt="Home page">
+<img align="right" src="Images/Home.png" alt="Home page" width=50%>
 The control page is the default landing page the user will land on. An example of this page is shown in the figure on the right.
 
 - **The brightness slider** will always change the brightness no matter in what mode it is in (except for AP since that is not a defined mode), these values are only send and updated on releasing the slide bar. This will also turn off auto brightness.
 - **The RGB sliders** will either (try) change the animation accent to the given RGB colour, or switch the mode to Wi-Fi control and set the RGB color.
 - **Settings button** The gear on the right lower corner will open the settings page.
 
-<img align="right" src="Images/Settings.png" alt="Settings page">
+<img align="right" src="Images/Settings.png" alt="Settings page" width=50%>
 An example of the settings page is shown in the figure on the right.
 
 - **Mode** is the current mode the light is in.
@@ -122,7 +123,7 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 ## Input voltage
 The power supply is either 5V or 12V. The difference in the voltage is the used LED strip. If the WS2812B (older model) is used it would need to be 5V, but if the WS2815 are used then 12V is required. The newer model WS2815 with redundant data lines is 12V. 
 
-<img align="right" src="positive polarity.png" alt="positive polarity">
+<img align="right" src="Images/positive polarity.png" alt="positive polarity">
 The pinout of the DC jack has by default positive polarity. Meaning the outer tube, as shown in the figure right, is the ground connection. The lamp will fail to work otherwise (but is able to handle the shock).
 ## Power consumption
 The lamp will consume 18Watts at maximum, so as an example for 12V an 1.5A (or 5V at 3.6A) power supply is required to allow full brightness. Although actual measurements came closer to 12Watt.
