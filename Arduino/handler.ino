@@ -429,8 +429,8 @@ void handle_Info() {
                    "AutoBrightness N = " + String(AutoBrightnessN) + "\n"
                    "AutoBrightness P = " + String(AutoBrightnessP) + "\n"
                    "AutoBrightness O = " + String(AutoBrightnessO) + "\n"
-                   "AutoBrightness Value raw = " + String(L.Value) + "(inverse)\n"
-                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + "=(raw-N)*P+O \n"
+                   "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
+                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
                    "";
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
