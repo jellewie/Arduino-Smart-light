@@ -55,8 +55,8 @@ const byte PotMinChange = 2;              //How much the pot_value needs to chan
 const byte PotStick = PotMinChange + 1;   //If this close to HIGH or LOW stick to it
 const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to change, to set mode to manual
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
-const long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
-const int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
+long  gmtOffset_sec = 3600;         //Set to you GMT offset (in seconds)
+int   daylightOffset_sec = 3600;    //Set to your daylight offset (in seconds)
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
 const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
 //========================================//
