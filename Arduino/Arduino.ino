@@ -17,9 +17,8 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-//========================================//
-//User Variables
-//========================================//
+#define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
+const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const byte PAO_LED = 25;                  //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                    //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                    //
@@ -27,21 +26,8 @@ const byte PAI_B = 34;                    //
 const byte PAI_Brightness = 35;           //
 const byte PDI_Button = 26;               //Pulled down with 10k to GND
 const byte PAI_LIGHT = 39;                //Pulled down with a GL5528 to GND, and pulled up with 10k, This sensor is for AutoBrightness
-const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
-#define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
-const char* Name = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
-//========================================//
-//End of User Variables
-//========================================//
+
 #include "functions.h"
-
-bool UpdateLEDs;                          //If we need to physically update the LEDs
-bool WiFiManager_connected;               //If the ESP is connected to WIFI
-bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
-byte Mode;                                //Holds in which mode the light is currently in
-byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
-const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
-
 byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
 bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
@@ -57,22 +43,26 @@ int  daylightOffset_sec = 3600;           //SOFT_SETTING Set to your daylight of
 byte PotMinChange = 2;                    //SOFT_SETTING How much the pot_value needs to change before we process it
 byte PotStick = PotMinChange + 1;         //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;           //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
-
-const String CompileDate = String(__DATE__) + " " + String(__TIME__); //Set Compile date to the date we compile this
+char Name[16] = "smart-clock";            //SOFT_SETTING The mDNS, WIFI APmode SSID, and OTA name of the device. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+bool UpdateLEDs;                          //If we need to physically update the LEDs
+bool WiFiManager_connected;               //If the ESP is connected to WIFI
+bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+byte Mode;                                //Holds in which mode the light is currently in
+byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
+const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
+TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
 
 #include <FastLED.h>
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
-TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
 #include "Task.h"
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
 #include <ESPmDNS.h>
 WebServer server(80);
-
 
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);

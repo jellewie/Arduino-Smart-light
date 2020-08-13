@@ -412,12 +412,12 @@ void handle_GetTasks() {
 
 void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
-
-  String Message = "Code compiled on " +  String(CompileDate) + "\n"
+  String Message = "Code compiled on " +  String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
-                   "Name = " + String(Name) + "\n"
+                   "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
+                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
 
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)

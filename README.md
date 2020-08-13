@@ -16,7 +16,7 @@ A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI 
 ## Firmware (To compile)
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
 - [ESP32](https://dl.espressif.com/dl/package_esp32_index.json).
-- [Arduino-WiFiManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
+- [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
 
@@ -54,16 +54,16 @@ Although these options change a bit over time, here is a list of 3 actions what 
 - If it isn’t connected to WIFI it will start connecting to WIFI (and possibly go into AP mode, that is explained in 
 ## LED status
 In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP (LED_BUILDIN) this LED reflects some more errors.
-- **ON** WIFI starts, goes OFF when WIFI setup is successfully completed
-- **blink 100ms** WIFI setup failed, APmode has started
-- **blink 500ms** it is connecting to its known WiFi
-- **blink 1000ms** OTA is on
-- **blink 2000ms** WIFI is lost, so the current time (we are in CLOCK mode) can not be updated
+- **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
+- **blink 100ms** WIFI setup failed, APmode has started.
+- **blink 500ms** it is connecting to its known WIFI.
+- **blink 1000ms** OTA is on.
+- **blink 2000ms** WIFI is lost, so the current time (we are in CLOCK mode) cannot be updated.
 
 Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
-- **White short blink** It is booting up
-- **PURPLE/RED/PURPLE/RED** It is starting the WIFI connect code
-- **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code
+- **White short blink** It is booting up.
+- **PURPLE/RED/PURPLE/RED** It is starting the WIFI connect code.
+- **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code.
 ## Pot meter
 The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
 ## WIFI page
@@ -81,7 +81,7 @@ By default the SSID and password is limited to 16 characters by the firmware, an
 To trigger this menu please see [Button](#Button), this part is just about how to read it. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a x100 multiplication and green will have x10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue. This is shown in the figure below
 
 <img src="Images/ShowIP.png" alt="ShowIP 198.168.1.150">
-But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to optain its IP.
+But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to obtain its IP.
 
 ### Control
 <img align="right" src="Images/Home.png" alt="Home page" width=50%>
@@ -105,7 +105,7 @@ An example of the settings page is shown in the figure on the right.
 - **Sync time** will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
 - **Reset** will fully restart the ESP.
 - **Info** will open the info page with some information like the version compile date
-- **Task** WIP this will show an task menu, so tasks can be scheduled, removed, changed, and listed.
+- **Task** WIP this will show a task menu, so tasks can be scheduled, removed, changed, and listed.
 - **Saved settings** just redirects you to [smart-light.local/ip](http://smart-light.local/ip) to show you the values saved in the EEPROM
 
 ### Soft settings
@@ -126,21 +126,22 @@ The most up-to-date values can be found in the top of the [WifiManager.ino](Ardu
 - **PotMinChange** How much the pot_value needs to change before we process it.
 - **PotStick** If this close to HIGH or LOW stick to it.
 - **PotMin** On how much pot_value_change need to change, to set mode to manual.
+- **Name** The mDNS, WIFI APmode SSID, and OTA name of the device. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
 
 ### Clock mode
 For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 
 
 Clock mode can only be started when WIFI has been connected and the user switches mode, after switching to Clockmode the lamp will turn PURPLE/GREEN/PURPLE/GREEN this means it is getting the time from a time server.
 
-Also the clock can be manual updated with [smart-light.local/time?h=2&m=4&s=1](http://smart-light.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also updates automatically every day at 4:00
+Also the clock can be manual updated with [smart-light.local/time?h=2&m=4&s=1](http://smart-light.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
 
 Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#Soft%20settings)
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
-2.	[Optional for WiFi] Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. Long press the button again to cancel this setup.
+2.	[Optional for WIFI] Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. Long press the button again to cancel this setup.
 3.	Connect to this Access Point, by default it will be called “smart-light”.
-4.	When connected go to 192.168.4.1 this will show a page where the WIFI name and password can be set, do not forget to submit. The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device doesn’t prompt the login page.
+4.	When connected go to 192.168.4.1 this will show a page where the WIFI name and password can be set, do not forget to submit. The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page.
 5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-light.local/info](http://smart-light.local/info) can be used.
 
 # Specifications 

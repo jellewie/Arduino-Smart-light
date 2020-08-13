@@ -22,12 +22,12 @@
 */
 
 #define WiFiManager_ConnectionTimeOutMS 10000
-#define WiFiManager_APSSID "smart-light"
+#define WiFiManager_APSSID Name
 #define WiFiManager_EEPROM_SIZE 128           //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -335,6 +335,9 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
     case 17:
       PotMin = WiFiManager_Temp.toInt();
       break;
+    case 18:
+      WiFiManager_Temp.toCharArray(Name, 16);
+      break;
   }
   return true;
 }
@@ -415,6 +418,9 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
       break;
     case 17:
       WiFiManager_Temp_Return = PotMin;
+      break;
+    case 18:
+      WiFiManager_Temp_Return = String(Name);
       break;
   }
 #ifdef WiFiManager_SerialEnabled
