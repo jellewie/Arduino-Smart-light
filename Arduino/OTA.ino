@@ -23,5 +23,7 @@ bool OTA_loop() {
     OTA_Started = true;
   }
   ArduinoOTA.handle();
+  if (TickEveryMS(1000))
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
   return true;
 }
