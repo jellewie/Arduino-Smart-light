@@ -39,40 +39,42 @@ void UpdateAndShowClock(bool ShowClock) {
   //==============================
   //Show the time on the LEDs if needed
   //==============================
-  if (ClockAnalog) {
-    ClearAndSetupClock();
-
-    float TimeSSfactor = (millis() - TimeCurrent.Ticks) / 1000.0 + TimeCurrent.SS;
-    float TimeMMfactor = TimeCurrent.MM + TimeCurrent.SS / 60.0;
-    float TimeHHfactor = TimeCurrent.HH * 5 + TimeCurrent.MM / 60.0;
-    if (TimeHHfactor > 60) TimeHHfactor -= 60;                      //If its above 12 hours, remove 12 since we can only show 0-12 hours
-
-    byte TimeSSoffset = 0, TimeMMoffset = 0, TimeHHoffset = 0;      //If time is over a half circle, lower it, and set the offset
-    if (TimeSSfactor > 30) TimeSSfactor -= TimeSSoffset = 30;       //^
-    if (TimeMMfactor > 30) TimeMMfactor -= TimeMMoffset = 30;       //^
-    if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30;       //^
-
-    for (int i = 0; i < TotalLEDs; i++) {
-      byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255;        //https://www.desmos.com/calculator/zkl6idhjvx
-      byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255;        //^
-      byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255;        //^
-      LEDs[LEDtoPosition(i + TimeSSoffset)] += CRGB(0, 0, TimeSSbr);
-      LEDs[LEDtoPosition(i + TimeMMoffset)] += CRGB(0, TimeMMbr, 0);
-      LEDs[LEDtoPosition(i + TimeHHoffset)] += CRGB(TimeHHbr, 0, 0);
-      UpdateLEDs = true;
-    }
-  } else if (ShowClock) {
-    static byte LastSec = TimeCurrent.SS;       //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
-    if (LastSec != TimeCurrent.SS) {
-      LastSec = TimeCurrent.SS;
+  if (ShowClock) {
+    if (ClockAnalog) {
       ClearAndSetupClock();
-      LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
-      LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
-      byte ClockHH = TimeCurrent.HH * 5;
-      if (ClockHourAnalog)
-        ClockHH += (TimeCurrent.MM / 15);
-      LEDs[LEDtoPosition(ClockHH)] += CRGB(255, 0, 0);
-      UpdateLEDs = true;
+
+      float TimeSSfactor = (millis() - TimeCurrent.Ticks) / 1000.0 + TimeCurrent.SS;
+      float TimeMMfactor = TimeCurrent.MM + TimeCurrent.SS / 60.0;
+      float TimeHHfactor = TimeCurrent.HH * 5 + TimeCurrent.MM / 60.0;
+      if (TimeHHfactor > 60) TimeHHfactor -= 60;                      //If its above 12 hours, remove 12 since we can only show 0-12 hours
+
+      byte TimeSSoffset = 0, TimeMMoffset = 0, TimeHHoffset = 0;      //If time is over a half circle, lower it, and set the offset
+      if (TimeSSfactor > 30) TimeSSfactor -= TimeSSoffset = 30;       //^
+      if (TimeMMfactor > 30) TimeMMfactor -= TimeMMoffset = 30;       //^
+      if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30;       //^
+
+      for (int i = 0; i < TotalLEDs; i++) {
+        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255;        //https://www.desmos.com/calculator/zkl6idhjvx
+        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255;        //^
+        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255;        //^
+        LEDs[LEDtoPosition(i + TimeSSoffset)] += CRGB(0, 0, TimeSSbr);
+        LEDs[LEDtoPosition(i + TimeMMoffset)] += CRGB(0, TimeMMbr, 0);
+        LEDs[LEDtoPosition(i + TimeHHoffset)] += CRGB(TimeHHbr, 0, 0);
+        UpdateLEDs = true;
+      }
+    } else {
+      static byte LastSec = TimeCurrent.SS;       //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
+      if (LastSec != TimeCurrent.SS) {
+        LastSec = TimeCurrent.SS;
+        ClearAndSetupClock();
+        LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
+        LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
+        byte ClockHH = TimeCurrent.HH * 5;
+        if (ClockHourAnalog)
+          ClockHH += (TimeCurrent.MM / 15);
+        LEDs[LEDtoPosition(ClockHH)] += CRGB(255, 0, 0);
+        UpdateLEDs = true;
+      }
     }
   }
 }
