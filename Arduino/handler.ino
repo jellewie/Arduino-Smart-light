@@ -416,24 +416,13 @@ void handle_Info() {
   String Message = "Code compiled on " +  String(CompileDate) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "mDNS name = " + String(Name) + "\n"
-
-                   "SOFT_SETTING ClockOffset = " + String(ClockOffset) + "\n"
-                   "SOFT_SETTING gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
-                   "SOFT_SETTING daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
-
-                   "SOFT_SETTING PotMinChange = " + String(PotMinChange) + "\n"
-                   "SOFT_SETTING PotStick = " + String(PotStick) + "\n"
-                   "SOFT_SETTING PotMin = " + String(PotMin) + "\n"
-
-                   "SOFT_SETTING AutoBrightness N = " + String(AutoBrightnessN) + "\n"
-                   "SOFT_SETTING AutoBrightness P = " + String(AutoBrightnessP) + "\n"
-                   "SOFT_SETTING AutoBrightness O = " + String(AutoBrightnessO) + "\n"
-                   "SOFT_SETTING AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
-                   "SOFT_SETTING AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
-
                    "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
-                   "";
+                   "Name = " + String(Name) + "\n"
+
+                   "\nSOFT_SETTINGS\n";
+  for (byte i = 3; i < WiFiManager_Settings + 1; i++)
+    Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager_Get_Value(i, false, true) + "\n";
+
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
 #endif //SerialEnabled
