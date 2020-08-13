@@ -58,6 +58,7 @@ In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP 
 - **blink 100ms** WIFI setup failed, APmode has started
 - **blink 500ms** it is connecting to its known WiFi
 - **blink 1000ms** OTA is on
+- **blink 2000ms** WIFI is lost, so the current time (we are in CLOCK mode) can not be updated
 
 Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
 - **White short blink** It is booting up

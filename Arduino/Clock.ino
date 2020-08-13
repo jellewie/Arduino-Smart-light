@@ -34,6 +34,7 @@ void UpdateAndShowClock(bool ShowClock) {
     } else
       TimeFlag = false;
   }
+  if (TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
   //==============================
   //Show the time on the LEDs if needed
   //==============================
