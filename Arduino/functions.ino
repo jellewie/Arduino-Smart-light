@@ -46,7 +46,8 @@ void UpdateBrightness(bool ForceUpdate) {
   }
   POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
-    FastLED.setBrightness(constrain(Brightness.Value, 1, 255));
+    if (Brightness.Value == 0) Brightness.Value = 1;
+    FastLED.setBrightness(Brightness.Value);
     AutoBrightness = false;
     UpdateLEDs = true;
 #ifdef SerialEnabled

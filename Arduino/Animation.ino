@@ -26,16 +26,16 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
     Serial.println("AN: AnimationCounter=" + String(AnimationCounter));
 #endif //SerialEnabled
   }
+  const byte AnimationMoveValue = (AnimationCounterTime * 1000 + 500) / (TotalLEDs * 4);  //define the speed so it goes around 4 times
   switch (CurrentAnimation) {
     case 0:
-#define AnimationMoveValue (AnimationCounterTime * 1000 + 500) / TotalLEDs * 2
-      AnimationMove(RGBColor, AnimationMoveValue, Start, 2, 3); //void AnimationMove(byte rgb[3], byte Delay, byte MoveAmount, byte MoveLength)
+      AnimationMove(RGBColor, AnimationMoveValue, Start, 2, 3);               //void AnimationMove(byte rgb[3], byte Delay, bool Start, byte MoveAmount, byte MoveLength)
       break;
     case 1:
-      AnimationFlash(RGBColor, 500, Start, 4);                                   //void AnimationFlash(byte rgb[3], int Delay, bool Start, byte BrightScaler)
+      AnimationFlash(RGBColor, 500, Start, 4);                                //void AnimationFlash(byte rgb[3], int Delay, bool Start, byte BrightScaler)
       break;
     case 2:
-      AnimationBlink(RGBColor, (AnimationCounterTime * 1000 / TotalLEDs) - 1, Start, 1, TotalLEDs);     //void AnimationBlink(byte rgb[3], byte Delay, bool Start, byte AlwaysOn, byte LengthBlink)
+      AnimationBlink(RGBColor, (AnimationCounterTime * 1000 / TotalLEDs) - 1, Start, 1, TotalLEDs); //void AnimationBlink(byte rgb[3], byte Delay, bool Start, byte AlwaysOn, byte LengthBlink)
       break;
     case 3:
       AnimationRainbow(10, 255 / TotalLEDs);                                  //void AnimationRainbow(byte Delay, byte DeltaHue)
@@ -44,7 +44,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
       Animationjuggle(20, 8);                                                 //void Animationjuggle(byte Delay, byte Amount)
       break;
     case 5:
-      AnimationSinelon(RGBColor, 10, Start, 13);                               //void AnimationSinelon(byte rgb[3], byte DimBy, bool Return)
+      AnimationSinelon(RGBColor, 10, Start, 13);                              //void AnimationSinelon(byte rgb[3], byte DimBy, bool Return)
       break;
     case 6:
       SetNewColor();
@@ -214,7 +214,7 @@ bool AnimationSinelon(byte rgb[3], byte DimBy, bool Start, byte BPM) { // a colo
 }
 void AnimationConfetti(byte rgb[3], byte DimBy, byte Delay) { // random colored speckles that blink in and fade smoothly
   //byte rgb[3] = {255, 0, 0};                                      //The color value
-  //byte Delay = 100;                                                //Delay in ms to fade to black
+  //byte Delay = 100;                                               //Delay in ms to fade to black
 
   fadeToBlackBy(LEDs, TotalLEDs, DimBy);
   EVERY_N_MILLISECONDS(Delay) {
@@ -230,7 +230,7 @@ void AnimationaddGlitter(byte rgb[3], byte chanceOfGlitter, byte Delay) {
   if (random8() < chanceOfGlitter)
     LEDs[random8(TotalLEDs)] += CRGB(rgb[0], rgb[1], rgb[2]);
 }
-void AnimationBPM(byte gHue, byte BeatsPerMinute) { // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+void AnimationBPM(byte gHue, byte BeatsPerMinute) {                 ///Colored stripes pulsing at a defined Beats-Per-Minute (BPM)
   //byte gHue
   //byte BeatsPerMinute = 60;
 
