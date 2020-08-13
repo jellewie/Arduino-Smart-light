@@ -112,17 +112,20 @@ An example of the settings page is shown in the figure on the right.
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
 The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-light.local/ip](http://smart-light.local/ip).
 - **Bootmode** In which mode to start in after start-up
-- **HourlyAnimation** If it needs to show hourly animations when in CLOCK mode
-- **DoublePressMode** In what mode to go into when the button is double pressed
-- **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P
-- **AutoBrightnessN** Brightness =(X-N)xP+O
+- **HourlyAnimation** If it needs to show hourly animations when in CLOCK mode.
+- **DoublePressMode** In what mode to go into when the button is double pressed.
+- **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P.
+- **AutoBrightnessN** Brightness =(X-N)xP+O.
 - **AutoBrightnessP**
 - **AutoBrightnessO**
-- **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255
-- **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just 12
-- **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
-- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so thats 3600 seconds
-- **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds
+- **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255.
+- **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just stick to wholes and use 12.
+- **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations.
+- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so thats 3600 seconds.
+- **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds.
+- **PotMinChange** How much the pot_value needs to change before we process it.
+- **PotStick** If this close to HIGH or LOW stick to it.
+- **PotMin** On how much pot_value_change need to change, to set mode to manual.
 
 ### Clock mode
 For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 

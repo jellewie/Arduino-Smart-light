@@ -17,32 +17,6 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-bool UpdateLEDs;                          //Holds if we need to physically update the LEDs
-bool WiFiManager_connected;               //If the ESP is connected to WIFI
-bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
-byte Mode;                                //Holds in which mode the light is currently in
-byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
-byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
-bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
-bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
-float AutoBrightnessP = 1.7;              //SOFT_SETTING Brightness = Y=(X-N)*P+O         [1-(AutoBrightnessN/255)] https://www.desmos.com/calculator/gpr6bwjleg
-byte AutoBrightnessN = 105;               //SOFT_SETTING ^ (signed byte so -127 to 128)   [Just the lowest raw sensor value you can find]
-byte AutoBrightnessO = 8;                 //SOFT_SETTING ^                                [Just an brigtness offset, so it can be set to be globaly more bright]
-byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
-const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
-
-#include <FastLED.h>
-CRGB LEDs[TotalLEDs];
-#include "StableAnalog.h"
-#include "Button.h"
-#include "functions.h"
-TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
-#include "time.h"                         //We need this for the clock function to get the time (Time library)
-#include "Task.h"
-#include <WiFi.h>                         //we need this for WIFI stuff (duh)
-#include <WebServer.h>
-#include <ESPmDNS.h>
-WebServer server(80);
 //========================================//
 //User Variables
 //========================================//
@@ -53,23 +27,52 @@ const byte PAI_B = 34;                    //
 const byte PAI_Brightness = 35;           //
 const byte PDI_Button = 26;               //Pulled down with 10k to GND
 const byte PAI_LIGHT = 39;                //Pulled down with a GL5528 to GND, and pulled up with 10k, This sensor is for AutoBrightness
-
-const byte PotMinChange = 2;              //How much the pot_value needs to change before we process it
-const byte PotStick = PotMinChange + 1;   //If this close to HIGH or LOW stick to it
-const byte PotMin = PotMinChange + 2;     //On how much pot_value_change need to change, to set mode to manual
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
-long  gmtOffset_sec = 3600;               //SOFT_SETTING Set to you GMT offset (in seconds)
-int   daylightOffset_sec = 3600;          //SOFT_SETTING Set to your daylight offset (in seconds)
 #define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
-const char mDNSname[] = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
+const char* Name = "smart-light";    //On what url the ESP can also be accesed on (besides the ip) for example 'http://smart-light.local/'
 //========================================//
 //End of User Variables
 //========================================//
-const String CompileDate = String(__DATE__) + " " + String(__TIME__); //Set Compile date to the date we compile this
-bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
+#include "functions.h"
+
+bool UpdateLEDs;                          //If we need to physically update the LEDs
+bool WiFiManager_connected;               //If the ESP is connected to WIFI
+bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
+byte Mode;                                //Holds in which mode the light is currently in
+byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
+const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
+
 byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
+bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
+bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
+float AutoBrightnessP = 1.7;              //SOFT_SETTING Brightness = Y=(X-N)*P+O         [1-(AutoBrightnessN/255)] https://www.desmos.com/calculator/gpr6bwjleg
+byte AutoBrightnessN = 105;               //SOFT_SETTING ^ (signed byte so -127 to 128)   [Just the lowest raw sensor value you can find]
+byte AutoBrightnessO = 8;                 //SOFT_SETTING ^                                [Just an brigtness offset, so it can be set to be globaly more bright]
+byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
+bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
+byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
+long gmtOffset_sec = 3600;                //SOFT_SETTING Set to you GMT offset (in seconds)
+int  daylightOffset_sec = 3600;           //SOFT_SETTING Set to your daylight offset (in seconds)
+byte PotMinChange = 2;                    //SOFT_SETTING How much the pot_value needs to change before we process it
+byte PotStick = PotMinChange + 1;         //SOFT_SETTING If this close to HIGH or LOW stick to it
+byte PotMin = PotMinChange + 2;           //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
+
+const String CompileDate = String(__DATE__) + " " + String(__TIME__); //Set Compile date to the date we compile this
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
+
+#include <FastLED.h>
+CRGB LEDs[TotalLEDs];
+#include "StableAnalog.h"
+#include "Button.h"
+TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
+#include "time.h"                         //We need this for the clock function to get the time (Time library)
+#include "Task.h"
+#include <WiFi.h>                         //we need this for WIFI stuff (duh)
+#include <WebServer.h>
+#include <ESPmDNS.h>
+WebServer server(80);
+
 
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);

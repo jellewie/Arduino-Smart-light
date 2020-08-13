@@ -418,19 +418,19 @@ void handle_Info() {
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "mDNS name = " + String(mDNSname) + "\n"
 
-                   "ClockOffset = " + String(ClockOffset) + "\n"
-                   "gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
-                   "daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
+                   "SOFT_SETTING ClockOffset = " + String(ClockOffset) + "\n"
+                   "SOFT_SETTING gmtOffset_sec = " + String(gmtOffset_sec) + "\n"
+                   "SOFT_SETTING daylightOffset_sec = " + String(daylightOffset_sec) + "\n"
 
-                   "PotMinChange = " + String(PotMinChange) + "\n"
-                   "PotStick = " + String(PotStick) + "\n"
-                   "PotMin = " + String(PotMin) + "\n"
+                   "SOFT_SETTING PotMinChange = " + String(PotMinChange) + "\n"
+                   "SOFT_SETTING PotStick = " + String(PotStick) + "\n"
+                   "SOFT_SETTING PotMin = " + String(PotMin) + "\n"
 
-                   "AutoBrightness N = " + String(AutoBrightnessN) + "\n"
-                   "AutoBrightness P = " + String(AutoBrightnessP) + "\n"
-                   "AutoBrightness O = " + String(AutoBrightnessO) + "\n"
-                   "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
-                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
+                   "SOFT_SETTING AutoBrightness N = " + String(AutoBrightnessN) + "\n"
+                   "SOFT_SETTING AutoBrightness P = " + String(AutoBrightnessP) + "\n"
+                   "SOFT_SETTING AutoBrightness O = " + String(AutoBrightnessO) + "\n"
+                   "SOFT_SETTING AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
+                   "SOFT_SETTING AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
 
                    "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
                    "";
