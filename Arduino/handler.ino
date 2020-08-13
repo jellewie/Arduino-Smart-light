@@ -19,6 +19,7 @@
 #define PreFixSetClockHourLines "hl"
 #define PreFixSetClockHourAnalog "a"
 #define PreFixSetClockOffset "o"
+#define PreFixSetClockAnalog "c"
 
 //<ip>/time[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
@@ -91,6 +92,9 @@ void handle_Set() {
     } else if (ArguName == PreFixSetClockOffset) {
       ClockOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
       DoWriteToEEPROM = true;
+    } else if (ArguName == PreFixSetClockAnalog) {
+      ClockAnalog = IsTrue(ArgValue);
+      DoWriteToEEPROM = true;
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
   }
@@ -145,10 +149,11 @@ void handle_Getcolors() {
   String ans = "{\"m\":\"" + ConvertModeToString(Mode) + "\","
                "\"bm\":\"" + ConvertModeToString(BootMode) + "\","
                "\"dm\":\"" + ConvertModeToString(DoublePressMode) + "\","
-               "\"ha\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
                "\"i\":\"" + IsTrueToString(AutoBrightness) + "\","
+               "\"ha\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
                "\"hl\":\"" + ClockHourLines + "\","
-               "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\",";
+               "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
+               "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
 
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
@@ -233,6 +238,7 @@ void handle_OnConnect() {
                        "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let Dhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
                        "let Da=new DropDown({name:\"Analog hours\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "let Dc=new DropDown({name:\"Analog clock\",setParamName:\"c\",possibleValues:[\"FALSE\",\"TRUE\"]});"
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
                        "let Bo=new RequestButton(\"Enable OTA\",\"/ota\",\"OTA enabled\");"
@@ -262,10 +268,11 @@ void handle_OnConnect() {
                        "Dm.value=json.m;"
                        "Dbm.value=json.bm;"
                        "Ddm.value=json.dm;"
-                       "Da.value=json.a;"
                        "Di.value=json.i;"
-                       "Dhl.value=json.hl;"
                        "Dha.value=json.ha;"
+                       "Dhl.value=json.hl;"
+                       "Da.value=json.a;"
+                       "Dc.value=json.c;"
                        "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sl.value=col.L;}"
 
                        "async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}"

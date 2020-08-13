@@ -6,12 +6,14 @@
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
 #endif
+
 //#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled
 #define     Server_SerialEnabled
 #define     Task_SerialEnabled
 #define     Time_SerialEnabled
+//#define     LoopTime_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
 //#define     Convert_SerialEnabled
@@ -38,6 +40,7 @@ byte AutoBrightnessO = 8;                 //SOFT_SETTING ^                      
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
 byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
+bool ClockAnalog = false;                 //SOFT_SETTING Makes it so the LEDs dont step, but smootly transition
 long gmtOffset_sec = 3600;                //SOFT_SETTING Set to you GMT offset (in seconds)
 int  daylightOffset_sec = 3600;           //SOFT_SETTING Set to your daylight offset (in seconds)
 byte PotMinChange = 2;                    //SOFT_SETTING How much the pot_value needs to change before we process it
@@ -166,6 +169,13 @@ void loop() {
     UpdateColor(false);               //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
+#ifdef LoopTime_SerialEnabled   //Just a way to measure loop speed, so the performance can be checked
+  static unsigned long LoopLast = 0;
+  unsigned long LoopNow = micros();
+  float LoopMs = (LoopNow - LoopLast) / 1000.0;
+  LoopLast = LoopNow;
+  Serial.println("Loop took ms:\t" + String(LoopMs));
+#endif //LoopTime_SerialEnabled
 }
 
 void loopLEDS() {

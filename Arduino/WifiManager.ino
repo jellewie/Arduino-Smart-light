@@ -27,7 +27,7 @@
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -321,21 +321,24 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
       ClockOffset = WiFiManager_Temp.toInt();
       break;
     case 13:
-      gmtOffset_sec = WiFiManager_Temp.toInt();
+      ClockAnalog = IsTrue(WiFiManager_Temp);
       break;
     case 14:
-      daylightOffset_sec = WiFiManager_Temp.toInt();
+      gmtOffset_sec = WiFiManager_Temp.toInt();
       break;
     case 15:
-      PotMinChange = WiFiManager_Temp.toInt();
+      daylightOffset_sec = WiFiManager_Temp.toInt();
       break;
     case 16:
-      PotStick = WiFiManager_Temp.toInt();
+      PotMinChange = WiFiManager_Temp.toInt();
       break;
     case 17:
-      PotMin = WiFiManager_Temp.toInt();
+      PotStick = WiFiManager_Temp.toInt();
       break;
     case 18:
+      PotMin = WiFiManager_Temp.toInt();
+      break;
+    case 19:
       WiFiManager_Temp.toCharArray(Name, 16);
       break;
   }
@@ -405,21 +408,24 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
       WiFiManager_Temp_Return = ClockOffset;
       break;
     case 13:
-      WiFiManager_Temp_Return = gmtOffset_sec;
+      WiFiManager_Temp_Return = IsTrueToString(ClockAnalog);
       break;
     case 14:
-      WiFiManager_Temp_Return = daylightOffset_sec;
+      WiFiManager_Temp_Return = gmtOffset_sec;
       break;
     case 15:
-      WiFiManager_Temp_Return = PotMinChange;
+      WiFiManager_Temp_Return = daylightOffset_sec;
       break;
     case 16:
-      WiFiManager_Temp_Return = PotStick;
+      WiFiManager_Temp_Return = PotMinChange;
       break;
     case 17:
-      WiFiManager_Temp_Return = PotMin;
+      WiFiManager_Temp_Return = PotStick;
       break;
     case 18:
+      WiFiManager_Temp_Return = PotMin;
+      break;
+    case 19:
       WiFiManager_Temp_Return = String(Name);
       break;
   }
