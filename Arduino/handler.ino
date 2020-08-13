@@ -228,7 +228,7 @@ void handle_OnConnect() {
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
                        "let Di=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
-                       
+
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
                        "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let Dhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
