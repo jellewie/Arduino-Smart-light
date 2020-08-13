@@ -52,7 +52,17 @@ Although these options change a bit over time, here is a list of 3 actions what 
 - If in APmode it will cancel and reboot.
 - If it was connected to WIFI it will show its IP, Which is explained in [WIFI page](#wifi-page) - Getting it’s IP.
 - If it isn’t connected to WIFI it will start connecting to WIFI (and possibly go into AP mode, that is explained in 
+## LED status
+In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP (LED_BUILDIN) this LED reflects some more errors.
+- **ON** WIFI starts, goes OFF when WIFI setup is successfully completed
+- **blink 100ms** WIFI setup failed, APmode has started
+- **blink 500ms** it is connecting to its known WiFi
+- **blink 1000ms** OTA is on
 
+Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
+- **White short blink** It is booting up
+- **PURPLE/RED/PURPLE/RED** It is starting the WIFI connect code
+- **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code
 ## Pot meter
 The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
 ## WIFI page

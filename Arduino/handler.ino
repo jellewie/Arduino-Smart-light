@@ -431,6 +431,8 @@ void handle_Info() {
                    "AutoBrightness O = " + String(AutoBrightnessO) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
+
+                   "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
                    "";
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
