@@ -21,7 +21,7 @@ void UpdateAndShowClock(bool ShowClock) {
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
         StartAnimation(random(0, TotalAnimations), AnimationCounterTime); //Start a random Animation
-        ShowClock = false;                       //Do not show the clock, an animation will be shown
+        ShowClock = false;                      //Do not show the clock, an animation will be shown
       }
     }
     if (TimeCurrent.HH >= 24)
@@ -29,22 +29,23 @@ void UpdateAndShowClock(bool ShowClock) {
     static bool TimeFlag = false;
     if (TimeCurrent.HH == 4 and !TimeFlag) {
       TimeFlag = true;
-      if (!UpdateTime())                    //Get a new sync timestamp from the server
+      if (!UpdateTime())                        //Get a new sync timestamp from the server
         WiFiManager_connected = false;
     } else
       TimeFlag = false;
   }
-  if (TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
+  if (WiFiManager_connected)                    //If we are no longer connected to WIFI
+    if (TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
   //==============================
   //Show the time on the LEDs if needed
   //==============================
   if (ShowClock) {
-    static byte LastSec = TimeCurrent.SS;     //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
+    static byte LastSec = TimeCurrent.SS;       //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
     if (LastSec != TimeCurrent.SS) {
       LastSec = TimeCurrent.SS;
       FastLED.clear();
       if (ClockHourLines) {
-        for (int i = 0; i <= 55; i += 5)                         //Create the (12) hourly stripes
+        for (int i = 0; i <= 55; i += 5)        //Create the (12) hourly stripes
           LEDs[LEDtoPosition(i)] += CRGB(ClockHourLines, ClockHourLines, ClockHourLines);
       }
       LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
