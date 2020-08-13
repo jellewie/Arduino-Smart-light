@@ -13,7 +13,7 @@
 
 #define TaskLimit 16        //defined as an byte in for loops, so 255 at max
 #define Task_SerialEnabled
-enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN}; //Just to make the code easier to read, this replaces the
+enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESET, CHANGERGB}; //Just to make the code easier to read, this replaces the
 
 void SetupTask() {
   //For exmaple to set-up some pinmodes
@@ -105,6 +105,19 @@ bool DoTask(TASK Item) {
         Serial.println("T: BRIGHTEN from " + String(FastLED.getBrightness()) + " to " + String(Now));
 #endif //Task_SerialEnabled
         FastLED.setBrightness(Now);
+        UpdateLEDs = true;
+      }
+      break;
+    case RESET: {
+        ESP.restart();
+      }
+    case CHANGERGB: {
+        //A = new Red value
+        //B = new Green value
+        //C = new Blue value
+        Mode = ON;
+        LastMode = Mode;
+        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(A, B, C));
         UpdateLEDs = true;
       }
       break;
