@@ -394,6 +394,11 @@
                 setParamName: "a",
                 possibleValues: ["FALSE", "TRUE"]
             });
+            let Dc = new DropDown({
+                name: "Analog clock",
+                setParamName: "c",
+                possibleValues: ["FALSE", "TRUE"]
+            });
             settingsContainer.appendChild(document.createElement("br"));
             let Bo = new RequestButton("Enable OTA","/ota","OTA enabled");
             let Bt = new RequestButton("Sync time","/time","Time updated");
@@ -401,7 +406,7 @@
             settingsContainer.appendChild(document.createElement("br"));
             new LinkButton("Info","/info");
             new LinkButton("Taks","/task");
-            new LinkButton("WIFI settings","/ip");
+            new LinkButton("Saved settings","/ip");
             curtainEl.addEventListener("click", _=>this.setSettingsVisibility(false));
             settingsBtn.addEventListener("click", _=>this.setSettingsVisibility(true));
             function setSettingsVisibility(visible) {
@@ -470,10 +475,11 @@
                 Dm.value = json.m;
                 Dbm.value = json.bm;
                 Ddm.value = json.dm;
-                Da.value = json.a;
                 Di.value = json.i;
-                Dhl.value = json.hl;
                 Dha.value = json.ha;
+                Dhl.value = json.hl;
+                Da.value = json.a;
+                Dc.value = json.c;
                 let col = json.RGBL[0];
                 Sr.value = col.R;
                 Sg.value = col.G;
