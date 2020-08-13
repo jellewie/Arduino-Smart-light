@@ -5,7 +5,7 @@
 */
 #include <ArduinoOTA.h>
 
-#define OTA_Name "ESP32 Lamp"
+#define OTA_Name Name
 
 bool OTA_Enabled;
 

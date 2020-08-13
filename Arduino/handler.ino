@@ -416,7 +416,7 @@ void handle_Info() {
   String Message = "Code compiled on " +  String(CompileDate) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "mDNS name = " + String(mDNSname) + "\n"
+                   "mDNS name = " + String(Name) + "\n"
 
                    "SOFT_SETTING ClockOffset = " + String(ClockOffset) + "\n"
                    "SOFT_SETTING gmtOffset_sec = " + String(gmtOffset_sec) + "\n"

@@ -131,7 +131,7 @@ void setup() {
   //==============================
   //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
   //==============================
-  bool MDNSStatus = MDNS.begin(mDNSname);               //Start mDNS with the given domain name
+  bool MDNSStatus = MDNS.begin(Name);               //Start mDNS with the given domain name
   if (MDNSStatus) MDNS.addService("http", "tcp", 80);   //Add service to MDNS-SD
 #ifdef SerialEnabled
   if (MDNSStatus)
