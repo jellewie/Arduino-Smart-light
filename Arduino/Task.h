@@ -13,7 +13,7 @@
 
 #define TaskLimit 16        //defined as an byte in for loops, so 255 at max
 #define Task_SerialEnabled
-enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESET, CHANGERGB}; //Just to make the code easier to read, this replaces the
+enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB}; //Just to make the code easier to read, this replaces the
 
 void SetupTask() {
   //For exmaple to set-up some pinmodes
@@ -108,7 +108,7 @@ bool DoTask(TASK Item) {
         UpdateLEDs = true;
       }
       break;
-    case RESET: {
+    case RESETESP: {
         ESP.restart();
       }
     case CHANGERGB: {
@@ -117,7 +117,7 @@ bool DoTask(TASK Item) {
         //C = new Blue value
         Mode = ON;
         LastMode = Mode;
-        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(A, B, C));
+        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(Item.A, Item.B, Item.C));
         UpdateLEDs = true;
       }
       break;
