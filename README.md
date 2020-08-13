@@ -120,6 +120,8 @@ The most up-to-date values can be found in the top of the [WifiManager.ino](Ardu
 - **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just 12
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
+- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so thats 3600 seconds
+- **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds
 
 ### Clock mode
 For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 
