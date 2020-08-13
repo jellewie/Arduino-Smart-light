@@ -44,10 +44,8 @@ Please refer the in the [appendix](#appendix) - PCB & schematic for the schemati
 Although these options change a bit over time, here is a list of 3 actions what the button generally does, these can also change in different modes.
 1.	**StartPress** Triggered when you start a press, will be rejected if sooner than Time_RejectStarts (80ms) of the last press).
 - Will toggle the lamp ON/OFF
-
 2.	**StartDoublePress** Triggered when you start a second press between Time_RejectStarts (80ms) and Time_StartDoublePress (200ms) after the last one ended.
 - Will change the mode to 'DoublePressMode' (RAINBOW by default)
-
 3.	**StartLongPress** Triggered when you press the button longer than Time_StartLongPressMS (5000) but shorter than Time_ESPrestartMS (15000) ms.
 - If in APmode it will cancel and reboot.
 - If it was connected to WIFI it will show its IP, Which is explained in [WIFI page](#wifi-page) - Getting it’s IP.
@@ -72,16 +70,18 @@ Some special functions might not be listed here. If important things missing fee
 ### Setup
 <img align="right" src="Images/ip.png" alt="WIFI page /ip">
 
-The setup page will be accessible and shown in APmode, but can also be access by going to [smart-light.local/ip](http://smart-light.local/ip). An example of this page is shown in the figure on the right.
+The setup page will be accessible and shown in APmode, but can also be access by going to [smart-clock.local/ip](http://smart-clock.local/ip). An example of this page is shown in the figure on the right.
 The password is replaced with starts, and cannot be received without changing the firmware. 
 Leave fields blank (or for the password leaving only stars) to not update those values upon sending this forum.
 By default the SSID and password is limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 128. Going over these values results in unexpected behaviour. 
 
 ### Getting it’s IP
-To trigger this menu please see [Button](#Button), this part is just about how to read it. The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a x100 multiplication and green will have x10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue. This is shown in the figure below
+User devices that support mDNS, like Windows and Apple, can use [smart-clock.local/info](smart-clock.local/info) to obtain its IP.
+
+Alternatively the IP can be shown in the LEDs themself. To trigger this see [Button](#Button).
+The LEDs are divided into 10 sections, and each byte in the IP range will be shown one at a time, to goto the next section press the button shortly again. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a x100 multiplication and green will have x10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue. This is shown in the figure below
 
 <img src="Images/ShowIP.png" alt="ShowIP 198.168.1.150">
-But on user devices who support mDNS, like Windows and Apple, [smart-light.local/info](smart-light.local/info) can be also be used to obtain its IP.
 
 ### Control
 <img align="right" src="Images/Home.png" alt="Home page" width=50%>
@@ -106,11 +106,11 @@ An example of the settings page is shown in the figure on the right.
 - **Reset** will fully restart the ESP.
 - **Info** will open the info page with some information like the version compile date
 - **Task** WIP this will show a task menu, so tasks can be scheduled, removed, changed, and listed.
-- **Saved settings** just redirects you to [smart-light.local/ip](http://smart-light.local/ip) to show you the values saved in the EEPROM
+- **Saved settings** just redirects you to [smart-clock.local/ip](http://smart-clock.local/ip) to show you the values saved in the EEPROM
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
-The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-light.local/ip](http://smart-light.local/ip).
+The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimation** If it needs to show hourly animations when in CLOCK mode.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
@@ -134,16 +134,16 @@ For the use of clock mode the right time zone needs to be set up, these are stor
 
 Clock mode can only be started when WIFI has been connected and the user switches mode, after switching to Clockmode the lamp will turn PURPLE/GREEN/PURPLE/GREEN this means it is getting the time from a time server.
 
-Also the clock can be manual updated with [smart-light.local/time?h=2&m=4&s=1](http://smart-light.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
+Also the clock can be manual updated with [smart-clock.local/time?h=2&m=4&s=1](http://smart-clock.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
 
 Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#Soft%20settings)
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
 2.	[Optional for WIFI] Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. Long press the button again to cancel this setup.
-3.	Connect to this Access Point, by default it will be called “smart-light”.
+3.	Connect to this Access Point, by default it will be called “smart-clock”.
 4.	When connected go to 192.168.4.1 this will show a page where the WIFI name and password can be set, do not forget to submit. The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page.
-5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-light.local/info](http://smart-light.local/info) can be used.
+5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
 
 # Specifications 
 ## Input voltage
