@@ -224,6 +224,7 @@ byte WiFiManager_APMode() {
   */
   if (!WiFi.softAP(WiFiManager_APSSID))       //config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
     return 2;
+  WiFiManager_Status_StartAP();
   WiFiManager_EnableSetup(true);              //Flag we need to responce to settings commands
   WiFiManager_StartServer();                  //start server (if we havn't already)
   //dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));  //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
@@ -486,6 +487,13 @@ void WiFiManager_Status_Done() {
 }
 void WiFiManager_Status_Blink() {
   digitalWrite(WiFiManager_LED, !digitalRead(WiFiManager_LED));
+}
+void WiFiManager_Status_StartAP() {
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs purple 2222
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 1th quater red  1222
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 2rd quater red  1212
+  FastLED.show();                                                       //Update leds to show wifi is starting
+  FastLED.delay(1);
 }
 bool WiFiManager_HandleAP() {                 //Called when in the While loop in APMode, this so you can exit it
 #define TimeOutApMode 15 * 60 * 1000;     //Example for a timeout, re-enable these 3 lines to apply. (time in ms)

@@ -29,7 +29,6 @@ byte GetAutoBrightness(byte Value) {
   float Answer = (Value - AutoBrightnessN) * AutoBrightnessP - AutoBrightnessO;
   return 255 - constrain(Answer, 0, 254);
 }
-
 void UpdateBrightness(bool ForceUpdate) {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
   if (AutoBrightness) {
@@ -60,10 +59,9 @@ void UpdateBrightness(bool ForceUpdate) {
 bool StartWIFIstuff() {
   //Returns true if WIFI was already started, returns FALSE if it wasn't
   if (WiFiManager_connected) return true;     //If WIFI already on, stop and return true
-
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs blue  0202
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 1th quater red 1202
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 2rd quater red 1212
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs purple 2222
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //turn 1th quater blue 1222
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //turn 2rd quater blue 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
   if (WiFiManager_Start() == 1) {                                       //run the wifi startup
     WiFiManager_StartServer();                                          //Enable responce to web request

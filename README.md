@@ -60,7 +60,8 @@ In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP 
 
 Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
 - **White short blink** It is booting up.
-- **PURPLE/RED/PURPLE/RED** It is starting the WIFI connect code.
+- **PURPLE/BLUE/PURPLE/BLUE** It is starting the WIFI connect code.
+- **PURPLE/RED/PURPLE/RED** It is starting the Acces Point code (WIFI could not connect).
 - **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code.
 ## Pot meter
 The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
