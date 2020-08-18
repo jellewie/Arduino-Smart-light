@@ -48,7 +48,7 @@ byte PotStick = PotMinChange + 1;         //SOFT_SETTING If this close to HIGH o
 byte PotMin = PotMinChange + 2;           //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
 char Name[16] = "smart-clock";            //SOFT_SETTING The mDNS, WIFI APmode SSID, and OTA name of the device. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
 bool UpdateLEDs;                          //If we need to physically update the LEDs
-bool WiFiManager_connected;               //If the ESP is connected to WIFI
+extern bool WiFiManager_connected;        //If the ESP is connected to WIFI
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                //Holds in which mode the light is currently in
 byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
