@@ -30,7 +30,7 @@ String ConvertModeToString(byte IN) {
 #endif //Convert_SerialEnabled
   if (IN < Modes_Amount)
     return ModesString[IN];
-  return "OFF";
+  return "UNK";
 }
 int ConvertModeToInt(String IN) {
 #ifdef Convert_SerialEnabled
