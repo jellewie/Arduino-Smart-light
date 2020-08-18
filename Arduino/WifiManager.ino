@@ -52,16 +52,16 @@ byte WiFiManager_Start() {
      2 Can't begin EEPROM
      3 Can't write [all] data to EEPROM
   */
-  if (byte temp = LoadData()) return temp;
-  bool WiFiManager_Connected = false;
+  if (ssid[0] == 0 and password[0] == 0)    //If the ssid and password are not yet in memory
+    if (byte temp = LoadData()) return temp;//load the EEPROM to get the ssid and password. Exit with code if failed
   bool FlagApMode = false;
-  while (!WiFiManager_Connected) {
+  while (!WiFiManager_connected) {
     if ((strlen(ssid) == 0 or strlen(password) == 0 or FlagApMode)) {
       FlagApMode = false;
       WiFiManager_APMode();                 //No ssid or password given, or ssid not found. Entering APmode
     } else {
       if (WiFiManager_Connect(WiFiManager_ConnectionTimeOutMS)) //try to connected to ssid password
-        WiFiManager_Connected = true;
+        WiFiManager_connected = true;
       else
         FlagApMode = true;                  //Flag so we will enter AP mode
     }
