@@ -57,7 +57,7 @@ void UpdateBrightness(bool ForceUpdate) {
   }
 }
 bool StartWIFIstuff() {
-  //Returns true if WIFI was already started, returns FALSE if it wasn't
+  //Returns TRUE if WIFI was already started, returns FALSE if it wasn't
   if (WiFiManager_connected) return true;     //If WIFI already on, stop and return true
   fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs purple 2222
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //turn 1th quater blue 1222

@@ -117,10 +117,11 @@ void setup() {
   //==============================
   LoadData();
   Mode = BootMode;                                      //Set the startup mode
-  UpdateBrightness(true);                               //Force Update the brightness
 #ifdef SerialEnabled
   Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
+  loopLEDS();
+  UpdateBrightness(true);                               //Force Update the brightness
   //==============================
   //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
   //==============================
