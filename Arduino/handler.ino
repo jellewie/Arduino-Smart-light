@@ -26,16 +26,6 @@
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
-//<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
-#define PreFixMode  "t"   //a=Add r=Remove
-#define PreFixID    "i"   //Task ID
-#define PreFixA     "a"   //Task A
-#define PreFixB     "b"   //Task B
-#define PreFixC     "c"   //Task B
-#define PreFixTimeS "s"   //On which time the task needs to be executed
-#define PreFixTimeM "m"   //^
-#define PreFixTimeH "h"   //^
-
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
   bool DoWriteToEEPROM = false;
@@ -141,7 +131,7 @@ void handle_Set() {
   } else {
     server.send(400, "text/plain", ERRORMSG);
 #ifdef Server_SerialEnabled
-    Serial.println("SV: 400 " + ERRORMSG);
+    Serial.println("SV: 400 Set " + ERRORMSG);
 #endif //Server_SerialEnabled
   }
 }
@@ -166,7 +156,7 @@ void handle_Getcolors() {
 
   server.send(200, "application/json", ans);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200 Return colors " + ans);
+  Serial.println("SV: 200 Getcolors " + ans);
 #endif //Server_SerialEnabled
 }
 void handle_OnConnect() {
@@ -281,7 +271,7 @@ void handle_OnConnect() {
                        "async function installSw(){if(!(\"serviceWorker\"in window.navigator))return;await navigator.serviceWorker.register(\"sw.js\");}installSw();</script></body></html>";
   server.send(200, "text/html", html);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200 (User has connected)");
+  Serial.println("SV: 200 OnConnect");
 #endif //Server_SerialEnabled
 }
 void handle_EnableOTA() {
@@ -289,7 +279,7 @@ void handle_EnableOTA() {
   String message = "OTA enabled '" + String(OTA_Name) + "' at '" + IpAddress2String(WiFi.localIP()) + "'";
   server.send(200, "text/html", message);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200 " + message);
+  Serial.println("SV: 200 EnableOTA" + message);
 #endif //Server_SerialEnabled
 }
 void handle_UpdateTime() {
@@ -335,88 +325,9 @@ void handle_UpdateTime() {
     server.send(200, "text/plain", message);
 
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200/400 " + ERRORMSG + message);
+  Serial.println("SV: 200/400 UpdateTime" + ERRORMSG + message);
 #endif //Server_SerialEnabled
 }
-void handle_GetTasks() {
-  String ERRORMSG = "";
-  String Message;
-  if (server.args() > 0) {                      //If manual time given
-    TASK TempTask;
-    byte TaskMode = 0;
-    for (int i = 0; i < server.args(); i++) {
-      String ArguName = server.argName(i);
-      ArguName.toLowerCase();
-      int ArgValue = server.arg(i).toInt();
-      if (ArguName == PreFixMode) {
-        TaskMode = ArgValue;
-      } else if (ArguName == PreFixID) {
-        TempTask.ID = ArgValue;
-      } else if (ArguName == PreFixA) {
-        TempTask.A = ArgValue;
-      } else if (ArguName == PreFixB) {
-        TempTask.B = ArgValue;
-      } else if (ArguName == PreFixC) {
-        TempTask.C = ArgValue;
-      } else if (ArguName == PreFixTimeS) {
-        TempTask.ExectuteAt.SS = ArgValue;
-      } else if (ArguName == PreFixTimeM) {
-        TempTask.ExectuteAt.MM = ArgValue;
-      } else if (ArguName == PreFixTimeH) {
-        TempTask.ExectuteAt.HH = ArgValue;
-      } else
-        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
-    }
-    if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.SS == 0 and TempTask.ExectuteAt.MM == 0 and TempTask.ExectuteAt.HH == 0) {
-      ERRORMSG += "No Task time given\n";
-    } else {
-      if (TaskMode == 0) {
-        ERRORMSG += "No Task Mode given\n";
-      } else {
-        if (TempTask.ID == 0) {
-          ERRORMSG += "No Task ID given\n";
-        } else {
-          if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
-            TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
-            TempTask.ExectuteAt.SS = 0;             //Reset the time, we dont use these
-            TempTask.ExectuteAt.MM = 0;
-            TempTask.ExectuteAt.HH = 0;
-          } else if (!TimeSet)
-            ERRORMSG += "Warning time is not yet set/synced\n";
-          switch (TaskMode) {
-            case 0:
-              ERRORMSG += "No Task mode given\n";
-              break;
-            case 1:
-              if (!AddTask(TempTask))
-                ERRORMSG += "Could not add tasks\n";
-              break;
-            case 3:
-              if (!RemoveTask(TempTask.ID))
-                ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
-              break;
-          }
-        }
-      }
-    }
-  }
-  Message += GetTaskList();
-  //    for (byte i = 0; i < TaskLimit; i++) {         //For each task in the list
-  //      if (TaskList[i].ID > 0) {                   //If there is a task
-  //        if (R != "") R += "\n";               //If there is already an entry, start a new line
-  //        //
-  //      }
-  //    }
-  if (ERRORMSG != "")
-    server.send(400, "text/plain", ERRORMSG + Message);
-  else
-    server.send(200, "text/plain", Message);
-
-#ifdef Server_SerialEnabled
-  Serial.println("SV: 200/400 " + ERRORMSG + Message);
-#endif //Server_SerialEnabled
-}
-
 void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
   String Message = "Code compiled on " +  String(__DATE__) + " " + String(__TIME__) + "\n"
@@ -425,6 +336,7 @@ void handle_Info() {
                    "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
+                   "Current time =" + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + ""
 
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
@@ -436,7 +348,7 @@ void handle_Info() {
 
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
-  Serial.println("SV: 200 " + Message);
+  Serial.println("SV: 200 Info" + Message);
 #endif //Server_SerialEnabled
 }
 void handle_NotFound() {

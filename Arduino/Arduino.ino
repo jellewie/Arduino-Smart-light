@@ -61,11 +61,11 @@ CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
-#include "Task.h"
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
 #include <ESPmDNS.h>
 WebServer server(80);
+#include "Task.h"
 
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);
@@ -95,12 +95,13 @@ void setup() {
   //==============================
   server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager_Start()" for APMode
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager_Start()" for APMode
+  server.on("/task",       Tasks_handle_Connect);
+  server.on("/settask",    Tasks_handle_Settings);
   server.on("/",            handle_OnConnect);          //Call the 'handleRoot' function when a client requests URI "/"
   server.on("/set",         handle_Set);
   server.on("/get",         handle_Getcolors);
   server.on("/ota",         handle_EnableOTA);
   server.on("/time",        handle_UpdateTime);
-  server.on("/task",        handle_GetTasks);
   server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
   //==============================
