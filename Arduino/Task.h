@@ -91,7 +91,7 @@ bool AddTask(TASK Item) {
 bool DoTask(TASK Item) {
   bool returnValue = true;
 #ifdef Task_SerialEnabled
-  Serial.print("T: DoTask " + String(Item.ID) + " a=" + String(Item.A) + " b=" + String(Item.B) + " c=" + Item.C);
+  Serial.print("T: DoTask " + ConvertTaskIDToString(Item.ID) + " a=" + String(Item.A) + " b=" + String(Item.B) + " c=" + Item.C);
   if (Item.ExectuteAt.Ticks > 0)
     Serial.println(" due to Ticks, scheduled for " + String(Item.ExectuteAt.Ticks) + " now=" + String(millis()));
   else
@@ -212,7 +212,7 @@ void Tasks_handle_Connect() {
 
       Message += "<form action=\"/settask?\" method=\"set\">#" + String(i) + " "
                  "<input type=\"hidden\" name=\"o\" value=\"2\">"
-                 "<label>Do task </label>" + String(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"i\">";
+                 "<label>Do task </label>" + ConvertTaskIDToString(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"i\">";
       if (TaskList[i].ExectuteAt.Ticks > 0)
         Message += " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms";
       else
