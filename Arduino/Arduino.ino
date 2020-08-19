@@ -19,7 +19,7 @@
 //#define     Convert_SerialEnabled
 #endif //SerialEnabled
 
-#define LED_TYPE WS2813                   //WS2812B for 5V leds, WS2813 for newer 12V leds
+#define LED_TYPE WS2812B                  //WS2812B for 5V leds, WS2813 for 12V leds
 const char* ntpServer = "pool.ntp.org";   //The server where to get the time from
 const byte PAO_LED = 25;                  //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                    //               ^ <Red potmeter> ^
