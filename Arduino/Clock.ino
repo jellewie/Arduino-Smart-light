@@ -1,4 +1,6 @@
 /* Written by JelleWho https://github.com/jellewie */
+#define Clock_ConnectionTimeOutMS 10000
+
 void UpdateAndShowClock(bool ShowClock) {
   //==============================
   //Update the internal time clock
@@ -105,7 +107,7 @@ bool UpdateTime() {
 #endif //Time_SerialEnabled
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
+  if (!getLocalTime(&timeinfo, Clock_ConnectionTimeOutMS)) {
 #ifdef Time_SerialEnabled
     Serial.println("TM: Failed to obtain time");
 #endif //Time_SerialEnabled
