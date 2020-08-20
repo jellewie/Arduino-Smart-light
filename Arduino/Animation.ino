@@ -1,5 +1,4 @@
 /* Written by JelleWho https://github.com/jellewie */
-const byte AnimationCounterTime = 10;                               //Howlong the AnimationCounter hourly Animation should happen (in Seconds)
 byte CurrentAnimation;                                              //Which AnimationCounter Animation is selected
 byte TotalAnimations = 9;
 byte RGBColor[3] = {0, 0, 0};
@@ -26,7 +25,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
     Serial.println("AN: AnimationCounter=" + String(AnimationCounter));
 #endif //SerialEnabled
   }
-  const byte AnimationMoveValue = (AnimationCounterTime * 1000 + 500) / (TotalLEDs * 4);  //define the speed so it goes around 4 times
+  const byte AnimationMoveValue = (HourlyAnimationS * 1000 + 500) / (TotalLEDs * 4);  //define the speed so it goes around 4 times
   switch (CurrentAnimation) {
     case 0:
       AnimationMove(RGBColor, AnimationMoveValue, Start, 2, 3);               //void AnimationMove(byte rgb[3], byte Delay, bool Start, byte MoveAmount, byte MoveLength)
@@ -35,7 +34,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
       AnimationFlash(RGBColor, 500, Start, 4);                                //void AnimationFlash(byte rgb[3], int Delay, bool Start, byte BrightScaler)
       break;
     case 2:
-      AnimationBlink(RGBColor, (AnimationCounterTime * 1000 / TotalLEDs) - 1, Start, 1, TotalLEDs); //void AnimationBlink(byte rgb[3], byte Delay, bool Start, byte AlwaysOn, byte LengthBlink)
+      AnimationBlink(RGBColor, (HourlyAnimationS * 1000 / TotalLEDs) - 1, Start, 1, TotalLEDs); //void AnimationBlink(byte rgb[3], byte Delay, bool Start, byte AlwaysOn, byte LengthBlink)
       break;
     case 3:
       AnimationRainbow(10, 255 / TotalLEDs);                                  //void AnimationRainbow(byte Delay, byte DeltaHue)

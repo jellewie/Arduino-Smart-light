@@ -33,7 +33,7 @@ const byte PAI_LIGHT = 39;                //Pulled down with a GL5528 to GND, an
 
 #include "functions.h"
 byte BootMode = OFF;                      //SOFT_SETTING In which mode to start in
-bool DoHourlyAnimation = true;            //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode
+byte HourlyAnimationS = 10;               //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
 float AutoBrightnessP = 1.7;              //SOFT_SETTING Brightness = Y=(X-N)*P+O         [1-(AutoBrightnessN/255)] https://www.desmos.com/calculator/gpr6bwjleg

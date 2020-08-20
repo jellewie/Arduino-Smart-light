@@ -27,7 +27,7 @@
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "DoHourlyAnimation", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -295,7 +295,7 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
       BootMode = ConvertModeToInt(WiFiManager_Temp);
       break;
     case 4:
-      DoHourlyAnimation = IsTrue(WiFiManager_Temp);
+      HourlyAnimationS = WiFiManager_Temp.toInt();
       break;
     case 5:
       DoublePressMode = ConvertModeToInt(WiFiManager_Temp);
@@ -370,10 +370,7 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
         WiFiManager_Temp_Return = BootMode;
       break;
     case 4:
-      if (WiFiManager_Convert)
-        WiFiManager_Temp_Return = IsTrueToString(DoHourlyAnimation);
-      else
-        WiFiManager_Temp_Return = DoHourlyAnimation;
+      WiFiManager_Temp_Return = HourlyAnimationS;
       break;
     case 5:
       if (WiFiManager_Convert)
@@ -494,7 +491,7 @@ void WiFiManager_Status_StartAP() {
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 2rd quater red  1212
   FastLED.show();                                                       //Update leds to show we are entering APmode
   FastLED.delay(1);
-  #ifdef LEDstatus_SerialEnabled
+#ifdef LEDstatus_SerialEnabled
   Serial.println("LS: Setting LEDs to 'entering APmode'");
 #endif //LEDstatus_SerialEnabled
 }

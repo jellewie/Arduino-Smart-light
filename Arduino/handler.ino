@@ -14,7 +14,7 @@
 #define PreFixSetAutoBrightnessP "p"
 #define PreFixSetModeTo "m"
 #define PreFixSetBootMode "bm"
-#define PreFixSetDoHourlyAnimation "ha"
+#define PreFixSetHourlyAnimationS "ha"
 #define PreFixSetDoublePressMode "dm"
 #define PreFixSetClockHourLines "hl"
 #define PreFixSetClockHourAnalog "a"
@@ -69,8 +69,8 @@ void handle_Set() {
     } else if (ArguName == PreFixSetBootMode) {
       BootMode = ConvertModeToInt(ArgValue);
       DoWriteToEEPROM = true;
-    } else if (ArguName == PreFixSetDoHourlyAnimation) {
-      DoHourlyAnimation = IsTrue(ArgValue);
+    } else if (ArguName == PreFixSetHourlyAnimationS) {
+      HourlyAnimationS = constrain((ArgValue.toInt()), 0, 255);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetDoublePressMode) {
       DoublePressMode = ConvertModeToInt(ArgValue);
@@ -146,7 +146,7 @@ void handle_Getcolors() {
                "\"bm\":\"" + ConvertModeToString(BootMode) + "\","
                "\"dm\":\"" + ConvertModeToString(DoublePressMode) + "\","
                "\"i\":\"" + IsTrueToString(AutoBrightness) + "\","
-               "\"ha\":\"" + IsTrueToString(DoHourlyAnimation) + "\","
+               "\"ha\":\"" + HourlyAnimationS + "\","
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
@@ -231,7 +231,7 @@ void handle_OnConnect() {
                        "let Di=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
 
                        "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"2\",\"5\",\"10\"]});"
                        "let Dhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
                        "let Da=new DropDown({name:\"Analog hours\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
                        "let Dc=new DropDown({name:\"Analog clock\",setParamName:\"c\",possibleValues:[\"FALSE\",\"TRUE\"]});"

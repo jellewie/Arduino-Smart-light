@@ -114,7 +114,7 @@ There are multiple soft settings, these are settings that can be changed after t
 The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
 - **Bootmode** In which mode to start in after start-up
-- **HourlyAnimation** If it needs to show hourly animations when in CLOCK mode.
+- **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
 - **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P.
 - **AutoBrightnessN** Brightness =(X-N)xP+O.

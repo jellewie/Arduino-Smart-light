@@ -23,11 +23,11 @@ void UpdateAndShowClock(bool ShowClock) {
     if (TimeCurrent.MM >= 60) {
       TimeCurrent.MM = 0;
       TimeCurrent.HH++;
-      if (ShowClock and DoHourlyAnimation) {
+      if (ShowClock and HourlyAnimationS > 0) {
 #ifdef Time_SerialEnabled
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
-        StartAnimation(random(0, TotalAnimations), AnimationCounterTime); //Start a random Animation
+        StartAnimation(random(0, TotalAnimations), HourlyAnimationS); //Start a random Animation
         ShowClock = false;                      //Do not show the clock, an animation will be shown
       }
     }
