@@ -13,10 +13,12 @@
 #define     Server_SerialEnabled
 #define     Task_SerialEnabled
 #define     Time_SerialEnabled
+#define     SetupTime_SerialEnabled
 //#define     LoopTime_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
 //#define     Convert_SerialEnabled
+//#define     LEDstatus_SerialEnabled
 #endif //SerialEnabled
 
 #define LED_TYPE WS2812B                  //WS2812B for 5V leds, WS2813 for 12V leds
@@ -112,7 +114,7 @@ void setup() {
     UpdateColor(false);                                 //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
   }
-  FastLED.setBrightness(1);                             //Set boot Brightness
+  FastLED.setBrightness(8);                             //Set boot Brightness
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode
   //==============================
@@ -134,8 +136,18 @@ void setup() {
   else
     Serial.println("Error setting up MDNS responder!");
 #endif
+#ifdef SetupTime_SerialEnabled   //Just a way to measure setup speed, so the performance can be checked
+  Serial.println("Setup took ms:\t" + String(millis()));
+#endif //SetupTime_SerialEnabled
 }
 void loop() {
+#ifdef LoopTime_SerialEnabled   //Just a way to measure loop speed, so the performance can be checked
+  static unsigned long LoopLast = 0;
+  unsigned long LoopNow = micros();
+  float LoopMs = (LoopNow - LoopLast) / 1000.0;
+  LoopLast = LoopNow;
+  Serial.println("Loop took ms:\t" + String(LoopMs));
+#endif //LoopTime_SerialEnabled
   OTA_loop();                                         //Do OTA stuff if needed
   WiFiManager_RunServer();                            //Do WIFI server stuff if needed
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
@@ -171,13 +183,6 @@ void loop() {
     UpdateColor(false);               //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
-#ifdef LoopTime_SerialEnabled   //Just a way to measure loop speed, so the performance can be checked
-  static unsigned long LoopLast = 0;
-  unsigned long LoopNow = micros();
-  float LoopMs = (LoopNow - LoopLast) / 1000.0;
-  LoopLast = LoopNow;
-  Serial.println("Loop took ms:\t" + String(LoopMs));
-#endif //LoopTime_SerialEnabled
 }
 
 void loopLEDS() {

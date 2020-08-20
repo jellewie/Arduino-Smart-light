@@ -5,7 +5,12 @@ void UpdateAndShowClock(bool ShowClock) {
   //==============================
   //Update the internal time clock
   //==============================
-  while (TimeCurrent.Ticks + 1000 <= millis()) {
+  static bool FirstUpdate = true;    //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
+#ifdef Time_SerialEnabled
+  if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate RGB=" + String(LEDs[0].r) + "," + String(LEDs[0].g) + "," + String(LEDs[0].b));
+#endif //Time_SerialEnabled
+  while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) {
+    FirstUpdate = false;
 #ifdef TimeExtra_SerialEnabled
     Serial.println("TM: Time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + " " + String(TimeCurrent.Ticks) + " now=" + String(millis()));
 #endif //TimeExtra_SerialEnabled
@@ -65,7 +70,7 @@ void UpdateAndShowClock(bool ShowClock) {
         UpdateLEDs = true;
       }
     } else {
-      static byte LastSec = TimeCurrent.SS;       //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
+      static byte LastSec = -1;       //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
       if (LastSec != TimeCurrent.SS) {
         LastSec = TimeCurrent.SS;
         ClearAndSetupClock();
@@ -95,13 +100,17 @@ byte LEDtoPosition(byte LEDID) {
     LEDID -= TotalLEDs;
   return LEDID;
 }
-
 bool UpdateTime() {
   if (!WiFiManager_connected) return false;   //If WIFI not connected, stop right away
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs Purple  0202
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //turn 1th quater green 1202
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //turn 2rd quater green 1212
-  FastLED.show();                                                       //Update leds to show wifi is starting
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212
+  FastLED.show();                                                       //Update leds to show updating time
+  FastLED.clear();
+  UpdateLEDs = true;
+#ifdef LEDstatus_SerialEnabled
+  Serial.println("LS: Setting LEDs to 'updating time'");
+#endif //LEDstatus_SerialEnabled
 #ifdef Time_SerialEnabled
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled
@@ -111,20 +120,15 @@ bool UpdateTime() {
 #ifdef Time_SerialEnabled
     Serial.println("TM: Failed to obtain time");
 #endif //Time_SerialEnabled
-    FastLED.clear();
-    FastLED.show();
     return false;
-  } else {
-#ifdef Time_SerialEnabled
-    Serial.println(&timeinfo, "TM: %A, %B %d %Y %H:%M:%S");
-#endif //Time_SerialEnabled
-    TimeCurrent.Ticks = millis();
-    TimeCurrent.HH = timeinfo.tm_hour;
-    TimeCurrent.MM = timeinfo.tm_min;
-    TimeCurrent.SS = timeinfo.tm_sec;
   }
+#ifdef Time_SerialEnabled
+  Serial.println(&timeinfo, "TM: %A, %B %d %Y %H:%M:%S");
+#endif //Time_SerialEnabled
+  TimeCurrent.Ticks = millis();
+  TimeCurrent.HH = timeinfo.tm_hour;
+  TimeCurrent.MM = timeinfo.tm_min;
+  TimeCurrent.SS = timeinfo.tm_sec;
   TimeSet = true;
-  FastLED.clear();
-  UpdateLEDs = true;
   return true;
 }

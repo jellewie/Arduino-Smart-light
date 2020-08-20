@@ -58,16 +58,22 @@ void UpdateBrightness(bool ForceUpdate) {
 }
 bool StartWIFIstuff() {
   //Returns TRUE if WIFI was already started, returns FALSE if it wasn't
-  if (WiFiManager_connected) return true;     //If WIFI already on, stop and return true
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs purple 2222
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //turn 1th quater blue 1222
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //turn 2rd quater blue 1212
+  if (WiFiManager_connected) return true;                               //If WIFI already on, stop and return true
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 1th quater blue 1222
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 2rd quater blue 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
-  if (WiFiManager_Start() == 1) {                                       //run the wifi startup
+#ifdef LEDstatus_SerialEnabled
+  Serial.println("LS: Setting LEDs to 'wifi is starting'");
+#endif //LEDstatus_SerialEnabled
+  if (WiFiManager_Start() == 1) {                                       //Run the wifi startup
     WiFiManager_StartServer();                                          //Enable responce to web request
     WiFiManager_EnableSetup(true);                                      //Enable the setup page, disable for more security
-    fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //turn all LEDs green
-    UpdateLEDs = true;
+    fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
+    FastLED.show();                                                     //Update leds to show wifi is done
+#ifdef LEDstatus_SerialEnabled
+  Serial.println("LS: Setting LEDs to 'wifi is done'");
+#endif //LEDstatus_SerialEnabled
   }
   return false;
 }

@@ -68,7 +68,7 @@ byte WiFiManager_Start() {
   }
   WiFiManager_Status_Done();
 #ifdef WiFiManager_SerialEnabled
-  Serial.print("WM: connected; SSID=" + String(ssid) + " ip=");
+  Serial.print("WM: Connected; SSID=" + String(ssid) + " ip=");
   Serial.println(WiFi.localIP());
 #endif //WiFiManager_SerialEnabled
   WiFiManager_connected = true;
@@ -489,11 +489,14 @@ void WiFiManager_Status_Blink() {
   digitalWrite(WiFiManager_LED, !digitalRead(WiFiManager_LED));
 }
 void WiFiManager_Status_StartAP() {
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //turn all LEDs purple 2222
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 1th quater red  1222
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //turn 2rd quater red  1212
-  FastLED.show();                                                       //Update leds to show wifi is starting
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 1th quater red  1222
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 2rd quater red  1212
+  FastLED.show();                                                       //Update leds to show we are entering APmode
   FastLED.delay(1);
+  #ifdef LEDstatus_SerialEnabled
+  Serial.println("LS: Setting LEDs to 'entering APmode'");
+#endif //LEDstatus_SerialEnabled
 }
 bool WiFiManager_HandleAP() {                 //Called when in the While loop in APMode, this so you can exit it
 #define TimeOutApMode 15 * 60 * 1000;     //Example for a timeout, re-enable these 3 lines to apply. (time in ms)
