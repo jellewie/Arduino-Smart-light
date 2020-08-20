@@ -342,7 +342,7 @@ void handle_Info() {
                    "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
-                   "Current time =" + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + ""
+                   "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + ""
 
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)

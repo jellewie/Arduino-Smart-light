@@ -246,8 +246,7 @@ void Tasks_handle_Connect() {
              "<div><label>Task ID </label><input type=\"text\" name=\"i\" value=\"\"> 1=SWITCHMODE, 2=DIMMING, 3=BRIGHTEN, 4=RESETESP, 5=CHANGERGB</div>"
              "ABC = Custom value to give along, for example for DIMMING: Stepsize,GoTo,TimeInterfall in ms"
              "<div><label>ABC </label><input type=\"text\" name=\"a\"><input type=\"text\" name=\"b\"><input type=\"text\" name=\"c\"></div>"
-             "<div><label>Time h:m:s</label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"></div>"
-             "<div><label>Time in ms from now</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
+             "<div><label>Time h:m:s</label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"><label>Time in ms from now</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
              "<button>Add task</button></form>";
 
   Message += "<br>Current time is " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
