@@ -26,6 +26,8 @@
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
+#define EEPROMSaveDelayMS 30000
+
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
   bool DoWriteToEEPROM = false;
@@ -111,9 +113,13 @@ void handle_Set() {
       LEDs[0].b = NewB;
     }
   }
-
-  if (DoWriteToEEPROM) WiFiManager_WriteEEPROM();
-
+  if (DoWriteToEEPROM) {                //If we need to write to EEPROM
+    RemoveTasksByID(SAVEEEPROM);        //Remove old EEPROM write command if they exist
+    TASK TempTask;
+    TempTask.ID = SAVEEEPROM;           //Create a new EEPROM write command
+    TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS; //Schedule to write data to EEPROM
+    AddTask(TempTask);                  //Add the command to the task list
+  };
   if (Mode == WIFI)
     fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);   //Change the whole LED strip to have the color of the first set LED
   else if (Mode == RESET) {

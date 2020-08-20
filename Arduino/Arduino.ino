@@ -62,6 +62,7 @@ TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
+extern bool WiFiManager_WriteEEPROM();
 #include "time.h"                         //We need this for the clock function to get the time (Time library)
 #include <WiFi.h>                         //we need this for WIFI stuff (duh)
 #include <WebServer.h>
