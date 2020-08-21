@@ -133,7 +133,6 @@
                 bottom: 0;
                 right: 0;
                 position: absolute;
-                background: url(settings.svg);
                 width: 30px;
                 height: 30px;
                 margin: 10px;
@@ -328,7 +327,7 @@
                             if (response.ok) {
                                 doToastMessage(successMessage);
                             } else {
-                                doToastMessage(await response.body(), true);
+                                doToastMessage(await response.text(), true);
                             }
                         } catch (_) {
                             doToastMessage("Failed to connect", true);
@@ -430,8 +429,17 @@
             }
             updateCssColor();
             async function getServerState() {
-                let response = await fetch("/get");
-                await updateServerStateFromResponse(response);
+                try{
+                    let response = await fetch("/get");
+                    if(response.ok){
+                        await updateServerStateFromResponse(response);
+                    }else{
+                        doToastMessage(await response.text(), true);
+                    }
+                }catch(e){
+                    console.log(e);
+                    doToastMessage("Failed to connect", true);
+                }
             }
             getServerState();
             setInterval(async(_)=>{
@@ -464,7 +472,7 @@
                         await updateServerStateFromResponse(response);
                         return true;
                     } else {
-                        doToastMessage(await response.body(), true);
+                        doToastMessage(await response.text(), true);
                     }
                 } catch (e) {
                     doToastMessage("Failed to connect", true);
