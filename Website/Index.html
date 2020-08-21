@@ -125,7 +125,9 @@
 
             #settingsContainer.hidden {
                 transform: translate(-50%,calc( - 50% - 10px));
-                opacity:0;pointer-events:none}
+                opacity:0;
+                pointer-events:none
+            }
 
             #settingsBtn {
                 bottom: 0;
@@ -494,7 +496,7 @@
             }
             async function doToastMessage(message, error=false) {
                 let el = document.createElement("div");
-                el.classList.add("toast", "hidden");
+                el.classList.add("toast","slideIn","hidden");
                 el.classList.toggle("error", error);
                 el.textContent = message;
                 document.body.appendChild(el);
