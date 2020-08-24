@@ -175,7 +175,7 @@ void handle_OnConnect() {
     Replace " with \"
     static String html = "<code>";
   */
-  static String html = "<html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover\"><link rel=\"manifest\" href=\"manifest.json\"><style>body,"
+  const String html = "<html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover\"><link rel=\"manifest\" href=\"manifest.json\"><style>body,"
                        "html{font-family:Helvetica,Arial,sans-serif;margin:0;background:var(--selected-color);color:var(--ui-color)}"
                        "#sliders{width:80%;max-width:400px;top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)}"
                        ".sliderContainer{margin:30px 0;text-align:center}"
@@ -238,11 +238,11 @@ void handle_OnConnect() {
                        "let Dc=new DropDown({name:'Analog clock',setParamName:'c',possibleValues:['FALSE','TRUE']});"
 
                        "settingsContainer.appendChild(document.createElement('br'));"
-                       "let Bo=new RequestButton('Enable OTA','/ota','OTA enabled');"
                        "let Bt=new RequestButton('Sync time','/time','Time updated');"
                        "let Br=new RequestButton('Reset','/set?m=RESET','ESP restarting');"
 
                        "settingsContainer.appendChild(document.createElement('br'));"
+                       "new LinkButton('OTA','/ota');"
                        "new LinkButton('Info','/info');"
                        "new LinkButton('Taks','/task');"
                        "new LinkButton('Saved settings','/ip');"
@@ -284,14 +284,6 @@ void handle_OnConnect() {
     server.send(200, "text/html", html);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 OnConnect");
-#endif //Server_SerialEnabled
-}
-void handle_EnableOTA() {
-  OTA_setup();
-  String message = "OTA enabled '" + String(OTA_Name) + "' at '" + IpAddress2String(WiFi.localIP()) + "'";
-  server.send(200, "text/html", message);
-#ifdef Server_SerialEnabled
-  Serial.println("SV: 200 EnableOTA" + message);
 #endif //Server_SerialEnabled
 }
 void handle_UpdateTime() {
@@ -345,7 +337,6 @@ void handle_Info() {
   String Message = "Code compiled on " +  String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " +  String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "OTA_Enabled = " + IsTrueToString(OTA_Enabled) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (inverse)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + ""

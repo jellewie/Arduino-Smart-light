@@ -14,6 +14,7 @@
 #define     Task_SerialEnabled
 #define     Time_SerialEnabled
 #define     SetupTime_SerialEnabled
+#define     OTA_SerialEnabled
 //#define     LoopTime_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
@@ -100,10 +101,11 @@ void setup() {
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager_Start()" for APMode
   server.on("/task",       Tasks_handle_Connect);
   server.on("/settask",    Tasks_handle_Settings);
+  server.on("/ota",               OTA_handle_UploadPage);
+  server.on("/update", HTTP_POST, OTA_handle_update, OTA_handle_update2);
   server.on("/",            handle_OnConnect);          //Call the 'handleRoot' function when a client requests URI "/"
   server.on("/set",         handle_Set);
   server.on("/get",         handle_Getcolors);
-  server.on("/ota",         handle_EnableOTA);
   server.on("/time",        handle_UpdateTime);
   server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
@@ -149,7 +151,6 @@ void loop() {
   LoopLast = LoopNow;
   Serial.println("Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
-  OTA_loop();                                         //Do OTA stuff if needed
   WiFiManager_RunServer();                            //Do WIFI server stuff if needed
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
