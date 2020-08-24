@@ -193,7 +193,7 @@ void handle_OnConnect() {
                        "#curtain.hidden{opacity:0;pointer-events:none}"
                        "#settingsContainer{position:absolute;width:90%;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:150}"
                        "#settingsContainer.hidden{transform:translate(-50%,calc( - 50% - 10px));opacity:0;pointer-events:none}"
-                       "#settingsBtn{bottom:0;right:0;position:absolute;background:url(settings.svg);width:30px;height:30px;margin:10px;cursor:pointer}"
+                       "#settingsBtn{bottom:0;right:0;position:absolute;width:30px;height:30px;margin:10px;cursor:pointer}"
                        ".selectLabel{margin:5px;display:block}"
                        ".selectContainer{display:inline-block;position:relative}"
                        "select{-webkit-appearance:none;background:0;color:var(--ui-color);border:solid 1px var(--ui-color);border-radius:5px;margin:3px;padding:2px}"
@@ -207,46 +207,47 @@ void handle_OnConnect() {
                        "<div id=\"curtain\" class=\"hidden\"></div>"
                        "<div id=\"settingsContainer\" class=\"slideIn hidden\"></div>"
                        "<svg viewBox=\"0 0 50 50\" xmlns=\"http://www.w3.org/2000/svg\" id=\"settingsBtn\"><defs><mask id=\"mask\"><g><path d=\"M10 31.5 L2 29 L2 21 L10 18.5 L6 11 L11 6 L18.5 10 L21 2 L29 2 L31.5 10 L39 6 L44 11 L40 18.5 L48 21 L48 29 L40 31.5 L44 39 L39 44 L31.5 40 L29 48 L21 48 L18.5 40 L11 44 L6 39\" fill=\"white\"/><circle cx=\"25\" cy=\"25\" r=\"18\" fill=\"white\"/><circle cx=\"25\" cy=\"25\" r=\"10\" fill=\"black\"/></g></mask></defs><rect x=\"0\" y=\"0\" width=\"100\" height=\"100\" mask=\"url(#mask)\" style=\"fill:var(--ui-color)\"/></svg>"
-                       "<script>let slidersEl = document.getElementById(\"sliders\");"
-                       "let curtainEl = document.getElementById(\"curtain\");"
-                       "let settingsContainerEl = document.getElementById(\"settingsContainer\");"
-                       "let settingsBtn = document.getElementById(\"settingsBtn\");"
-                       "let colorVarsEl = document.getElementById(\"colorVars\");"
-                       "class Slider{constructor(name, forceRgb = true){this.name = name;this.containerEl = document.createElement(\"div\");this.containerEl.classList.add(\"sliderContainer\");slidersEl.appendChild(this.containerEl);this.textEl = document.createElement(\"div\");this.textEl.classList.add(\"sliderText\");this.containerEl.appendChild(this.textEl);this.rangeEl = document.createElement(\"input\");this.rangeEl.type = \"range\";this.rangeEl.min = \"0\";this.rangeEl.max = \"255\";this.containerEl.appendChild(this.rangeEl);this.rangeEl.addEventListener(\"input\", (_) =>{this.update();});this.rangeEl.addEventListener(\"change\", (_) =>{setServerState(forceRgb);});this.updateText();}get value(){return this.rangeEl.value;}set value(v){this.rangeEl.value = v;this.update();}get value01(){return this.value / 255;}update(){this.updateText();updateCssColor();}updateText(){this.textEl.textContent = this.name + \": \" + this.value;}}"
-                       "class DropDown{constructor({name=\"\",setParamName=\"\",possibleValues=[],modifySendParams=null}={}){let labelEl=document.createElement(\"label\");labelEl.classList.add(\"selectLabel\");labelEl.textContent=name+\":\";settingsContainerEl.appendChild(labelEl);this.name=name;this._value=\"\";this.setParamName=setParamName;this.modifySendParams=modifySendParams;let selectContainer=document.createElement(\"div\");selectContainer.classList.add(\"selectContainer\");labelEl.appendChild(selectContainer);this.el=document.createElement(\"select\");selectContainer.appendChild(this.el);this.el.addEventListener(\"change\",(_)=>{this.onChange();});for(const val of possibleValues){let optionEl=document.createElement(\"option\");optionEl.value=optionEl.textContent=val;this.el.appendChild(optionEl);}this.el.value=\"\";this.fakeValueEl=document.createElement(\"div\");this.fakeValueEl.classList.add(\"dropdownFakeValue\");selectContainer.appendChild(this.fakeValueEl);}async onChange(){this.value=this.el.value;this.el.value=\"\";let sendParams={};sendParams[this.setParamName]=this.value;if(this.modifySendParams){let newSendParams=this.modifySendParams(sendParams);if(newSendParams)sendParams=newSendParams;}let success=await sendServerState(sendParams);if(success){doToastMessage(this.name+\" Updated\");}}get value(){return this._value;}set value(v){this._value=v;this.fakeValueEl.textContent=v;}}"
-                       "class Button{constructor(label,cb){this.el=document.createElement(\"button\");this.el.textContent=label;settingsContainer.appendChild(this.el);this.el.addEventListener(\"click\",(_)=>{cb();});}}"
-                       "class RequestButton extends Button{constructor(label,endpoint,successMessage){super(label,async(_)=>{try{let response=await fetch(endpoint);if(response.ok){doToastMessage(successMessage);}else{doToastMessage(await response.body(),true);}}catch(_){doToastMessage(\"Failed to connect\",true);}});}}"
-                       "class LinkButton extends Button{constructor(label,url){super(label,_=>{window.open(url,\"_blank\");});}}"
+                       
+                       "<script>let slidersEl = document.getElementById('sliders');"
+                       "let curtainEl = document.getElementById('curtain');"
+                       "let settingsContainerEl = document.getElementById('settingsContainer');"
+                       "let settingsBtn = document.getElementById('settingsBtn');"
+                       "let colorVarsEl = document.getElementById('colorVars');"
+                       "class Slider{constructor(name, forceRgb = true){this.name = name;this.containerEl = document.createElement('div');this.containerEl.classList.add('sliderContainer');slidersEl.appendChild(this.containerEl);this.textEl = document.createElement('div');this.textEl.classList.add('sliderText');this.containerEl.appendChild(this.textEl);this.rangeEl = document.createElement('input');this.rangeEl.type = 'range';this.rangeEl.min = '0';this.rangeEl.max = '255';this.containerEl.appendChild(this.rangeEl);this.rangeEl.addEventListener('input', (_) =>{this.update();});this.rangeEl.addEventListener('change', (_) =>{setServerState(forceRgb);});this.updateText();}get value(){return this.rangeEl.value;}set value(v){this.rangeEl.value = v;this.update();}get value01(){return this.value / 255;}update(){this.updateText();updateCssColor();}updateText(){this.textEl.textContent = this.name + ': ' + this.value;}}"
+                       "class DropDown{constructor({name='',setParamName='',possibleValues=[],modifySendParams=null}={}){let labelEl=document.createElement('label');labelEl.classList.add('selectLabel');labelEl.textContent=name+':';settingsContainerEl.appendChild(labelEl);this.name=name;this._value='';this.setParamName=setParamName;this.modifySendParams=modifySendParams;let selectContainer=document.createElement('div');selectContainer.classList.add('selectContainer');labelEl.appendChild(selectContainer);this.el=document.createElement('select');selectContainer.appendChild(this.el);this.el.addEventListener('change',(_)=>{this.onChange();});for(const val of possibleValues){let optionEl=document.createElement('option');optionEl.value=optionEl.textContent=val;this.el.appendChild(optionEl);}this.el.value='';this.fakeValueEl=document.createElement('div');this.fakeValueEl.classList.add('dropdownFakeValue');selectContainer.appendChild(this.fakeValueEl);}async onChange(){this.value=this.el.value;this.el.value='';let sendParams={};sendParams[this.setParamName]=this.value;if(this.modifySendParams){let newSendParams=this.modifySendParams(sendParams);if(newSendParams)sendParams=newSendParams;}let success=await sendServerState(sendParams);if(success){doToastMessage(this.name+' Updated');}}get value(){return this._value;}set value(v){this._value=v;this.fakeValueEl.textContent=v;}}"
+                       "class Button{constructor(label,cb){this.el=document.createElement('button');this.el.textContent=label;settingsContainer.appendChild(this.el);this.el.addEventListener('click',(_)=>{cb();});}}"
+                       "class RequestButton extends Button{constructor(label,endpoint,successMessage){super(label,async(_)=>{try{let response=await fetch(endpoint);if(response.ok){doToastMessage(successMessage);}else{doToastMessage(await response.text(),true);}}catch(_){doToastMessage('Failed to connect',true);}});}}"
+                       "class LinkButton extends Button{constructor(label,url){super(label,_=>{window.open(url,'_blank');});}}"
 
-                       "let Sl=new Slider(\"Brightness\",false);"
-                       "let Sr=new Slider(\"Red\");"
-                       "let Sg=new Slider(\"Green\");"
-                       "let Sb=new Slider(\"Blue\");"
+                       "let Sl=new Slider('Brightness',false);"
+                       "let Sr=new Slider('Red');"
+                       "let Sg=new Slider('Green');"
+                       "let Sb=new Slider('Blue');"
 
-                       "let Dm=new DropDown({name:\"Mode\",setParamName:\"m\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"],modifySendParams:(oldParams)=>{if(Dm.value==\"WIFI\"){let extraData=this.getServerStateMessageData(true);return{...oldParams,...extraData};}},});"
-                       "let Dbm=new DropDown({name:\"Bootmode\",setParamName:\"bm\",possibleValues:[\"OFF\",\"ON\",\"WIFI\",\"CLOCK\"]});"
-                       "let Ddm=new DropDown({name:\"Doublepress mode\",setParamName:\"dm\",possibleValues:[\"WIFI\",\"CLOCK\",\"BLINK\",\"BPM\",\"CONFETTI\",\"FLASH\",\"GLITTER\",\"JUGGLE\",\"MOVE\",\"RAINBOW\",\"SINELON\",\"SINELON2\"]});"
+                       "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData(true);return{...oldParams,...extraData};}},});"
+                       "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK']});"
+                       "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2']});"
 
-                       "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "let Di=new DropDown({name:\"Auto brightness\",setParamName:\"i\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "settingsContainer.appendChild(document.createElement('br'));"
+                       "let Di=new DropDown({name:'Auto brightness',setParamName:'i',possibleValues:['FALSE','TRUE']});"
 
-                       "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "let Dha=new DropDown({name:\"Hourly animation\",setParamName:\"ha\",possibleValues:[\"FALSE\",\"2\",\"5\",\"10\"]});"
-                       "let Dhl=new DropDown({name:\"Hourly lines\",setParamName:\"hl\",possibleValues:[\"FALSE\",\"1\",\"2\",\"4\",\"8\",\"16\",\"32\"]});"        //This one is actually a Byte
-                       "let Da=new DropDown({name:\"Analog hours\",setParamName:\"a\",possibleValues:[\"FALSE\",\"TRUE\"]});"
-                       "let Dc=new DropDown({name:\"Analog clock\",setParamName:\"c\",possibleValues:[\"FALSE\",\"TRUE\"]});"
+                       "settingsContainer.appendChild(document.createElement('br'));"
+                       "let Dha=new DropDown({name:'Hourly animation',setParamName:'ha',possibleValues:['FALSE','2','5','10']});"
+                       "let Dhl=new DropDown({name:'Hourly lines',setParamName:'hl',possibleValues:['FALSE','1','2','4','8','16','32']});"        //This one is actually a Byte
+                       "let Da=new DropDown({name:'Analog hours',setParamName:'a',possibleValues:['FALSE','TRUE']});"
+                       "let Dc=new DropDown({name:'Analog clock',setParamName:'c',possibleValues:['FALSE','TRUE']});"
 
-                       "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "let Bo=new RequestButton(\"Enable OTA\",\"/ota\",\"OTA enabled\");"
-                       "let Bt=new RequestButton(\"Sync time\",\"/time\",\"Time updated\");"
-                       "let Br=new RequestButton(\"Reset\",\"/set?m=RESET\",\"ESP restarting\");"
+                       "settingsContainer.appendChild(document.createElement('br'));"
+                       "let Bo=new RequestButton('Enable OTA','/ota','OTA enabled');"
+                       "let Bt=new RequestButton('Sync time','/time','Time updated');"
+                       "let Br=new RequestButton('Reset','/set?m=RESET','ESP restarting');"
 
-                       "settingsContainer.appendChild(document.createElement(\"br\"));"
-                       "new LinkButton(\"Info\",\"/info\");"
-                       "new LinkButton(\"Taks\",\"/task\");"
-                       "new LinkButton(\"Saved settings\",\"/ip\");"
+                       "settingsContainer.appendChild(document.createElement('br'));"
+                       "new LinkButton('Info','/info');"
+                       "new LinkButton('Taks','/task');"
+                       "new LinkButton('Saved settings','/ip');"
 
-                       "curtainEl.addEventListener(\"click\",_=>this.setSettingsVisibility(false));settingsBtn.addEventListener(\"click\",_=>this.setSettingsVisibility(true));function setSettingsVisibility(visible){curtainEl.classList.toggle(\"hidden\",!visible);settingsContainerEl.classList.toggle(\"hidden\",!visible);}"
+                       "curtainEl.addEventListener('click',_=>this.setSettingsVisibility(false));settingsBtn.addEventListener('click',_=>this.setSettingsVisibility(true));function setSettingsVisibility(visible){curtainEl.classList.toggle('hidden',!visible);settingsContainerEl.classList.toggle('hidden',!visible);}"
                        "function updateCssColor(){"
                        "let r=Math.pow(Sr.value01*Sl.value01,1/2.2)*255;"
                        "let g=Math.pow(Sg.value01*Sl.value01,1/2.2)*255;"
@@ -254,13 +255,17 @@ void handle_OnConnect() {
                        "let selectedColor=`rgb(${r},${g},${b})`;"
                        "let perceivedBrightness=Math.round((r*299+g*587+b*114)/1000);"
                        "let uiBrightness=perceivedBrightness>125?0:255;"
-                       "let uiColRGB=uiBrightness+\",\"+uiBrightness+\",\"+uiBrightness;"
+                       "let uiColRGB=uiBrightness+','+uiBrightness+','+uiBrightness;"
                        "let uiColor=`rgb(${uiColRGB})`;let uiColorTrans1=`rgba(${uiColRGB},0.8)`;"
                        "let uiColorTrans2=`rgba(${uiColRGB},0.5)`;"
                        "colorVarsEl.textContent=`:root{--selected-color:${selectedColor};--ui-color:${uiColor};--ui-color-trans1:${uiColorTrans1};--ui-color-trans2:${uiColorTrans2};}`;}"
-
-                       "updateCssColor();async function getServerState(){let response=await fetch(\"/get\");await updateServerStateFromResponse(response);}getServerState();setInterval(async(_)=>{getServerState();},10*1000);function getServerStateMessageData(forceRgb=true){let state={l:Sl.value};if(Dm.value==\"WIFI\"||forceRgb){state={...state,r:Sr.value,g:Sg.value,b:Sb.value};}return state;}async function setServerState(forceRgb=true){let state=getServerStateMessageData(forceRgb);await sendServerState(state);}async function sendServerState(params,endPoint=\"/set\"){let searchParams=new URLSearchParams(params);try{let response=await fetch(endPoint+\"?\"+searchParams);if(response.ok){await updateServerStateFromResponse(response);return true;}else{doToastMessage(await response.body(),true);}}catch(e){doToastMessage(\"Failed to connect\",true);}}"
+                       "updateCssColor();"
+                       "async function getServerState(){try{let response=await fetch('/get');if(response.ok){await updateServerStateFromResponse(response);}else{doToastMessage(await response.text(),true);}}catch(e){console.log(e);doToastMessage('Failed to connect',true);}}"
+                       "getServerState();"
+                       "setInterval(async(_)=>{getServerState();},10*1000);function getServerStateMessageData(forceRgb=true){let state={l:Sl.value};if(Dm.value=='WIFI'||forceRgb){state={...state,r:Sr.value,g:Sg.value,b:Sb.value};}return state;}async function setServerState(forceRgb=true){let state=getServerStateMessageData(forceRgb);await sendServerState(state);}"
+                       "async function sendServerState(params,endPoint='/set'){let searchParams=new URLSearchParams(params);try{let response=await fetch(endPoint+'?'+searchParams);if(response.ok){await updateServerStateFromResponse(response);return true;}else{doToastMessage(await response.text(),true);}}catch(e){doToastMessage('Failed to connect',true);}}"
                        "async function updateServerStateFromResponse(response){if(!response.ok)return;let json=await response.json();"
+                       
                        "Dm.value=json.m;"
                        "Dbm.value=json.bm;"
                        "Ddm.value=json.dm;"
@@ -272,10 +277,11 @@ void handle_OnConnect() {
                        "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sl.value=col.L;}"
 
                        "async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}"
-                       "function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue(\"top\");}"
-                       "async function doToastMessage(message,error=false){let el=document.createElement(\"div\");el.classList.add(\"toast\",\"hidden\");el.classList.toggle(\"error\",error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove(\"hidden\");await timeout(5000);el.classList.add(\"hidden\");await timeout(200);el.parentElement.removeChild(el);}"
-                       "async function installSw(){if(!(\"serviceWorker\"in window.navigator))return;await navigator.serviceWorker.register(\"sw.js\");}installSw();</script></body></html>";
-  server.send(200, "text/html", html);
+                       "function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue('top');}"
+                       "async function doToastMessage(message,error=false){let el=document.createElement('div');el.classList.add('toast','slideIn','hidden');el.classList.toggle('error',error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove('hidden');await timeout(5000);el.classList.add('hidden');await timeout(200);el.parentElement.removeChild(el);}"
+                       "async function installSw(){if(!('serviceWorker'in window.navigator))return;await navigator.serviceWorker.register('sw.js');}installSw();</script></body></html>";
+
+    server.send(200, "text/html", html);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 OnConnect");
 #endif //Server_SerialEnabled
