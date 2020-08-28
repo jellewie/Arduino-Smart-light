@@ -230,7 +230,7 @@ void Tasks_handle_Connect() {
 
       Message += "<form action=\"/settask?\" method=\"set\">#" + String(i) + " "
                  "<input type=\"hidden\" name=\"o\" value=\"2\">"
-                 "<label>Do task </label>" + ConvertTaskIDToString(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"i\">";
+                 "<label>Do task </label>" + ConvertTaskIDToString(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"" + i + "\">";
       if (TaskList[i].ExectuteAt.Ticks > 0)
         Message += " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms";
       else
