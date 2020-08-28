@@ -72,7 +72,7 @@ bool StartWIFIstuff() {
     fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
     FastLED.show();                                                     //Update leds to show wifi is done
 #ifdef LEDstatus_SerialEnabled
-  Serial.println("LS: Setting LEDs to 'wifi is done'");
+    Serial.println("LS: Setting LEDs to 'wifi is done'");
 #endif //LEDstatus_SerialEnabled
   }
   return false;
