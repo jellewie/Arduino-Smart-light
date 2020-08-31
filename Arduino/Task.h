@@ -20,39 +20,30 @@ const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why fil
 //<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixMode  "o"   //1=Add 2=Remove
 #define PreFixID    "i"   //Task ID
-#define PreFixA     "a"   //Task A
-#define PreFixB     "b"   //Task B
-#define PreFixC     "c"   //Task B
+#define PreFixVar   "a"   //Task Variable
 #define PreFixTimeH "h"   //On which time the task needs to be executed
 #define PreFixTimeM "m"   //^
 #define PreFixTimeS "s"   //^
 #define PreFixTimeT "t"   //In howmany ticks the task needs to be executed
 
 struct TASK {
-  byte ID = 0;                     //the ID of the task, these are defined in the enum
-  byte A = 0;                      //If you want to add some data to the task, for example a pin number
-  byte B = 0;                      //If you want to add even more data to the task, for example a pin state
-  String C = "";                   //If you want to add even more data to the task, for example a time interfal
-  TimeS ExectuteAt = {0, 0, 0, 0}; //The time in millis to execute this task
+  byte ID = 0;                     //The ID of the task, these are defined in the enum
+  String Var = "";                 //Used for some special variables
+  TimeS ExectuteAt = {0, 0, 0, 0}; //The time in {HH:MM:SS:or millis} to execute this task
   bool Executed = false;           //Just here to keep track of it a Time based task has been executed today
 };
 TASK TaskList[TaskLimit];
 
-//Declare all functions here, so we can cross reference then in the code. Basically just placeholders to the compiler does not wine about that they do not yet exist
-extern bool AddTask(TASK Item);
+//Declare some functions here, so we can cross reference then in the code. Basically just placeholders to the compiler does not whine about that they do not exist yet
 extern String ConvertTaskIDToString(byte IN);
-extern int ConvertTaskIDToInt(String IN);
-extern bool DoTask(TASK Item);
-extern bool RemoveTask(byte i);
-extern void RemoveTasksByID(byte ID);
-extern void ExecuteTask();
-extern void Tasks_handle_Connect();
-extern void Tasks_handle_Settings();
+extern int    ConvertTaskIDToInt(String IN);
+extern void   CutVariable(String _Input, String *_Variable, byte _VariableLength);
+extern bool   AddTask(TASK Item);
 
 bool DoTask(TASK Item) {
   bool returnValue = true;
 #ifdef Task_SerialEnabled
-  Serial.print("T: DoTask " + ConvertTaskIDToString(Item.ID) + " a=" + String(Item.A) + " b=" + String(Item.B) + " c=" + Item.C);
+  Serial.print("T: DoTask " + ConvertTaskIDToString(Item.ID) + " var=" + String(Item.Var));
   if (Item.ExectuteAt.Ticks > 0)
     Serial.println(" due to Ticks, scheduled for " + String(Item.ExectuteAt.Ticks) + " now=" + String(millis()));
   else
@@ -60,28 +51,25 @@ bool DoTask(TASK Item) {
 #endif //Task_SerialEnabled
   switch (Item.ID) {
     case SWITCHMODE: {
-        //C = New Mode
-#ifdef Task_SerialEnabled
-        Serial.println("T: SWITCHMODE to " + Item.C + "(" + String(ConvertModeToInt(Item.C)) + ")");
-#endif //Task_SerialEnabled
-        Mode = ConvertModeToInt(Item.C);
+        //Var = New Mode
+        Mode = ConvertModeToInt(Item.Var);
         UpdateLEDs = true;
       } break;
     case DIMMING: {
-        //A = Stepsize
-        //B = GoTo
-        //C = TimeInterfall in ms
-#ifdef Task_SerialEnabled
-        Serial.println("T: DIMMING from " + String(FastLED.getBrightness()) + " a " + String(Item.A) + " a " + String(Item.B) + " a " + Item.C);
-#endif //Task_SerialEnabled
+        //Var = Stepsize,GoTo,TimeInterfall in ms
+        String _Vars[3];
+        CutVariable(Item.Var, &_Vars[0], 3);
+        byte Stepsize = constrain(_Vars[0].toInt(), 0, 255);
+        byte GoTo     = constrain(_Vars[1].toInt(), 0, 255);
+        int TimeInterfall       = _Vars[2].toInt();
         byte BRI = FastLED.getBrightness();
-        if (BRI - Item.A < Item.B) {
-          BRI = Item.B;
+        if (BRI - Stepsize < GoTo) {
+          BRI = GoTo;
         } else {
-          BRI = BRI - Item.A;
-          if (Item.C.toInt() > 0) {     //If we need to go further, and need to create another task
+          BRI = BRI - Stepsize;
+          if (TimeInterfall > 0) {     //If we need to go further, and need to create another task
             TASK TempTask = Item;
-            TempTask.ExectuteAt.Ticks = millis() + Item.C.toInt();
+            TempTask.ExectuteAt.Ticks = millis() + TimeInterfall;
             AddTask(TempTask);
           }
         }
@@ -89,19 +77,22 @@ bool DoTask(TASK Item) {
         UpdateLEDs = true;
       } break;
     case BRIGHTEN: {
-        //A = Stepsize
-        //B = GoTo
-        //C = TimeInterfal in ms
+        //Var = Stepsize,GoTo,TimeInterfall in ms
+        String _Vars[3];
+        CutVariable(Item.Var, &_Vars[0], 3);
+        byte Stepsize = constrain(_Vars[0].toInt(), 0, 255);
+        byte GoTo     = constrain(_Vars[1].toInt(), 0, 255);
+        int TimeInterfall       = _Vars[2].toInt();
         byte Now = FastLED.getBrightness();
         byte To = 255;
-        if (Item.B > 0) To = Item.B;
-        if (To - Now < Item.A) {
+        if (GoTo > 0) To = GoTo;
+        if (To - Now < Stepsize) {
           Now = To;
         } else {
-          Now += Item.A;
-          if (Item.C.toInt() > 0) {
+          Now += Stepsize;
+          if (TimeInterfall > 0) {
             TASK TempTask = Item;
-            TempTask.ExectuteAt.Ticks = millis() + Item.C.toInt();
+            TempTask.ExectuteAt.Ticks = millis() + TimeInterfall;
             AddTask(TempTask);
           }
         }
@@ -115,12 +106,15 @@ bool DoTask(TASK Item) {
         ESP.restart();
       } break;
     case CHANGERGB: {
-        //A = new Red value
-        //B = new Green value
-        //C = new Blue value
+        //Var = new Red value,new Green value,new Blue value
+        String _Vars[3];
+        CutVariable(Item.Var, &_Vars[0], 3);
+        byte GoToR = constrain(_Vars[0].toInt(), 0, 255);
+        byte GoToG = constrain(_Vars[1].toInt(), 0, 255);
+        byte GoToB = constrain(_Vars[2].toInt(), 0, 255);
         Mode = ON;
         LastMode = Mode;
-        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(Item.A, Item.B, Item.C.toInt()));
+        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(GoToR, GoToG, GoToB));
         UpdateLEDs = true;
       } break;
     case SAVEEEPROM: {
@@ -132,6 +126,7 @@ bool DoTask(TASK Item) {
   }
   return returnValue;
 }
+
 String ConvertTaskIDToString(byte IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("ConvertTaskToString '" + String(IN) + "'");
@@ -157,9 +152,26 @@ int ConvertTaskIDToInt(String IN) {
   }
   return 0;
 }
+void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
+  //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
+  //Returns the output in the same string, for example
+  //  String _Output[3], _Input = "test,yes,good,no,what";
+  //  CutVariable(_Input, &_Output[0], 3);
+  //  Serial.println(String(_Output[0]) + "_" + String(_Output[1]) + "_" + String(_Output[2]));
+  byte _StartAt = 0, _WriteTo = 0;
+  for (byte i = 0; i <= _Input.length(); i++) { //For each character in the input string
+    if (_Input.charAt(i) == ',') {
+      _Variable[_WriteTo] = _Input.substring(_StartAt, i);
+      _WriteTo ++;
+      _StartAt = i + 1;
+      if (_WriteTo >= _VariableLength - 1) break;       //If last one
+    }
+  }
+  _Variable[_WriteTo] = _Input.substring(_StartAt);
+}
 bool AddTask(TASK Item) {
 #ifdef Task_SerialEnabled
-  Serial.print("T: AddTask " + String(Item.ID) + " a=" + String(Item.A) + " b=" + String(Item.B) + " c=" + Item.C);
+  Serial.print("T: AddTask " + String(Item.ID) + " Var=" + String(Item.Var));
   if (Item.ExectuteAt.Ticks > 0) Serial.println(" in " + String(Item.ExectuteAt.Ticks - millis()));
   else Serial.println(" at " + String(Item.ExectuteAt.HH) + ":" + String(Item.ExectuteAt.MM) + ":" + String(Item.ExectuteAt.SS));
 #endif //Task_SerialEnabled
@@ -235,8 +247,7 @@ void Tasks_handle_Connect() {
         Message += " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms";
       else
         Message += " at " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS) + "";
-      Message += " ABC=" + String(TaskList[i].A) + "," + String(TaskList[i].B) + "," + TaskList[i].C + " "
-                 "<button>Remove task</button></form>";
+      Message += " Var=" + String(TaskList[i].Var) + " <button>Remove task</button></form>";
     }
   }
   if (Message == "") Message += "No task in the tasklist<br>";
@@ -244,12 +255,11 @@ void Tasks_handle_Connect() {
   Message += "<br><form action=\"/settask?\" method=\"set\">"
              "<input type=\"hidden\" name=\"o\" value=\"1\">"
              "<div><label>Task ID </label><input type=\"text\" name=\"i\" value=\"\"> 1=SWITCHMODE, 2=DIMMING, 3=BRIGHTEN, 4=RESETESP, 5=CHANGERGB</div>"
-             "ABC = Custom value to give along, for example for DIMMING: Stepsize,GoTo,TimeInterfall in ms"
-             "<div><label>ABC </label><input type=\"text\" name=\"a\"><input type=\"text\" name=\"b\"><input type=\"text\" name=\"c\"></div>"
-             "<div><label>Time h:m:s</label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"><label>Time in ms from now</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
+             "<div><label>Var </label><input type=\"text\" name=\"a\">Custom value to give along, for example for DIMMING:(Stepsize,GoTo,TimeInterfall in ms) OR SWITCHMODE:(NewModeIdOrName)</div>"
+             "<div><label>Time h:m:s </label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"><label> or time in ms from now:</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
              "<button>Add task</button></form>";
 
-  Message += "<br>Current time is " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
+  Message += "Current time is " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
 
   if (ERRORMSG != "")
     server.send(400, "text/html", "<html>" + ERRORMSG + "<br><br>" + Message + "<html>");
@@ -264,33 +274,36 @@ void Tasks_handle_Settings() {
   String ERRORMSG = "";
   if (server.args() > 0) {                      //If manual time given
     TASK TempTask;
+    TempTask.ExectuteAt.HH = -1;
+    TempTask.ExectuteAt.MM = -1;
+    TempTask.ExectuteAt.SS = -1;
+    TempTask.ExectuteAt.Ticks = 0;
+    TempTask.ID = -1;
     byte TaskCommand = 0;
     for (int i = 0; i < server.args(); i++) {
       String ArguName = server.argName(i);
       ArguName.toLowerCase();
       String ArgValue = server.arg(i);
-      if (ArguName == PreFixMode) {
-        TaskCommand = ArgValue.toInt();
-      } else if (ArguName == PreFixID) {
-        TempTask.ID = ConvertTaskIDToInt(ArgValue);
-      } else if (ArguName == PreFixA) {
-        TempTask.A = ArgValue.toInt();
-      } else if (ArguName == PreFixB) {
-        TempTask.B = ArgValue.toInt();
-      } else if (ArguName == PreFixC) {
-        TempTask.C = ArgValue;
-      } else if (ArguName == PreFixTimeS) {
-        TempTask.ExectuteAt.SS = ArgValue.toInt();
-      } else if (ArguName == PreFixTimeM) {
-        TempTask.ExectuteAt.MM = ArgValue.toInt();
-      } else if (ArguName == PreFixTimeH) {
-        TempTask.ExectuteAt.HH = ArgValue.toInt();
-      } else if (ArguName == PreFixTimeT) {
-        TempTask.ExectuteAt.Ticks = ArgValue.toInt();
-      } else
-        ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
+      if (ArgValue != "") {
+        if (ArguName == PreFixMode) {
+          TaskCommand = ArgValue.toInt();
+        } else if (ArguName == PreFixID) {
+          TempTask.ID = ConvertTaskIDToInt(ArgValue);
+        } else if (ArguName == PreFixVar) {
+          TempTask.Var = ArgValue;
+        } else if (ArguName == PreFixTimeS) {
+          TempTask.ExectuteAt.SS = ArgValue.toInt();
+        } else if (ArguName == PreFixTimeM) {
+          TempTask.ExectuteAt.MM = ArgValue.toInt();
+        } else if (ArguName == PreFixTimeH) {
+          TempTask.ExectuteAt.HH = ArgValue.toInt();
+        } else if (ArguName == PreFixTimeT) {
+          TempTask.ExectuteAt.Ticks = ArgValue.toInt();
+        } else
+          ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
+      }
     }
-    if (TempTask.ID == 0) {
+    if (TempTask.ID == -1) {
       ERRORMSG += "No Task ID given\n";
     } else {
       switch (TaskCommand) {
@@ -298,16 +311,21 @@ void Tasks_handle_Settings() {
           ERRORMSG += "No command given\n";
           break;
         case 1: //Add
-          if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.SS == 0 and TempTask.ExectuteAt.MM == 0 and TempTask.ExectuteAt.HH == 0) {
-            ERRORMSG += "No Task time given\n";
+          if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.HH > 24 and TempTask.ExectuteAt.MM > 60 and TempTask.ExectuteAt.SS > 60) {
+            ERRORMSG += "No (proper) Task time given\n";
           } else {
             if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
               TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
-              TempTask.ExectuteAt.SS = 0;             //Reset the time, we dont use these
+              TempTask.ExectuteAt.HH = 0;             //Reset the time, we dont use these
               TempTask.ExectuteAt.MM = 0;
-              TempTask.ExectuteAt.HH = 0;
-            } else if (!TimeSet)
-              ERRORMSG += "Warning time is not synced\n";
+              TempTask.ExectuteAt.SS = 0;
+            } else {
+              if (!TimeSet)
+                ERRORMSG += "Warning time is not synced\n";
+              if (TempTask.ExectuteAt.HH > 24) TempTask.ExectuteAt.HH = 0;
+              if (TempTask.ExectuteAt.MM > 60) TempTask.ExectuteAt.MM = 0;
+              if (TempTask.ExectuteAt.SS > 60) TempTask.ExectuteAt.SS = 0;
+            }
             if (!AddTask(TempTask))
               ERRORMSG += "Could not add tasks\n";
           }
