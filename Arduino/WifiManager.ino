@@ -409,7 +409,7 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
       if (WiFiManager_Convert)
         WiFiManager_Temp_Return = IsTrueToString(ClockAnalog);
       else
-        WiFiManager_Temp_Return = ClockHourAnalog;
+        WiFiManager_Temp_Return = ClockAnalog;
       break;
     case 14:
       WiFiManager_Temp_Return = gmtOffset_sec;
