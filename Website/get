@@ -1,7 +1,8 @@
 {
    "On":"ON",
-   "Mode":"ON",
-   "BootMode":"WIFI",
+   "m":"CLOCK",
+   "bm":"WIFI",
+   "i":"FALSE",
    "HourAni":"TRUE",
    "RGBL":[{
          "R":255,
