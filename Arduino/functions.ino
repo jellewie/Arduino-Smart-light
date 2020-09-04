@@ -25,8 +25,7 @@ void UpdateColor(bool ForceUpdate) {
   }
 }
 byte GetAutoBrightness(byte Value) {
-  if (Value < 1) Value = 1;
-  float Answer = (Value - AutoBrightnessN) * AutoBrightnessP - AutoBrightnessO;
+  float Answer = AutoBrightnessP * (Value - AutoBrightnessN) - AutoBrightnessO;
   return 255 - constrain(Answer, 0, 254);
 }
 void UpdateBrightness(bool ForceUpdate) {

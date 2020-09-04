@@ -117,9 +117,9 @@ These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last chan
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
 - **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P.
-- **AutoBrightnessN** Brightness =(X-N)xP+O.
-- **AutoBrightnessP**
-- **AutoBrightnessO**
+- **AutoBrightnessN** Used to calculate auto brightness =P*(X-N)+O. please see www.desmos.com/calculator/gpr6bwjleg
+- **AutoBrightnessP** ^ Just the lowest raw sensor value you can find
+- **AutoBrightnessO** ^ Just an brigtness offset, so it can be set to be globaly more bright
 - **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255.
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just stick to wholes and use 12.
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations.
