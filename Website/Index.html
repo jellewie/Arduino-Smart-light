@@ -399,10 +399,10 @@
                 possibleValues: ['FALSE', 'TRUE']
             });
             settingsContainer.appendChild(document.createElement('br'));
-            let Bo = new RequestButton('Enable OTA','/ota','OTA enabled');
             let Bt = new RequestButton('Sync time','/time','Time updated');
             let Br = new RequestButton('Reset','/set?m=RESET','ESP restarting');
             settingsContainer.appendChild(document.createElement('br'));
+            new LinkButton('OTA','/ota');
             new LinkButton('Info','/info');
             new LinkButton('Taks','/task');
             new LinkButton('Saved settings','/ip');
