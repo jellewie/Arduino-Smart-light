@@ -1,9 +1,12 @@
 {
-   "On":"ON",
    "m":"CLOCK",
-   "bm":"WIFI",
+   "bm":"OFF",
+   "dm":"RAINBOW",
    "i":"FALSE",
-   "HourAni":"TRUE",
+   "ha":"10",
+   "hl":"FALSE",
+   "a":"FALSE",
+   "c":"FALSE",
    "RGBL":[{
          "R":255,
          "G":50,
