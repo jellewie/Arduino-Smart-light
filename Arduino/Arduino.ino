@@ -9,18 +9,18 @@
 
 //#define SerialEnabled
 #ifdef SerialEnabled
-#define     WiFiManager_SerialEnabled
-#define     Server_SerialEnabled
-#define     Task_SerialEnabled
-#define     Time_SerialEnabled
-#define     SetupTime_SerialEnabled
-#define     OTA_SerialEnabled
-#define     RGBL_SerialEnabled
-//#define     LoopTime_SerialEnabled
-//#define     TimeExtra_SerialEnabled
-//#define     UpdateLEDs_SerialEnabled
-//#define     Convert_SerialEnabled
-//#define     LEDstatus_SerialEnabled
+#define     WiFiManager_SerialEnabled   //WM:
+#define     Server_SerialEnabled        //SV:
+#define     Task_SerialEnabled          //TK:
+#define     Time_SerialEnabled          //TM:
+#define     SetupTime_SerialEnabled     //ST:
+#define     OTA_SerialEnabled           //OTA:
+#define     RGBL_SerialEnabled          //RG:
+//#define     LoopTime_SerialEnabled      //LT:
+//#define     TimeExtra_SerialEnabled     //TME:
+//#define     UpdateLEDs_SerialEnabled    //UL:
+//#define     Convert_SerialEnabled       //CV:
+//#define     LEDstatus_SerialEnabled     //LS:
 #endif //SerialEnabled
 
 #define LED_TYPE WS2812B                  //WS2812B for 5V leds, WS2813 for 12V leds
@@ -125,7 +125,7 @@ void setup() {
   LoadData();
   Mode = BootMode;                                      //Set the startup mode
 #ifdef SerialEnabled
-  Serial.println("Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
+  Serial.println("SE: Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
   loopLEDS();
   UpdateBrightness(true);                               //Force Update the brightness
@@ -136,12 +136,12 @@ void setup() {
   if (MDNSStatus) MDNS.addService("http", "tcp", 80);   //Add service to MDNS-SD
 #ifdef SerialEnabled
   if (MDNSStatus)
-    Serial.println("mDNS responder started");
+    Serial.println("SE: mDNS responder started");
   else
-    Serial.println("Error setting up MDNS responder!");
+    Serial.println("SE: Error setting up MDNS responder!");
 #endif
 #ifdef SetupTime_SerialEnabled   //Just a way to measure setup speed, so the performance can be checked
-  Serial.println("Setup took ms:\t" + String(millis()));
+  Serial.println("ST: Setup took ms:\t" + String(millis()));
 #endif //SetupTime_SerialEnabled
 }
 void loop() {
@@ -150,7 +150,7 @@ void loop() {
   unsigned long LoopNow = micros();
   float LoopMs = (LoopNow - LoopLast) / 1000.0;
   LoopLast = LoopNow;
-  Serial.println("Loop took ms:\t" + String(LoopMs));
+  Serial.println("LT: Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
   WiFiManager_RunServer();                            //Do WIFI server stuff if needed
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
@@ -289,7 +289,7 @@ void loopLEDS() {
 void UpdateLED() {
   if (UpdateLEDs) {
 #ifdef UpdateLEDs_SerialEnabled
-    Serial.println("Update LEDs");
+    Serial.println("UL: Update LEDs");
 #endif //UpdateLEDs_SerialEnabled
     UpdateLEDs = false;
     FastLED.show();                         //Update

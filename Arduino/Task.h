@@ -97,7 +97,7 @@ bool DoTask(TASK Item) {
           }
         }
 #ifdef Task_SerialEnabled
-        Serial.println("T: BRIGHTEN from " + String(FastLED.getBrightness()) + " to " + String(Now));
+        Serial.println("TK: BRIGHTEN from " + String(FastLED.getBrightness()) + " to " + String(Now));
 #endif //Task_SerialEnabled
         FastLED.setBrightness(Now);
         UpdateLEDs = true;
@@ -129,7 +129,7 @@ bool DoTask(TASK Item) {
 
 String ConvertTaskIDToString(byte IN) {
 #ifdef Convert_SerialEnabled
-  Serial.println("ConvertTaskToString '" + String(IN) + "'");
+  Serial.println("CV: ConvertTaskToString '" + String(IN) + "'");
 #endif //Convert_SerialEnabled
   if (IN < Task_Amount)
     return TaskString[IN];
@@ -137,7 +137,7 @@ String ConvertTaskIDToString(byte IN) {
 }
 int ConvertTaskIDToInt(String IN) {
 #ifdef Convert_SerialEnabled
-  Serial.println("ConvertTaskToInt '" + IN + "'");
+  Serial.println("CV: ConvertTaskToInt '" + IN + "'");
 #endif //Convert_SerialEnabled
   if (StringisDigit(IN)) {
     if (IN.toInt() < Task_Amount)
@@ -192,7 +192,7 @@ bool RemoveTask(byte i) {
   if (TaskList[i].ID > 0) {                   //If there is a task
     TaskList[i].ID = 0;                       //Clear this task entry
 #ifdef Task_SerialEnabled
-    Serial.print("T: RemoveTask " + String(i));
+    Serial.println("TK: Removed Task " + String(i));
 #endif //Task_SerialEnabled
     return true;                              //EXIT, task removed
   }

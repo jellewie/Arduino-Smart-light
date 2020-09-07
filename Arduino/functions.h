@@ -26,7 +26,7 @@ bool StringisDigit(String IN) {
 }
 String ConvertModeToString(byte IN) {
 #ifdef Convert_SerialEnabled
-  Serial.println("ConvertModeToString '" + String(IN) + "'");
+  Serial.println("CV: ConvertModeToString '" + String(IN) + "'");
 #endif //Convert_SerialEnabled
   if (IN < Modes_Amount)
     return ModesString[IN];
@@ -34,7 +34,7 @@ String ConvertModeToString(byte IN) {
 }
 int ConvertModeToInt(String IN) {
 #ifdef Convert_SerialEnabled
-  Serial.println("ConvertModeToInt '" + IN + "'");
+  Serial.println("CV: ConvertModeToInt '" + IN + "'");
 #endif //Convert_SerialEnabled
   if (StringisDigit(IN)) {
     if (IN.toInt() < Modes_Amount)
