@@ -12,15 +12,15 @@ void UpdateColor(bool ForceUpdate) {
         Mode = ON;
       fill_solid(&(LEDs[0]), TotalLEDs, CRGB(R.Value, G.Value, B.Value));
       UpdateLEDs = true;
-#ifdef SerialEnabled
+#ifdef RGBL_SerialEnabled
       String MSG = "Manual";
       if (ForceUpdate) MSG = "ForceUpdate";
-      Serial.println(MSG + " color changed to " +
+      Serial.println("RG: " + MSG + " color changed to " +
                      String(R.Value) + "(" + String(R.Changed) + ")," +
                      String(G.Value) + "(" + String(G.Changed) + ")," +
                      String(B.Value) + "(" + String(B.Changed) + ")");
-      if (!ForceUpdate) Serial.println(MSG + " mode changed from " + ConvertModeToString(Mode) + " to ON/manual");
-#endif //SerialEnabled
+      if (!ForceUpdate) Serial.println("RG: " + MSG + " mode changed from " + ConvertModeToString(Mode) + " to ON/manual");
+#endif //RGBL_SerialEnabled
     }
   }
 }
@@ -34,11 +34,11 @@ void UpdateBrightness(bool ForceUpdate) {
     if (L.Changed or ForceUpdate) {
       FastLED.setBrightness(GetAutoBrightness(L.Value));
       UpdateLEDs = true;
-#ifdef SerialEnabled
+#ifdef RGBL_SerialEnabled
       String MSG = "Automaticly";
       if (ForceUpdate) MSG = "ForceUpdate";
-      Serial.println(MSG + " Auto brightness changed to " + String(FastLED.getBrightness()) + " raw=" + String(L.Value) + "");
-#endif //SerialEnabled
+      Serial.println("RG: " + MSG + " Auto brightness changed to " + String(FastLED.getBrightness()) + " raw=" + String(L.Value) + "");
+#endif //RGBL_SerialEnabled
     }
     ForceUpdate = false;
   }
@@ -51,7 +51,7 @@ void UpdateBrightness(bool ForceUpdate) {
 #ifdef SerialEnabled
     String MSG = "Automaticly";
     if (ForceUpdate) MSG = "ForceUpdate";
-    Serial.println(MSG + " Manual brightness changed to " + String(FastLED.getBrightness()) + "(" + String(Brightness.Changed) + ")");
+    Serial.println("RG: " + MSG + " Manual brightness changed to " + String(FastLED.getBrightness()) + "(" + String(Brightness.Changed) + ")");
 #endif //SerialEnabled
   }
 }

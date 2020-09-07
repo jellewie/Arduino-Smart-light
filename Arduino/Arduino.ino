@@ -15,6 +15,7 @@
 #define     Time_SerialEnabled
 #define     SetupTime_SerialEnabled
 #define     OTA_SerialEnabled
+#define     RGBL_SerialEnabled
 //#define     LoopTime_SerialEnabled
 //#define     TimeExtra_SerialEnabled
 //#define     UpdateLEDs_SerialEnabled
