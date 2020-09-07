@@ -140,17 +140,17 @@ int ConvertTaskIDToInt(String IN) {
   Serial.println("CV: ConvertTaskToInt '" + IN + "'");
 #endif //Convert_SerialEnabled
   if (StringisDigit(IN)) {
-    if (IN.toInt() < Task_Amount)
+    if (IN.toInt() <= Task_Amount)
       return IN.toInt();
     else
-      return 0;
+      return -1;
   }
   IN.toUpperCase();
   for (byte i = 0; i < Task_Amount; i++) {
     if (IN == TaskString[i])
       return i;
   }
-  return 0;
+  return -1;
 }
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
