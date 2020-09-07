@@ -359,11 +359,11 @@ void Tasks_handle_Settings() {
         } else if (ArguName == PreFixVar) {
           TempTask.Var = ArgValue;
         } else if (ArguName == PreFixTimeH) {
-          TempTask.ExectuteAt.HH = ArgValue > 23 ? 23 : ArgValue;
+          TempTask.ExectuteAt.HH = ArgValue.toInt() > 23 ? 23 : ArgValue.toInt();
         } else if (ArguName == PreFixTimeM) {
-          TempTask.ExectuteAt.MM = ArgValue > 59 ? 59 : ArgValue;
+          TempTask.ExectuteAt.MM = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
         } else if (ArguName == PreFixTimeS) {
-          TempTask.ExectuteAt.SS = ArgValue > 59 ? 59 : ArgValue;
+          TempTask.ExectuteAt.SS = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
         } else if (ArguName == PreFixTimeT) {
           TempTask.ExectuteAt.Ticks = ArgValue.toInt();
         } else
