@@ -349,8 +349,8 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
       if (WiFiManager_ValueID < 20 + 8) {
         byte i = WiFiManager_ValueID - 20;
         RemoveTask(i);                                      //Remove task at set ID, this doesn't mean this task, but since we loop over the values in WifiManager this would be fine
-        String _Vars[4];                                    //Create a space to but the cut string in
-        CutVariable(WiFiManager_Temp, &_Vars[0], 4);        //Deconstruct the string, and put it into parts
+        String _Vars[5];                                    //Create a space to but the cut string in
+        CutVariable(WiFiManager_Temp, &_Vars[0], 5);        //Deconstruct the string, and put it into parts
         TASK TempTask;                                                      //Create a space to put a new Task in
         TempTask.ID                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
         if (TempTask.ID != 0 and TempTask.ID != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
