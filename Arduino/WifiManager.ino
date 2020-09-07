@@ -27,7 +27,7 @@
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
-const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name"};
+const String WiFiManager_VariableNames[] {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte WiFiManager_EEPROM_SIZE_SSID = 16;    //Howmany characters can be in the SSID
 const byte WiFiManager_EEPROM_SIZE_PASS = 16;
@@ -124,9 +124,9 @@ String WiFiManager_LoadEEPROM() {
   return String(WiFiManager_EEPROM_Seperator);  //ERROR; [maybe] not enough space
 }
 bool WiFiManager_WriteEEPROM() {
-  String WiFiManager_StringToWrite;                                   //Save to mem: <SSID>
+  String WiFiManager_StringToWrite;                                   //Save to mem:
   for (byte i = 0; i < WiFiManager_Settings; i++) {
-    WiFiManager_StringToWrite += WiFiManager_Get_Value(i + 1, true, false);  //^            <Seperator>
+    WiFiManager_StringToWrite += WiFiManager_Get_Value(i + 1, true, false);  //^     <Seperator>
     if (WiFiManager_Settings - i > 1)
       WiFiManager_StringToWrite += WiFiManager_EEPROM_Seperator;      //^            <Value>  (only if there more values)
   }
@@ -342,6 +342,26 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
     case 19:
       WiFiManager_Temp.toCharArray(Name, 16);
       break;
+    //==============================
+    //Tasks
+    //==============================
+    default:
+      if (WiFiManager_ValueID < 20 + 8) {
+        byte i = WiFiManager_ValueID - 20;
+        RemoveTask(i);                                      //Remove task at set ID, this doesn't mean this task, but since we loop over the values in WifiManager this would be fine
+        String _Vars[4];                                    //Create a space to but the cut string in
+        CutVariable(WiFiManager_Temp, &_Vars[0], 4);        //Deconstruct the string, and put it into parts
+        TASK TempTask;                                                      //Create a space to put a new Task in
+        TempTask.ID                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
+        if (TempTask.ID != 0 and TempTask.ID != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
+          TempTask.ExectuteAt.HH    = constrain(_Vars[1].toInt(), 0, 23);
+          TempTask.ExectuteAt.MM    = constrain(_Vars[2].toInt(), 0, 59);
+          TempTask.ExectuteAt.SS    = constrain(_Vars[3].toInt(), 0, 59);
+          TempTask.Var              = _Vars[4];
+          TempTask.Executed = false;
+          AddTask(TempTask);                  //Add the command to the task list
+        }
+      }
   }
   return true;
 }
@@ -429,6 +449,18 @@ String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bo
     case 19:
       WiFiManager_Temp_Return = String(Name);
       break;
+    //==============================
+    //Tasks
+    //==============================
+    default:
+      if (WiFiManager_ValueID < 20 + 8) {
+        byte i = WiFiManager_ValueID - 20;
+        if (TaskList[i].ID != 0 and TaskList[i].ExectuteAt.Ticks == 0) {
+          WiFiManager_Temp_Return = String(TaskList[i].ID) + "," + String(TaskList[i].ExectuteAt.HH) + "," + String(TaskList[i].ExectuteAt.MM) + "," + String(TaskList[i].ExectuteAt.SS) + "," + TaskList[i].Var;
+        } else {
+          WiFiManager_Temp_Return = "0";
+        }
+      }
   }
 #ifdef WiFiManager_SerialEnabled
   Serial.println(" = " + WiFiManager_Temp_Return);

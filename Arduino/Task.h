@@ -11,7 +11,8 @@
 */
 
 #define TaskLimit 16        //defined as an byte in for loops, so 255 at max
-#define Task_SerialEnabled
+//#define Task_SerialEnabled
+#define EEPROMSaveDelayMS 30000   //Save to EEPROM in X ms
 enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM}; //Just to make the code easier to read
 String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", "CHANGERGB", "SAVEEEPROM"}; //ALL CAPS!
 
@@ -28,8 +29,8 @@ const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why fil
 
 struct TASK {
   byte ID = 0;                     //The ID of the task, these are defined in the enum
-  String Var = "";                 //Used for some special variables
   TimeS ExectuteAt = {0, 0, 0, 0}; //The time in {HH:MM:SS:or millis} to execute this task
+  String Var = "0";                //Used for some special variables
   bool Executed = false;           //Just here to keep track of it a Time based task has been executed today
 };
 TASK TaskList[TaskLimit];
@@ -38,12 +39,12 @@ TASK TaskList[TaskLimit];
 extern String ConvertTaskIDToString(byte IN);
 extern int    ConvertTaskIDToInt(String IN);
 extern void   CutVariable(String _Input, String *_Variable, byte _VariableLength);
-extern bool   AddTask(TASK Item);
+extern bool   AddTask(TASK Item, bool _Reversed = false);
 
 bool DoTask(TASK Item) {
   bool returnValue = true;
 #ifdef Task_SerialEnabled
-  Serial.print("T: DoTask " + ConvertTaskIDToString(Item.ID) + " var=" + String(Item.Var));
+  Serial.print("TK: DoTask " + ConvertTaskIDToString(Item.ID) + " var=" + String(Item.Var));
   if (Item.ExectuteAt.Ticks > 0)
     Serial.println(" due to Ticks, scheduled for " + String(Item.ExectuteAt.Ticks) + " now=" + String(millis()));
   else
@@ -70,7 +71,7 @@ bool DoTask(TASK Item) {
           if (TimeInterfall > 0) {     //If we need to go further, and need to create another task
             TASK TempTask = Item;
             TempTask.ExectuteAt.Ticks = millis() + TimeInterfall;
-            AddTask(TempTask);
+            AddTask(TempTask, true);
           }
         }
         FastLED.setBrightness(BRI);
@@ -93,7 +94,7 @@ bool DoTask(TASK Item) {
           if (TimeInterfall > 0) {
             TASK TempTask = Item;
             TempTask.ExectuteAt.Ticks = millis() + TimeInterfall;
-            AddTask(TempTask);
+            AddTask(TempTask, true);
           }
         }
 #ifdef Task_SerialEnabled
@@ -169,18 +170,34 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   }
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
-bool AddTask(TASK Item) {
+bool AddTaskCheck(TASK Item, int i) {
+  //Just a private funtion that tries to put the task 'Item' into the slot 'i'
+  if (TaskList[i].ID == 0) {                      //If there is no task
+    if (Item.Var.length() == 0) Item.Var = "0";   //Arduino is weird and doesn't like emthy strings in structures, this check solves it
+    TaskList[i] = Item;
+    TaskList[i].Executed = false;                 //flag this task as not executed
 #ifdef Task_SerialEnabled
-  Serial.print("T: AddTask " + String(Item.ID) + " Var=" + String(Item.Var));
-  if (Item.ExectuteAt.Ticks > 0) Serial.println(" in " + String(Item.ExectuteAt.Ticks - millis()));
-  else Serial.println(" at " + String(Item.ExectuteAt.HH) + ":" + String(Item.ExectuteAt.MM) + ":" + String(Item.ExectuteAt.SS));
+    Serial.print(" i=" + String(i) + " ID=" + String(Item.ID) + " Var = '" + Item.Var + "'");
+    if (Item.ExectuteAt.Ticks > 0) Serial.println(" in " + String(Item.ExectuteAt.Ticks - millis()));
+    else Serial.println(" at " + String(Item.ExectuteAt.HH) + ":" + String(Item.ExectuteAt.MM) + ":" + String(Item.ExectuteAt.SS));
 #endif //Task_SerialEnabled
-  for (int i = 0; i < TaskLimit; i++) { //For each task that is allowed
-    if (TaskList[i].ID == 0) {          //If there is no task
-      TaskList[i] = Item;
-      TaskList[i].Executed = false;     //flag this task as not executed
-      return true;
-    }
+    return true;
+  }
+  return false;
+}
+bool AddTask(TASK Item, bool _Reversed) {
+  //TASK = The task to put into the list
+  //Reversed = put the item on the back most of the list instead of in the front, usefull for temp tasks
+
+#ifdef Task_SerialEnabled
+  Serial.print("TK: AddTask");
+#endif //Task_SerialEnabled
+  if (_Reversed) {
+    for (int i = TaskLimit; i > 0; i--)           //For each task that is allowed (start at end and count down)
+      if (AddTaskCheck(Item, i)) return true;
+  } else {
+    for (int i = 0; i < TaskLimit; i++)           //For each task that is allowed (start at begin and count up)
+      if (AddTaskCheck(Item, i)) return true;
   }
 #ifdef Task_SerialEnabled
   Serial.println("TaskList full, couldn't add new task");
@@ -189,23 +206,23 @@ bool AddTask(TASK Item) {
 }
 bool RemoveTask(byte i) {
   //Remove a task by its nummer in the TaskList
-  if (TaskList[i].ID > 0) {                   //If there is a task
-    TaskList[i].ID = 0;                       //Clear this task entry
+  if (TaskList[i].ID > 0) {                       //If there is a task
+    TaskList[i].ID = 0;                           //Clear this task entry
 #ifdef Task_SerialEnabled
     Serial.println("TK: Removed Task " + String(i));
 #endif //Task_SerialEnabled
-    return true;                              //EXIT, task removed
+    return true;                                  //EXIT, task removed
   }
   return false;
 }
 void RemoveTasksByID(byte ID) {
   //Remove ALL tasks with a sertain ID
   if (ID == 0) return;
-  for (byte i = 0; i < TaskLimit; i++) {      //For each task in the list
-    if (TaskList[i].ID == ID) {               //If there is a task
-      TaskList[i].ID = 0;                     //Clear this task entry
+  for (byte i = 0; i < TaskLimit; i++) {          //For each task in the list
+    if (TaskList[i].ID == ID) {                   //If there is a task
+      TaskList[i].ID = 0;                         //Clear this task entry
 #ifdef Task_SerialEnabled
-      Serial.print("T: RemoveTasksByID " + String(i));
+      Serial.print("TK: RemoveTasksByID " + String(i));
 #endif //Task_SerialEnabled
     }
   }
@@ -219,10 +236,8 @@ void ExecuteTask() {
           RemoveTask(i);                                      //Remove the task, it has been executed
         }
       } else if (TimeSet and (TaskList[i].ExectuteAt.HH > 0 or TaskList[i].ExectuteAt.MM > 0 or TaskList[i].ExectuteAt.SS > 0)) {
-
         if (TaskList[i].ExectuteAt.HH < TimeCurrent.HH - 12)  //If we are more than 12 hours away
           TaskList[i].Executed = false;                       //flag this task as not executed
-
         if (!TaskList[i].Executed and                         //If the task has not been executed yet, and it it time for it to do so
             TaskList[i].ExectuteAt.SS <= TimeCurrent.SS and
             TaskList[i].ExectuteAt.MM <= TimeCurrent.MM and
@@ -239,7 +254,6 @@ void Tasks_handle_Connect() {
   String Message;
   for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
     if (TaskList[i].ID > 0) {                   //If there is a task
-
       Message += "<form action=\"/settask?\" method=\"set\">#" + String(i) + " "
                  "<input type=\"hidden\" name=\"o\" value=\"2\">"
                  "<label>Do task </label>" + ConvertTaskIDToString(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"" + i + "\">";
@@ -270,15 +284,22 @@ void Tasks_handle_Connect() {
   Serial.println("SV: 200/400 Tasks_Connect " + ERRORMSG + Message);
 #endif //Server_SerialEnabled
 }
+void ScheduleWriteToEEPROM() {
+  RemoveTasksByID(SAVEEEPROM);        //Remove old EEPROM write command if they exist
+  TASK TempTask;
+  TempTask.ID = SAVEEEPROM;           //Create a new EEPROM write command
+  TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS; //Schedule to write data to EEPROM
+  AddTask(TempTask, true);                  //Add the command to the task list
+}
 void Tasks_handle_Settings() {
   String ERRORMSG = "";
   if (server.args() > 0) {                      //If manual time given
     TASK TempTask;
+    TempTask.ID = -1;
     TempTask.ExectuteAt.HH = -1;
     TempTask.ExectuteAt.MM = -1;
     TempTask.ExectuteAt.SS = -1;
     TempTask.ExectuteAt.Ticks = 0;
-    TempTask.ID = -1;
     byte TaskCommand = 0;
     for (int i = 0; i < server.args(); i++) {
       String ArguName = server.argName(i);
@@ -326,7 +347,10 @@ void Tasks_handle_Settings() {
               if (TempTask.ExectuteAt.MM > 60) TempTask.ExectuteAt.MM = 0;
               if (TempTask.ExectuteAt.SS > 60) TempTask.ExectuteAt.SS = 0;
             }
-            if (!AddTask(TempTask))
+            if (AddTask(TempTask)) {
+              if (TempTask.ExectuteAt.Ticks == 0)     //If it is a time event (HH:MM:SS)
+                ScheduleWriteToEEPROM();              //Schedule to save the task to EEPROM
+            } else
               ERRORMSG += "Could not add tasks\n";
           }
           break;

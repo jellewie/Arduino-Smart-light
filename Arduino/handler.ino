@@ -26,8 +26,6 @@
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
-#define EEPROMSaveDelayMS 30000
-
 void handle_Set() {
   String ERRORMSG;                //emthy=dont change
   bool DoWriteToEEPROM = false;
@@ -113,18 +111,13 @@ void handle_Set() {
       LEDs[0].b = NewB;
     }
   }
-  if (DoWriteToEEPROM) {                //If we need to write to EEPROM
-    RemoveTasksByID(SAVEEEPROM);        //Remove old EEPROM write command if they exist
-    TASK TempTask;
-    TempTask.ID = SAVEEEPROM;           //Create a new EEPROM write command
-    TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS; //Schedule to write data to EEPROM
-    AddTask(TempTask);                  //Add the command to the task list
-  };
+  if (DoWriteToEEPROM)
+    ScheduleWriteToEEPROM();    //If we need to write to EEPROM
   if (Mode == WIFI)
     fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);   //Change the whole LED strip to have the color of the first set LED
   else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
-    for (int i = 0; i < 100; i++) {      //Just wait for a few ms to make sure the "reset command recieved" has been send
+    for (int i = 0; i < 100; i++) {               //Just wait for a few ms to make sure the "reset command recieved" has been send
       server.handleClient();
       delay(1);
     }
