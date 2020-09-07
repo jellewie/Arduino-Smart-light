@@ -57,7 +57,7 @@ byte Mode;                                //Holds in which mode the light is cur
 byte LastMode = -1;                       //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
-TimeS TimeCurrent = {4};                  //Where we save the time to, set to HH=4 so it time syncs on startup
+TimeS TimeCurrent;                        //Where we save the time to
 extern bool WiFiManager_connected;        //If the ESP is connected to WIFI, extern meaning we are declairing it somewhere later
 extern bool WiFiManager_WriteEEPROM();
 
@@ -104,36 +104,43 @@ void setup() {
   server.on("/settask",    Tasks_handle_Settings);
   server.on("/ota",               OTA_handle_UploadPage);
   server.on("/update", HTTP_POST, OTA_handle_update, OTA_handle_update2);
-  server.on("/",            handle_OnConnect);          //Call the 'handleRoot' function when a client requests URI "/"
+  server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URI "/"
   server.on("/set",         handle_Set);
   server.on("/get",         handle_Getcolors);
   server.on("/time",        handle_UpdateTime);
   server.on("/info",        handle_Info);
-  server.onNotFound(        handle_NotFound);           //When a client requests an unknown URI
+  server.onNotFound(        handle_NotFound);         //When a client requests an unknown URI
   //==============================
   //Set AnalogResolution, and init the potmeters
   //==============================
   analogReadResolution(AnalogResolution);
   for (int i = 0; i < AverageAmount + 2; i++) {
-    UpdateColor(false);                                 //Trash some measurements, so we get a good average on start
+    UpdateColor(false);                               //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
   }
-  FastLED.setBrightness(8);                             //Set boot Brightness
+  FastLED.setBrightness(8);                           //Set boot Brightness
+  //==============================
+  //Add a SYNCTIME Task, this is just to initialise (will be overwritten with user data)
+  //==============================
+  TASK TempTask;                                      //Create a space to put a new Task in
+  TempTask.ID         = SYNCTIME;                     //Set the ID of the task to SYNCTIME
+  TempTask.ExectuteAt = TimeS{4, 0, 0, 0};            //Set the init value to auto sync time at 04:00:00
+  AddTask(TempTask);                                  //Add the Task command to the task list
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode
   //==============================
   LoadData();
-  Mode = BootMode;                                      //Set the startup mode
+  Mode = BootMode;                                    //Set the startup mode
 #ifdef SerialEnabled
   Serial.println("SE: Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
 #endif //SerialEnabled
   loopLEDS();
-  UpdateBrightness(true);                               //Force Update the brightness
+  UpdateBrightness(true);                             //Force Update the brightness
   //==============================
   //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
   //==============================
-  bool MDNSStatus = MDNS.begin(Name);               //Start mDNS with the given domain name
-  if (MDNSStatus) MDNS.addService("http", "tcp", 80);   //Add service to MDNS-SD
+  bool MDNSStatus = MDNS.begin(Name);                 //Start mDNS with the given domain name
+  if (MDNSStatus) MDNS.addService("http", "tcp", 80); //Add service to MDNS-SD
 #ifdef SerialEnabled
   if (MDNSStatus)
     Serial.println("SE: mDNS responder started");
@@ -145,7 +152,7 @@ void setup() {
 #endif //SetupTime_SerialEnabled
 }
 void loop() {
-#ifdef LoopTime_SerialEnabled   //Just a way to measure loop speed, so the performance can be checked
+#ifdef LoopTime_SerialEnabled                         //Just a way to measure loop speed, so the performance can be checked
   static unsigned long LoopLast = 0;
   unsigned long LoopNow = micros();
   float LoopMs = (LoopNow - LoopLast) / 1000.0;
@@ -157,7 +164,7 @@ void loop() {
   ExecuteTask();
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();       //Read buttonstate
-#ifdef SerialEnabled        //DEBUG, print button state to serial
+#ifdef SerialEnabled                                  //DEBUG, print button state to serial
     if (Value.StartPress)       Serial.println("StartPress");
     if (Value.StartLongPress)   Serial.println("StartLongPress");
     if (Value.StartDoublePress) Serial.println("StartDoublePress");
@@ -170,26 +177,26 @@ void loop() {
         Mode = OFF;
     }
     if (Value.StartDoublePress)
-      Mode = DoublePressMode;         //Cool RGB color palet mode
+      Mode = DoublePressMode;                         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WiFiManager_connected) {    //If WIFI was already started
+      if (WiFiManager_connected) {                    //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }
     };
-    if (Value.PressedLong) {          //If it is/was a long press
+    if (Value.PressedLong) {                          //If it is/was a long press
       if (Value.PressedTime > Time_ESPrestartMS - 1000) //If we are almost resetting
         Mode = RESET;
     }
-    UpdateBrightness(false);          //Check if manual input potmeters has changed, if so flag the update
-    UpdateColor(false);               //Check if manual input potmeters has changed, if so flag the update
+    UpdateBrightness(false);                          //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);                               //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
 }
 
 void loopLEDS() {
-  if (AnimationCounter != 0)      //Animation needs to be shown
+  if (AnimationCounter != 0)                          //Animation needs to be shown
     ShowAnimation(false);
   switch (Mode) {
     case OFF:
@@ -200,19 +207,19 @@ void loopLEDS() {
       }
       break;
     case ON:
-      if (LastMode != Mode) {     //If mode changed
+      if (LastMode != Mode) {                         //If mode changed
         AnimationCounter = 0;
         UpdateColor(true);
       }
       break;
     case WIFI:
-      if (LastMode != Mode) {     //If mode changed
+      if (LastMode != Mode) {                         //If mode changed
         AnimationCounter = 0;
-        StartWIFIstuff();         //Start WIFI if we haven't
+        StartWIFIstuff();                             //Start WIFI if we haven't
       }
       break;
     case RESET:
-      if (LastMode != Mode) {     //If mode changed
+      if (LastMode != Mode) {                         //If mode changed
         AnimationCounter = 0;
       }
       if (TickEveryMS(50)) {
@@ -223,62 +230,62 @@ void loopLEDS() {
         UpdateLEDs = true;
       }
     case CLOCK:
-      if (LastMode != Mode) {     //If mode changed
+      if (LastMode != Mode) {                         //If mode changed
         AnimationCounter = 0;
-        StartWIFIstuff();         //Start WIFI if we haven't
+        StartWIFIstuff();                             //Start WIFI if we haven't
       }
-      if (AnimationCounter == 0)            //If no (hourly) animation is playing
+      if (AnimationCounter == 0)//If no (hourly) animation is playing
         UpdateAndShowClock(true);
       break;
 
     //Animations
     case BLINK:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(2, -2);
       UpdateLEDs = true;
       break;
     case BPM:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(8, -2);
       UpdateLEDs = true;
       break;
     case CONFETTI:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(6, -2);
       UpdateLEDs = true;
       break;
     case FLASH:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(1, -2);
       UpdateLEDs = true;
       break;
     case GLITTER:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(7, -2);
       UpdateLEDs = true;
       break;
     case JUGGLE:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(4, -2);
       UpdateLEDs = true;
       break;
     case MOVE:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(0, -2);
       UpdateLEDs = true;
       break;
     case RAINBOW:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(3, -2);
       UpdateLEDs = true;
       break;
     case SINELON:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(5, -2);
       UpdateLEDs = true;
       break;
     case SINELON2:
-      if (LastMode != Mode)     //If mode changed
+      if (LastMode != Mode)                           //If mode changed
         StartAnimation(9, -2);
       UpdateLEDs = true;
       break;
@@ -292,7 +299,7 @@ void UpdateLED() {
     Serial.println("UL: Update LEDs");
 #endif //UpdateLEDs_SerialEnabled
     UpdateLEDs = false;
-    FastLED.show();                         //Update
+    FastLED.show();                                   //Update
   }
 }
 //ISR must return nothing and take no arguments, so we need this sh*t

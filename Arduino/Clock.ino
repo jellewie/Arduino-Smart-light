@@ -7,10 +7,14 @@ void UpdateAndShowClock(bool ShowClock) {
   //==============================
   static bool FirstUpdate = true;    //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
 #ifdef Time_SerialEnabled
-  if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate RGB=" + String(LEDs[0].r) + "," + String(LEDs[0].g) + "," + String(LEDs[0].b));
+  if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate");
 #endif //Time_SerialEnabled
   while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) {
-    FirstUpdate = false;
+    if (FirstUpdate) {
+      FirstUpdate = false;
+      if (!UpdateTime())                        //Get a new sync timestamp from the server
+        WiFiManager_connected = false;
+    }
 #ifdef TimeExtra_SerialEnabled
     Serial.println("TME: Time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + " " + String(TimeCurrent.Ticks) + " now=" + String(millis()));
 #endif //TimeExtra_SerialEnabled
@@ -33,13 +37,6 @@ void UpdateAndShowClock(bool ShowClock) {
     }
     if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
-    static bool TimeFlag = false;
-    if (TimeCurrent.HH == 4 and !TimeFlag) {
-      TimeFlag = true;
-      if (!UpdateTime())                        //Get a new sync timestamp from the server
-        WiFiManager_connected = false;
-    } else
-      TimeFlag = false;
   }
   if (!WiFiManager_connected)                    //If we are no longer connected to WIFI
     if (TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync

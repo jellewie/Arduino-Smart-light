@@ -23,7 +23,7 @@
 
 #define WiFiManager_ConnectionTimeOutMS 10000
 #define WiFiManager_APSSID Name
-#define WiFiManager_EEPROM_SIZE 128           //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
+#define WiFiManager_EEPROM_SIZE 256           //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
 #define WiFiManager_EEPROM_Seperator char(9)  //use 'TAB' as a seperator 
 //#define WiFiManager_SerialEnabled             //Disable to not send Serial debug feedback
 
@@ -275,6 +275,7 @@ bool WiFiManager_Connect(int WiFiManager_TimeOutMS) {
   return true;
 }
 bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
+  //From EEPROM to RAM
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: Set current value: " + String(WiFiManager_ValueID) + " = " + WiFiManager_Temp);
 #endif //WiFiManager_SerialEnabled
@@ -348,18 +349,17 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
     default:
       if (WiFiManager_ValueID < 20 + 8) {
         byte i = WiFiManager_ValueID - 20;
-        RemoveTask(i);                                      //Remove task at set ID, this doesn't mean this task, but since we loop over the values in WifiManager this would be fine
-        String _Vars[5];                                    //Create a space to but the cut string in
-        CutVariable(WiFiManager_Temp, &_Vars[0], 5);        //Deconstruct the string, and put it into parts
+        String _Vars[5];                                                    //Create a space to but the cut string in
+        CutVariable(WiFiManager_Temp, &_Vars[0], 5);                        //Deconstruct the string, and put it into parts
         TASK TempTask;                                                      //Create a space to put a new Task in
         TempTask.ID                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
         if (TempTask.ID != 0 and TempTask.ID != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
+          RemoveTask(i);            //Clear the spot this should go into, NOTE: this might not be an outdated value, but should be fine since the call function loops thought the list
           TempTask.ExectuteAt.HH    = constrain(_Vars[1].toInt(), 0, 23);
           TempTask.ExectuteAt.MM    = constrain(_Vars[2].toInt(), 0, 59);
           TempTask.ExectuteAt.SS    = constrain(_Vars[3].toInt(), 0, 59);
           TempTask.Var              = _Vars[4];
-          TempTask.Executed = false;
-          AddTask(TempTask);                  //Add the command to the task list
+          AddTask(TempTask);                                                //Add the command to the task list
         }
       }
   }
@@ -367,6 +367,7 @@ bool WiFiManager_Set_Value(byte WiFiManager_ValueID, String WiFiManager_Temp) {
 }
 String WiFiManager_Get_Value(byte WiFiManager_ValueID, bool WiFiManager_Safe, bool WiFiManager_Convert) {
   //WiFiManager_Safe == true will return the real password,
+  //From RAM to EEPROM
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: Get current value of: " + String(WiFiManager_ValueID) + " safe=" + String(WiFiManager_Safe) + " conv=" + String(WiFiManager_Convert));
 #endif //WiFiManager_SerialEnabled
