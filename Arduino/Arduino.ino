@@ -71,7 +71,6 @@ CRGB LEDs[TotalLEDs];
 #include <ESPmDNS.h>
 WebServer server(80);
 #include "Task.h"
-
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
@@ -82,6 +81,7 @@ StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 void setup() {
 #ifdef SerialEnabled
   Serial.begin(115200);
+  Serial.setTimeout(1);
 #endif //SerialEnabled
   attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
   //==============================
