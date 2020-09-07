@@ -292,13 +292,13 @@ void handle_UpdateTime() {
       byte ArgValue = server.arg(i).toInt();
       if (ArguName == PreFixTimeHour) {
         TimeUpdated = true;
-        TimeCurrent.HH = constrain(ArgValue, 0, 23);;
+        TimeCurrent.HH = ArgValue > 23 ? 23 : ArgValue;
       } else if (ArguName == PreFixTimeMin) {
         TimeUpdated = true;
-        TimeCurrent.MM = constrain(ArgValue, 0, 59);
+        TimeCurrent.MM = ArgValue > 59 ? 59 : ArgValue;
       } else if (ArguName == PreFixTimeSec) {
         TimeUpdated = true;
-        TimeCurrent.SS = constrain(ArgValue, 0, 59);
+        TimeCurrent.SS = ArgValue > 59 ? 59 : ArgValue;
       } else
         ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
     }

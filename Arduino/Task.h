@@ -5,6 +5,8 @@
   -"enum xxx"      Add the name to the enum to make the code better to read
   -"TaskString[]"  ^
   -DoTask()        Add what this task does
+  -VarCompress()   Add things to compress the 'Var' [Optional but highly suggested)
+  -VarDecompress() Add things to decomppress again, requires if Var Compression is used
 
   Time based tasks will not be auto deleted (execte X at HH:MM:SS)
   Delay based tasks will be auto deleted (execte X in Y ticks)
@@ -339,10 +341,10 @@ void Tasks_handle_Settings() {
   String ERRORMSG = "";
   if (server.args() > 0) {                      //If manual time given
     TASK TempTask;
-    TempTask.ID = -1;
-    TempTask.ExectuteAt.HH = -1;
-    TempTask.ExectuteAt.MM = -1;
-    TempTask.ExectuteAt.SS = -1;
+    TempTask.ID = 255;
+    TempTask.ExectuteAt.HH = 255;
+    TempTask.ExectuteAt.MM = 255;
+    TempTask.ExectuteAt.SS = 255;
     TempTask.ExectuteAt.Ticks = 0;
     byte TaskCommand = 0;
     for (int i = 0; i < server.args(); i++) {
@@ -356,19 +358,19 @@ void Tasks_handle_Settings() {
           TempTask.ID = ConvertTaskIDToInt(ArgValue);
         } else if (ArguName == PreFixVar) {
           TempTask.Var = ArgValue;
-        } else if (ArguName == PreFixTimeS) {
-          TempTask.ExectuteAt.SS = ArgValue.toInt();
-        } else if (ArguName == PreFixTimeM) {
-          TempTask.ExectuteAt.MM = ArgValue.toInt();
         } else if (ArguName == PreFixTimeH) {
-          TempTask.ExectuteAt.HH = ArgValue.toInt();
+          TempTask.ExectuteAt.HH = ArgValue > 23 ? 23 : ArgValue;
+        } else if (ArguName == PreFixTimeM) {
+          TempTask.ExectuteAt.MM = ArgValue > 59 ? 59 : ArgValue;
+        } else if (ArguName == PreFixTimeS) {
+          TempTask.ExectuteAt.SS = ArgValue > 59 ? 59 : ArgValue;
         } else if (ArguName == PreFixTimeT) {
           TempTask.ExectuteAt.Ticks = ArgValue.toInt();
         } else
           ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
       }
     }
-    if (TempTask.ID == -1) {
+    if (TempTask.ID == 255) {
       ERRORMSG += "No Task ID given\n";
     } else {
       switch (TaskCommand) {
