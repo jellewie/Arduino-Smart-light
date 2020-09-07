@@ -77,6 +77,7 @@ StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
+#include "WifiManager.h"
 
 void setup() {
 #ifdef SerialEnabled

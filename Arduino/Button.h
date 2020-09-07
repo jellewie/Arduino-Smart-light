@@ -1,8 +1,10 @@
 /* Written by JelleWho https://github.com/jellewie */
-#define Time_StartLongPressMS 3000    //After how much Ms we should consider a press a long press
-#define Time_ESPrestartMS 15000       //After how much Ms we should restart the ESP, note this is only triggered on released, or on a CheckButtons() call
-#define Time_StartDoublePress 200     //Withing how much Ms of the last release should the button be pressed for it to be a double press?
-#define Time_RejectStarts 80          //Just some rejection
+#ifndef Button_h                    //This prevents including this file more than once
+#define Button_h
+const int Time_StartLongPressMS  = 3000;  //After how much Ms we should consider a press a long press
+const int Time_ESPrestartMS      = 15000; //After how much Ms we should restart the ESP, note this is only triggered on released, or on a CheckButtons() call
+const byte Time_StartDoublePress = 200;   //Withing how much Ms of the last release should the button be pressed for it to be a double press?
+const byte Time_RejectStarts     = 80;    //Just some rejection
 struct buttons {
   byte PIN_Button;
   byte PIN_LED;
@@ -95,3 +97,4 @@ class Button {
     }
 };
 //resetFunc(); is a reset function for Arduino itself I believe
+#endif
