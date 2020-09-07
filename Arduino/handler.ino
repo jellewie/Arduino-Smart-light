@@ -342,7 +342,7 @@ void handle_Info() {
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
-                   "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + ""
+                   "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager_Get_Value(i, false, true) + "\n";
