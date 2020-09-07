@@ -14,11 +14,12 @@ void UpdateAndShowClock(bool ShowClock) {
       FirstUpdate = false;
       if (!UpdateTime())                        //Get a new sync timestamp from the server
         WiFiManager_connected = false;
+    } else {
+      TimeCurrent.Ticks += 1000;
     }
 #ifdef TimeExtra_SerialEnabled
     Serial.println("TME: Time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + " " + String(TimeCurrent.Ticks) + " now=" + String(millis()));
 #endif //TimeExtra_SerialEnabled
-    TimeCurrent.Ticks += 1000;
     TimeCurrent.SS++;
     if (TimeCurrent.SS >= 60) {
       TimeCurrent.SS = 0;
