@@ -13,7 +13,7 @@ void UpdateAndShowClock(bool ShowClock) {
     if (FirstUpdate) {
       FirstUpdate = false;
       if (!UpdateTime())                        //Get a new sync timestamp from the server
-        WiFiManager_connected = false;
+        WiFiManager_Connected = false;
     } else {
       TimeCurrent.Ticks += 1000;
     }
@@ -39,8 +39,8 @@ void UpdateAndShowClock(bool ShowClock) {
     if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
   }
-  if (!WiFiManager_connected)                    //If we are no longer connected to WIFI
-    if (TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
+  if (!WiFiManager_Connected)                    //If we are no longer connected to WIFI
+    if (WiFiManager.TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
   //==============================
   //Show the time on the LEDs if needed
   //==============================
@@ -99,7 +99,7 @@ byte LEDtoPosition(byte LEDID) {
   return LEDID;
 }
 bool UpdateTime() {
-  if (!WiFiManager_connected) return false;   //If WIFI not connected, stop right away
+  if (!WiFiManager_Connected) return false;   //If WIFI not connected, stop right away
   fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212

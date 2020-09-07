@@ -58,8 +58,8 @@ byte LastMode = -1;                       //Just to keep track if we are steppin
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                        //Where we save the time to
-extern bool WiFiManager_connected;        //If the ESP is connected to WIFI, extern meaning we are declairing it somewhere later
-extern bool WiFiManager_WriteEEPROM();
+extern bool WiFiManager_Connected;        //Extern meaning we are declairing it somewhere later
+extern bool WiFiManager_WriteEEPROM();    //^
 
 #include <FastLED.h>
 CRGB LEDs[TotalLEDs];
@@ -78,6 +78,7 @@ StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 #include "WifiManager.h"
+WiFiManager WiFiManager;
 
 void setup() {
 #ifdef SerialEnabled
@@ -99,8 +100,8 @@ void setup() {
   //==============================
   //Set up all server UrlRequest stuff
   //==============================
-  server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager_Start()" for APMode
-  server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager_Start()" for APMode
+  server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
+  server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/task",       Tasks_handle_Connect);
   server.on("/settask",    Tasks_handle_Settings);
   server.on("/ota",               OTA_handle_UploadPage);
@@ -130,7 +131,7 @@ void setup() {
   //==============================
   //Load data from EEPROM, so we can apply the set bootmode
   //==============================
-  LoadData();
+  WiFiManager.LoadData();
   Mode = BootMode;                                    //Set the startup mode
 #ifdef SerialEnabled
   Serial.println("SE: Booting up in mode " + String(Mode) + "=" + ConvertModeToString(Mode));
@@ -160,7 +161,7 @@ void loop() {
   LoopLast = LoopNow;
   Serial.println("LT: Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
-  WiFiManager_RunServer();                            //Do WIFI server stuff if needed
+  WiFiManager.RunServer();                            //Do WIFI server stuff if needed
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
   EVERY_N_MILLISECONDS(1000 / 60) {                   //Limit to 60FPS
@@ -181,7 +182,7 @@ void loop() {
       Mode = DoublePressMode;                         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WiFiManager_connected) {                    //If WIFI was already started
+      if (WiFiManager_Connected) {                    //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }
@@ -223,7 +224,7 @@ void loopLEDS() {
       if (LastMode != Mode) {                         //If mode changed
         AnimationCounter = 0;
       }
-      if (TickEveryMS(50)) {
+      if (WiFiManager.TickEveryMS(50)) {
         if (LEDs[0] != CRGB(0, 0, 0))
           FastLED.clear();
         else
@@ -306,4 +307,13 @@ void UpdateLED() {
 //ISR must return nothing and take no arguments, so we need this sh*t
 void ISR_ButtonsA() {
   ButtonsA.Pinchange();
+}
+void WiFiManager_handle_Connect() {
+  WiFiManager.handle_Connect();
+}
+void WiFiManager_handle_Settings() {
+  WiFiManager.handle_Settings();
+}
+bool WiFiManager_WriteEEPROM() {
+  return WiFiManager.WriteEEPROM();
 }

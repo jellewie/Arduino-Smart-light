@@ -57,7 +57,7 @@ void UpdateBrightness(bool ForceUpdate) {
 }
 bool StartWIFIstuff() {
   //Returns TRUE if WIFI was already started, returns FALSE if it wasn't
-  if (WiFiManager_connected) return true;                               //If WIFI already on, stop and return true
+  if (WiFiManager_Connected) return true;                               //If WIFI already on, stop and return true
   fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 1th quater blue 1222
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 2rd quater blue 1212
@@ -65,9 +65,9 @@ bool StartWIFIstuff() {
 #ifdef LEDstatus_SerialEnabled
   Serial.println("LS: Setting LEDs to 'wifi is starting'");
 #endif //LEDstatus_SerialEnabled
-  if (WiFiManager_Start() == 1) {                                       //Run the wifi startup
-    WiFiManager_StartServer();                                          //Enable responce to web request
-    WiFiManager_EnableSetup(true);                                      //Enable the setup page, disable for more security
+  if (WiFiManager.Start() == 1) {                                       //Run the wifi startup
+    WiFiManager.StartServer();                                          //Enable responce to web request
+    WiFiManager.EnableSetup(true);                                      //Enable the setup page, disable for more security
     fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
     FastLED.show();                                                     //Update leds to show wifi is done
 #ifdef LEDstatus_SerialEnabled
@@ -115,7 +115,7 @@ void ShowIPnumber(byte Number) {
 void MyDelay(int ms, bool ReturnOnButtonPress) {                    //Just a non-blocking delay
   unsigned long StopAtTime = millis() + ms;
   while (millis() < StopAtTime) {
-    WiFiManager_RunServer();                  //Do WIFI server stuff if needed
+    WiFiManager.RunServer();                  //Do WIFI server stuff if needed
     UpdateBrightness(false);                  //Check if manual input potmeters has changed, if so flag the update
     UpdateColor(false);                       //Check if manual input potmeters has changed, if so flag the update
     if (ReturnOnButtonPress) {

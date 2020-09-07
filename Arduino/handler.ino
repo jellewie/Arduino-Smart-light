@@ -159,7 +159,7 @@ void handle_Getcolors() {
 #endif //Server_SerialEnabled
 }
 void handle_OnConnect() {
-  if (!WiFiManager_connected) {
+  if (!WiFiManager_Connected) {
     WiFiManager_handle_Connect();       //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
@@ -338,7 +338,7 @@ void handle_Info() {
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
-    Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager_Get_Value(i, false, true) + "\n";
+    Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
 
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";

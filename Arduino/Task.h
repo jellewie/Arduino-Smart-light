@@ -127,7 +127,7 @@ bool DoTask(TASK Item) {
       } break;
     case SYNCTIME: {
         if (!UpdateTime())                        //Get a new sync timestamp from the server
-          WiFiManager_connected = false;
+          WiFiManager_Connected = false;
       } break;
     default:
       returnValue = false;
