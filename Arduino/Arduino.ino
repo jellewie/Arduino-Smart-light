@@ -2,6 +2,17 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json DOIT ESP32 DEVKIT V1
 
   TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
+
+
+  Special chars in Task Mode var like " or < >, make a allow list for it for ABC...
+  TaskTime execute doesnt seem to work for 0:0:0
+
+  [Should be] Check if Save Task to EEPROM works properly
+  [Should be] Add SaveTo EEPROM command to TAKS
+  [Should be] do not save SAVEEEPROM to EEPROM
+  [Should be] Add Sync time to TaskList
+
+  Add 'Do now' button to task list, next to 'Remove task'. (but only IF its a tick task??)
 */
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
@@ -78,7 +89,6 @@ StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 #include "WifiManager.h"
-WiFiManager WiFiManager;
 
 void setup() {
 #ifdef SerialEnabled

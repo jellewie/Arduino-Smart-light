@@ -29,10 +29,10 @@ const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiF
 bool WiFiManager_Connected;                         //If the ESP is WiFiManager_Connected to WIFI
 
 class WiFiManager {
-  private:                                          //Private variables/functions
+  public:
     const char EEPROM_Seperator = char(9);          //use 'TAB' as a seperator
     const int ConnectionTimeOutMS = 10000;
-  public:
+
     bool SettingsEnabled = false;                   //This holds the flag to enable settings, else it would not responce to settings commands
     bool WaitOnAPMode = true;                       //This holds the flag if we should wait in Apmode for data
     int EEPROM_USED = 0;                            //Howmany bytes we have used for data in the EEPROM
@@ -438,7 +438,7 @@ class WiFiManager {
       }
       Status_Done();
 #ifdef WiFiManager_SerialEnabled
-      Serial.print("WM: WiFiManager_Connected; SSID=" + String(ssid) + " ip=");
+      Serial.print("WM: Connected; SSID=" + String(ssid) + " ip=");
       Serial.println(WiFi.localIP());
 #endif //WiFiManager_SerialEnabled
       WiFiManager_Connected = true;
@@ -545,4 +545,5 @@ class WiFiManager {
     }
 #endif //WiFiManager_SerialEnabled
 };
+WiFiManager WiFiManager;
 #endif
