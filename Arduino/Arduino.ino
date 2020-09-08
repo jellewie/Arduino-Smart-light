@@ -81,6 +81,7 @@ CRGB LEDs[TotalLEDs];
 #include <WebServer.h>
 #include <ESPmDNS.h>
 WebServer server(80);
+#include "OTA.h"
 #include "Task.h"
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
 StableAnalog RED   = StableAnalog(PAI_R);
@@ -114,7 +115,7 @@ void setup() {
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/task",       Tasks_handle_Connect);
   server.on("/settask",    Tasks_handle_Settings);
-  server.on("/ota",               OTA_handle_UploadPage);
+  server.on("/ota",               OTA_handle_uploadPage);
   server.on("/update", HTTP_POST, OTA_handle_update, OTA_handle_update2);
   server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URI "/"
   server.on("/set",         handle_Set);
