@@ -28,7 +28,7 @@ const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "Hou
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 bool WiFiManager_Connected;                         //If the ESP is WiFiManager_Connected to WIFI
 
-class WiFiManager {
+class CWiFiManager {
   public:
     const char EEPROM_Seperator = char(9);          //use 'TAB' as a seperator
     const int ConnectionTimeOutMS = 10000;
@@ -545,5 +545,5 @@ class WiFiManager {
     }
 #endif //WiFiManager_SerialEnabled
 };
-WiFiManager WiFiManager;
+CWiFiManager WiFiManager;
 #endif
