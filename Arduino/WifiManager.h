@@ -18,11 +18,15 @@
 #ifndef WifiManager_h                               //This prevents including this file more than once
 #define WifiManager_h
 
+#define dnsServerEnabled
+
 //#define WiFiManager_SerialEnabled                 //Disable to not send Serial debug feedback
 
 #include <EEPROM.h>
-//#include <DNSServer.h>
-//DNSServer dnsServer;
+#ifdef dnsServerEnabled
+#include <DNSServer.h>
+DNSServer dnsServer;
+#endif //dnsServerEnabled
 
 const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
@@ -121,7 +125,7 @@ class CWiFiManager {
           if (ValueID < 20 + 8) {
             byte i = ValueID - 20;
             String _Vars[5];                                                    //Create a space to but the cut string in
-            CutVariable(Value, &_Vars[0], 5);                        //Deconstruct the string, and put it into parts
+            CutVariable(Value, &_Vars[0], 5);                                   //Deconstruct the string, and put it into parts
             TASK TempTask;                                                      //Create a space to put a new Task in
             TempTask.ID                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
             if (TempTask.ID != 0 and TempTask.ID != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
@@ -321,7 +325,9 @@ class CWiFiManager {
       Status_StartAP();
       EnableSetup(true);                            //Flag we need to responce to settings commands
       StartServer();                                //start server (if we havn't already)
-      //dnsServer.start(53, "*", IPAddress(192, 168, 4, 1)); //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
+#ifdef dnsServerEnabled
+      dnsServer.start(53, "*", IPAddress(192, 168, 4, 1)); //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
+#endif //dnsServerEnabled
 #ifdef WiFiManager_SerialEnabled
       Serial.print("WM: APMode on; SSID=" + String(APSSID) + " ip=");
       Serial.println(WiFi.softAPIP());
@@ -329,13 +335,17 @@ class CWiFiManager {
       while (WaitOnAPMode) {
         if (TickEveryMS(100)) Status_Blink();       //Let the LED blink to show we are not WiFiManager_Connected
         server.handleClient();
-        //dnsServer.processNextRequest();
+#ifdef dnsServerEnabled
+        dnsServer.processNextRequest();
+#endif //dnsServerEnabled
         if (HandleAP()) {
 #ifdef SerialEnabled
           Serial.println("WM: Manual leaving APMode");
 #endif //SerialEnabled
           EnableSetup(false);                       //Flag to stop responce to settings commands
-          //dnsServer.stop();
+#ifdef dnsServerEnabled
+          dnsServer.stop();
+#endif //dnsServerEnabled
           return 3;
         }
       }
