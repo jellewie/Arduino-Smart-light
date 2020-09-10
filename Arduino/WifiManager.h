@@ -516,11 +516,13 @@ class CWiFiManager {
         delay(1);
       }
       static String OldSSID = ssid;
-      if (OldSSID != String(ssid)) {
+      static String Oldpassword = password;
+      if (OldSSID != String(ssid) or Oldpassword != String(password)) {
 #ifdef WiFiManager_SerialEnabled
         Serial.println("WM: Auto disconnect, new SSID recieved, from " + OldSSID + " to " + String(ssid));
 #endif //WiFiManager_SerialEnabled
         OldSSID = String(ssid);
+        Oldpassword = String(password);
         WiFiManager_Connected = false;              //Flag that WIFI is off, and we need to reconnect (In case user requested to switch WIFI)
       }
     }
