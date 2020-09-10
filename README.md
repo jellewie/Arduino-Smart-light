@@ -106,13 +106,14 @@ An example of the settings page is shown in the figure on the right.
 - **Sync time** will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
 - **Reset** will fully restart the ESP.
 - **Info** will open the info page with some information like the version compile date
-- **Task** WIP this will show a task menu, so tasks can be scheduled, removed, changed, and listed.
+- **Task** this will show a task menu, so tasks can be scheduled or removed.
 - **Saved settings** just redirects you to [smart-clock.local/ip](http://smart-clock.local/ip) to show you the values saved in the EEPROM
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
 The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
+Note that the character " and TAB (EEPROM_Seperator) can not be used, these will be replace with ' and SPACE respectively
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
@@ -139,6 +140,33 @@ Clock mode can only be started when WIFI has been connected and the user switche
 Also the clock can be manual updated with [smart-clock.local/time?h=2&m=4&s=1](http://smart-clock.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
 
 Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#Soft%20settings)
+
+### Task List
+This page can be accesed on [smart-clock.local/task](http://smart-clock.local/task)
+There can be 16 tasks, and the first 8 will be saved to EEPROM and will be restored after boot. 
+By default the SYNCTIME had been added at 4:0:0
+
+The layout of Tasks in this list is as follows
+- I, the number in the list (0-15) assigned automatically
+- Time, 3x in the format of HH:MM:SS (x)(y)(z) |OR| time in ms to execute (w)
+- Var, this can be a custom variable
+- ID, the type of task and automatically convered to show the name. (TaskString in Task.h)
+
+The definition of there format is
+	ID (x but converted to name) - Var (x but can be converted to name)
+	1. SWITCHMODE - New mode to switch to (x)
+	2. DIMMING - Stepsize,GoTo,TimeInterfall in ms (x,y,z)
+	3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms (x,y,z)
+	4. RESETESP
+	5. CHANGERGB - Red,Green,Blue,OPT_Brightness (x,y,z) |OR| (x,y,z,w)
+	6. SAVEEEPROM
+	7. SYNCTIME
+
+### OTA (Over The Air update)
+This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota)
+On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
+After which the 'Upload' button needs to be press for the update process to begin, The unit will automatically update and reboot afterwards.
+
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
