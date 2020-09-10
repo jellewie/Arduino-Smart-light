@@ -18,15 +18,14 @@
 #ifndef WifiManager_h                               //This prevents including this file more than once
 #define WifiManager_h
 
-#define dnsServerEnabled
-
 //#define WiFiManager_SerialEnabled                 //Disable to not send Serial debug feedback
-
-#include <EEPROM.h>
+//#define dnsServerEnabled
 #ifdef dnsServerEnabled
 #include <DNSServer.h>
 DNSServer dnsServer;
 #endif //dnsServerEnabled
+
+#include <EEPROM.h>
 
 const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
