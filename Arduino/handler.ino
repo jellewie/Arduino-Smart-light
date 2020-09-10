@@ -330,8 +330,8 @@ void handle_UpdateTime() {
 void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
   String Message = "https://github.com/jellewie/Arduino-Smart-light\n"
-                   "Code compiled on " +  String(__DATE__) + " " + String(__TIME__) + "\n"
-                   "MAC adress = " +  String(WiFi.macAddress()) + "\n"
+                   "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
+                   "MAC adress = " + String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
