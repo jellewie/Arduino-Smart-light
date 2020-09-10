@@ -112,14 +112,17 @@ bool DoTask(TASK Item) {
       } break;
     case CHANGERGB: {
         //Var = new Red value,new Green value,new Blue value
-        String _Vars[3];
-        CutVariable(Item.Var, &_Vars[0], 3);
+        String _Vars[4];
+        CutVariable(Item.Var, &_Vars[0], 4);
         byte GoToR = constrain(_Vars[0].toInt(), 0, 255);
         byte GoToG = constrain(_Vars[1].toInt(), 0, 255);
         byte GoToB = constrain(_Vars[2].toInt(), 0, 255);
+        byte GoToL = constrain(_Vars[3].toInt(), 0, 255);
         Mode = ON;
         LastMode = Mode;
         fill_solid(&(LEDs[0]), TotalLEDs, CRGB(GoToR, GoToG, GoToB));
+        if (GoToL != 0)
+          FastLED.setBrightness(GoToL);
         UpdateLEDs = true;
       } break;
     case SAVEEEPROM: {
@@ -140,6 +143,7 @@ String VarCompress(byte ID, String IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("CV: VarDecompress '" + String(IN) + "'");
 #endif //Convert_SerialEnabled
+  IN.replace("\"", "'");                          //Make sure to change char(") since we can't use that, change to char(')
   switch (ID) {
     case NONE: {
         return "";                                //We do not use it, clear it so save space
@@ -147,11 +151,13 @@ String VarCompress(byte ID, String IN) {
     case SWITCHMODE: {
         return String(ConvertModeToInt(IN));
       } break;
-
+    //DIMMING
+    //BRIGHTEN
     case RESETESP: {
         return "";                                //We do not use it, clear it so save space
       } break;
-
+    //CHANGERGB
+    //CHANGERGB
     case SAVEEEPROM: {
         return "";                                //We do not use it, clear it so save space
       } break;
@@ -282,7 +288,7 @@ void ExecuteTask() {
           DoTask(TaskList[i]);                                //Execute this task entry
           RemoveTask(i);                                      //Remove the task, it has been executed
         }
-      } else if (TimeSet and (TaskList[i].ExectuteAt.HH > 0 or TaskList[i].ExectuteAt.MM > 0 or TaskList[i].ExectuteAt.SS > 0)) {
+      } else if (TimeSet) {
         if (TaskList[i].ExectuteAt.HH != TimeCurrent.HH)      //If we not need to execute the task this hour
           TaskList[i].Executed = false;                       //flag this task as not executed
         else if (!TaskList[i].Executed)                       //If the task has not been executed yet, (and the hour must the the same)
@@ -341,7 +347,7 @@ void Tasks_handle_Settings() {
   String ERRORMSG = "";
   if (server.args() > 0) {                      //If manual time given
     TASK TempTask;
-    TempTask.ID = 255;
+    TempTask.ID = 255;                          //Used to store ID when adding, and i (number in list) for removeal
     TempTask.ExectuteAt.HH = 255;
     TempTask.ExectuteAt.MM = 255;
     TempTask.ExectuteAt.SS = 255;
@@ -402,9 +408,12 @@ void Tasks_handle_Settings() {
           }
           break;
         case 2: //Remove
-          if (RemoveTask(TempTask.ID))
-            ScheduleWriteToEEPROM();                  //Schedule to save the changes to EEPROM
-          else
+          byte i = TempTask.ID;
+          byte TaskID = TaskList[i].ID;
+          if (RemoveTask(i)) {
+            if (i < 8 and TaskID != SAVEEEPROM)       //If this Task was (should) saved to EEPROM, and was not a SAVEEEPROM task
+              ScheduleWriteToEEPROM();                //Schedule to save the changes to EEPROM
+          } else
             ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
           break;
       }
