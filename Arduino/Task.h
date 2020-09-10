@@ -285,8 +285,9 @@ void ExecuteTask() {
     if (TaskList[i].ID > 0) {                                 //If there is a task
       if (TaskList[i].ExectuteAt.Ticks > 0) {
         if (TaskList[i].ExectuteAt.Ticks <= millis()) {       //If the execute time has pasted
-          DoTask(TaskList[i]);                                //Execute this task entry
+          TASK TempTask;                                      //Create a space to put a new Task in
           RemoveTask(i);                                      //Remove the task, it has been executed
+          DoTask(TempTask);                                   //Execute the task entry
         }
       } else if (TimeSet) {
         if (TaskList[i].ExectuteAt.HH != TimeCurrent.HH)      //If we not need to execute the task this hour
