@@ -113,7 +113,7 @@
                 pointer-events: none
             }
 
-            #settingsContainer {
+            .popup {
                 position: absolute;
                 width: 90%;
                 left: 50%;
@@ -123,7 +123,7 @@
                 z-index: 150
             }
 
-            #settingsContainer.hidden {
+            .popup.hidden {
                 transform: translate(-50%,calc( - 50% - 10px));
                 opacity:0;pointer-events:none}
 
@@ -193,7 +193,8 @@
     <body>
         <div id="sliders"></div>
         <div id="curtain" class="hidden"></div>
-        <div id="settingsContainer" class="slideIn hidden"></div>
+        <div id="settingsContainer" class="popup slideIn hidden"></div>
+        <div id="tasksContainer" class="popup slideIn hidden"></div>
         <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" id="settingsBtn">
             <defs>
                 <mask id="mask">
@@ -210,6 +211,9 @@
             let slidersEl = document.getElementById('sliders');
             let curtainEl = document.getElementById('curtain');
             let settingsContainerEl = document.getElementById('settingsContainer');
+            let tasksContainerEl = document.getElementById('tasksContainer');
+            let settingsPopupVisible = false;
+            let tasksPopupVisible = false;
             let settingsBtn = document.getElementById('settingsBtn');
             let colorVarsEl = document.getElementById('colorVars');
             class Slider {
@@ -399,18 +403,34 @@
                 possibleValues: ['FALSE', 'TRUE']
             });
             settingsContainer.appendChild(document.createElement('br'));
+            new Button('Tasks', _ => {
+                setSettingsVisibility(false);
+                setTasksVisibility(true);
+            });
             let Bt = new RequestButton('Sync time','/time','Time updated');
             let Br = new RequestButton('Reset','/set?m=RESET','ESP restarting');
             settingsContainer.appendChild(document.createElement('br'));
             new LinkButton('OTA','/ota');
             new LinkButton('Info','/info');
-            new LinkButton('Taks','/task');
             new LinkButton('Saved settings','/ip');
-            curtainEl.addEventListener('click', _=>this.setSettingsVisibility(false));
+            curtainEl.addEventListener('click', _=>{
+                this.setSettingsVisibility(false)
+                this.setTasksVisibility(false)
+            });
             settingsBtn.addEventListener('click', _=>this.setSettingsVisibility(true));
             function setSettingsVisibility(visible) {
-                curtainEl.classList.toggle('hidden', !visible);
+                settingsPopupVisible = visible;
                 settingsContainerEl.classList.toggle('hidden', !visible);
+                updateCurtainEl();
+            }
+            function setTasksVisibility(visible){
+                tasksPopupVisible = visible;
+                tasksContainerEl.classList.toggle('hidden', !visible);
+                updateCurtainEl();
+            }
+            function updateCurtainEl(){
+                const visible = settingsPopupVisible || tasksPopupVisible;
+                curtainEl.classList.toggle('hidden', !visible);
             }
             function updateCssColor() {
                 let r = Math.pow(Sr.value01 * Sl.value01, 1 / 2.2) * 255;
