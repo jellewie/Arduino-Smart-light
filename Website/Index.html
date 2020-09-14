@@ -137,6 +137,58 @@
                 cursor: pointer
             }
 
+            #taskList{
+                padding: 0;
+            }
+
+            .taskItem{
+                list-style: none;
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                flex-wrap: nowrap;
+                white-space: nowrap;
+            }
+
+            .taskItem > *{
+                margin: 0px 8px;
+            }
+
+            .taskTime::after{
+                content: ' ';
+                background: black;
+                width: 1px;
+                height: 23px;
+                display: inline-block;
+                margin-left: 10px;
+                vertical-align: middle;
+            }
+
+            .taskCloseBtn{
+                width: 27px;
+                height: 27px;
+                cursor: pointer;
+                opacity: 0.6;
+                margin-left: auto;
+            }
+            .taskCloseBtn:hover{
+                opacity: 1;
+            }
+            .taskCloseBtn::before, .taskCloseBtn::after{
+                content: '';
+                background: black;
+                width: 2px;
+                height: 25px;
+                display: block;
+                position: absolute;
+            }
+            .taskCloseBtn::before{
+                transform: translateX(12px) rotate(45deg);
+            }
+            .taskCloseBtn::after{
+                transform: translateX(12px) rotate(-45deg);
+            }
+
             .selectLabel {
                 margin: 5px;
                 display: block
@@ -194,7 +246,13 @@
         <div id="sliders"></div>
         <div id="curtain" class="hidden"></div>
         <div id="settingsContainer" class="popup slideIn hidden"></div>
-        <div id="tasksContainer" class="popup slideIn hidden"></div>
+        <div id="tasksContainer" class="popup slideIn hidden">
+            <ul id="taskList">
+                <li class="taskItem"><div class="taskTime">4:00:00</div><div class="taskType">SYNCTIME</div><div class="taskVar">Var: CLOCK</div><div class="taskCloseBtn"></div></li>
+                <li class="taskItem"><div class="taskTime">3:22:16</div><div class="taskType">SYNCTIME</div><div class="taskVar"></div>          <div class="taskCloseBtn"></div></li>
+                <li class="taskItem"><div class="taskTime">5:23:12</div><div class="taskType">SYNCTIME</div><div class="taskVar">Var: OFF</div>  <div class="taskCloseBtn"></div></li>
+            </ul>
+        </div>
         <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" id="settingsBtn">
             <defs>
                 <mask id="mask">
