@@ -237,7 +237,7 @@ void handle_OnConnect() {
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "new LinkButton('OTA','/ota');"
                       "new LinkButton('Info','/info');"
-                      "new LinkButton('Taks','/task');"
+                      "new LinkButton('Task','/task');"
                       "new LinkButton('Saved settings','/ip');"
 
                       "curtainEl.addEventListener('click',_=>this.setSettingsVisibility(false));settingsBtn.addEventListener('click',_=>this.setSettingsVisibility(true));function setSettingsVisibility(visible){curtainEl.classList.toggle('hidden',!visible);settingsContainerEl.classList.toggle('hidden',!visible);}"

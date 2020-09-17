@@ -22,7 +22,7 @@ const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why fil
 
 //<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixMode  "o"   //1=Add 2=Remove
-#define PreFixID    "i"   //Task ID
+#define PreFixID    "i"   //Task Type (or ID for remove task)
 #define PreFixVar   "a"   //Task Variable
 #define PreFixTimeH "h"   //On which time the task needs to be executed
 #define PreFixTimeM "m"   //^
@@ -144,6 +144,7 @@ String VarCompress(byte ID, String IN) {
   Serial.println("CV: VarDecompress '" + String(IN) + "'");
 #endif //Convert_SerialEnabled
   IN.replace("\"", "'");                          //Make sure to change char(") since we can't use that, change to char(')
+  IN.replace("\\", "/");                          //Make sure to change char(\) since we can't use that, change to char(/)
   switch (ID) {
     case NONE: {
         return "";                                //We do not use it, clear it so save space
@@ -321,7 +322,7 @@ void Tasks_handle_Connect() {
 
   Message += "<br><form action=\"/settask?\" method=\"set\">"
              "<input type=\"hidden\" name=\"o\" value=\"1\">"
-             "<div><label>Task ID </label><input type=\"text\" name=\"i\" value=\"\"> Examples: SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME</div>"
+             "<div><label>Task type </label><input type=\"text\" name=\"i\" value=\"\"> Examples: SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME</div>"
              "<div><label>Var </label><input type=\"text\" name=\"a\"> Custom value to give along, for example for DIMMING:(Stepsize,GoTo,TimeInterfall in ms) OR SWITCHMODE:(NewModeIdOrName)</div>"
              "<div><label>Time h:m:s </label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"><label> or time in ms from now:</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
              "<button>Add task</button></form>";
@@ -378,7 +379,7 @@ void Tasks_handle_Settings() {
       }
     }
     if (TempTask.ID == 255) {
-      ERRORMSG += "No Task ID given\n";
+      ERRORMSG += "No Task Type/ID given\n";
     } else {
       switch (TaskCommand) {
         case 0: //Unknown ID
