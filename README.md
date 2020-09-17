@@ -23,7 +23,7 @@ A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI 
 Upon release an .HEX file will also be supplied, this could then be uploaded with an HEX uploader of choice.
 
 # Creating a unit
-Please see [Quick start guide](#quick-start-guide) if you have already a light, and just want to run the set-up.
+You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
 ## Printing
 ### Desk model
 There are 4 files that need to be printed
@@ -111,20 +111,20 @@ An example of the settings page is shown in the figure on the right.
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
-The most up-to-date values can be found in the top of the [WifiManager.ino](Arduino/WifiManager.ino) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
+The most up-to-date values can be found in the top of the [WifiManager.h](Arduino/WifiManager.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
 Note that the character " and TAB (EEPROM_Seperator) can not be used, these will be replace with ' and SPACE respectively
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
 - **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P.
-- **AutoBrightnessN** Used to calculate auto brightness =P*(X-N)+O. please see www.desmos.com/calculator/gpr6bwjleg
+- **AutoBrightnessN** Used to calculate auto brightness =P*(X-N)+O. please see https://www.desmos.com/calculator/5tpxxofamn
 - **AutoBrightnessP** ^ Just the lowest raw sensor value you can find
 - **AutoBrightnessO** ^ Just an brigtness offset, so it can be set to be globaly more bright
 - **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255.
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just stick to wholes and use 12.
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations.
-- **ClockAnalog** Makes it so the LEDs dont step, but smootly transition. This does cost considerable more processing power. Makes ClockHourAnalog useless.
+- **ClockAnalog** Makes it so the LEDs dont step, but smootly transition. This does cost considerable more processing power. Makes ClockHourAnalog useless. https://www.desmos.com/calculator/zkl6idhjvx
 - **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so thats 3600 seconds.
 - **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds.
 - **PotMinChange** How much the pot_value needs to change before we process it.
@@ -139,7 +139,7 @@ Clock mode can only be started when WIFI has been connected and the user switche
 
 Also the clock can be manual updated with [smart-clock.local/time?h=2&m=4&s=1](http://smart-clock.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
 
-Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#Soft%20settings)
+Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#soft-settings)
 
 ### Task List
 This page can be accesed on [smart-clock.local/task](http://smart-clock.local/task)
