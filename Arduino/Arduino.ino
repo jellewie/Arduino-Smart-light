@@ -39,7 +39,7 @@ byte BootMode = OFF;                      //SOFT_SETTING In which mode to start 
 byte HourlyAnimationS = 10;               //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
-float AutoBrightnessP = 1.04;             //SOFT_SETTING Brightness = Y=P*(X-N)+O [255/(255-AutoBrightnessN)] https://www.desmos.com/calculator/gpr6bwjleg
+float AutoBrightnessP = 1.04;             //SOFT_SETTING Brightness = Y=P*(X-N)+O [255/(255-AutoBrightnessN)]
 byte AutoBrightnessN = 10;                //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
 byte AutoBrightnessO = 4;                 //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
