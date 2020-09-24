@@ -114,6 +114,10 @@ void setup() {
   server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);         //When a client requests an unknown URI
   //==============================
+  //Over The Air update
+  //==============================
+  OTA.Enabled = true;                                 //No security has been build in yet, so turn it on by default
+  //==============================
   //Set AnalogResolution, and init the potmeters
   //==============================
   analogReadResolution(AnalogResolution);
