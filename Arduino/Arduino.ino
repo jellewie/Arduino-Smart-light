@@ -309,12 +309,6 @@ void UpdateLED() {
 void ISR_ButtonsA() {
   ButtonsA.Pinchange();
 }
-void WiFiManager_handle_Connect() {
-  WiFiManager.handle_Connect();
-}
-void WiFiManager_handle_Settings() {
-  WiFiManager.handle_Settings();
-}
 bool WiFiManager_WriteEEPROM() {
   return WiFiManager.WriteEEPROM();
 }
