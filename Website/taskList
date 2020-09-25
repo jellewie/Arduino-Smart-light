@@ -1,0 +1,7 @@
+{
+  "tasks": [
+    {"id": 0, "type": "SWITCHMODE", "var": "OFF", "timeFromNow": 80000000, "time": ""},
+    {"id": 1, "type": "DIMMING", "var": "1,0,1000", "time": "4:00"}
+  ],
+  "currentTime": [2,55,1]
+}
