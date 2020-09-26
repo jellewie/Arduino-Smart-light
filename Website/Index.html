@@ -619,6 +619,11 @@
                     const closeBtn = document.createElement('div');
                     closeBtn.classList.add('taskCloseBtn');
                     liEl.appendChild(closeBtn);
+                    closeBtn.addEventListener('click', async _ => {
+                        const response = await fetch('/removeTask?id='+task.id);
+                        if(!response.ok) doToastMessage(await response.text(), true);
+                        await updateTaskList();
+                    });
                 }
             }
             function updateTaskTimes(){

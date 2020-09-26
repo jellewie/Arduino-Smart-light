@@ -17,7 +17,10 @@ self.addEventListener("fetch", e => {
 			cache.put(e.request, resp.clone());
 			return resp;
 		}else{
-			return await caches.match(e.request);
+			const cacheValue = await caches.match(e.request);
+			console.log(cacheValue);
+			if(cacheValue) return cacheValue;
+			return resp;
 		}
 	})();
 	e.respondWith(respPromise);
