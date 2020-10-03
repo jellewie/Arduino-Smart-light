@@ -1,13 +1,13 @@
 /* Written by JelleWho https://github.com/jellewie
    https://github.com/jellewie/Arduino-WiFiManager
 
-   1. Load hardcoded data
-   2. Load EEPROM data and save data
-   3. while(no data) Set up AP mode and wait for user data
-   4. try connecting, if (not) {GOTO3}
+   Basic function:
+   1. Load EEPROM data (if not yet done)
+   2. while(no data) Set up AP mode and wait for user data
+   3. try connecting, if (not) {GOTO 2}
 
    NOTES
-   DO NOT USE char(") in any of input stings on the webpage, use char(') if you need it. char(") will break a lot
+   DO NOT USE char(") in any of input stings on the webpage, use char(') if you need it. char(") will be replaced
 
    HOW TO ADD CUSTOM VALUES
    -"WiFiManager_VariableNames" Add the 'AP settings portal' name
@@ -35,7 +35,6 @@ class CWiFiManager {
   public:
     const char EEPROM_Seperator = char(9);          //use 'TAB' as a seperator
     const int ConnectionTimeOutMS = 10000;
-
     bool SettingsEnabled = false;                   //This holds the flag to enable settings, else it would not responce to settings commands
     bool WaitOnAPMode = true;                       //This holds the flag if we should wait in Apmode for data
     int EEPROM_USED = 0;                            //Howmany bytes we have used for data in the EEPROM
@@ -242,7 +241,6 @@ class CWiFiManager {
 #endif //WiFiManager_SerialEnabled
       Return_Value.replace("\"", "'");              //Make sure to change char("), since we can't use that, change to char(')
       Return_Value.replace(String(EEPROM_Seperator), " ");  //Make sure to change the EEPROM seperator, since we can't use that
-
       return String(Return_Value);
     }
     void Status_Start() {
@@ -558,4 +556,10 @@ class CWiFiManager {
 #endif //WiFiManager_SerialEnabled
 };
 CWiFiManager WiFiManager;
+void WiFiManager_handle_Connect() {
+  WiFiManager.handle_Connect();
+}
+void WiFiManager_handle_Settings() {
+  WiFiManager.handle_Settings();
+}
 #endif
