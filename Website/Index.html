@@ -96,6 +96,20 @@
                 margin-top: -12.5px
             }
 
+            input[type="text"], input[type="time"]{
+                background: #00000021;
+                color: var(--ui-color);
+                border: solid 1px var(--ui-color);
+                border-radius: 5px;
+            }
+            input[type="time"]::-webkit-calendar-picker-indicator{
+                background-color: var(--ui-color-trans2);
+            }
+
+            input[type="text"]::placeholder{
+                color: var(--ui-color-trans2);
+            }
+
             #curtain {
                 position: absolute;
                 left: 0;
@@ -254,6 +268,18 @@
         <div id="settingsContainer" class="popup slideIn hidden"></div>
         <div id="tasksContainer" class="popup slideIn hidden">
             <ul id="taskList"></ul>
+            <div id="newTaskSection">
+                <input id="addTaskTime" type="time" step="1" value="00:00:00">
+                <select id="addTaskTimeType">
+                    <option>ABSOLUTE</option>
+                    <option>RELATIVE</option>
+                </select>
+                <select id="addTaskType">
+                    <option>SWITCHMODE</option>
+                    <option>DIMMING</option>
+                </select>
+                <input id="addTaskVar" type="text" placeholder="var">
+            </div>
         </div>
         <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" id="settingsBtn">
             <defs>
@@ -277,6 +303,10 @@
             let tasksPopupVisible = false;
             let settingsBtn = document.getElementById('settingsBtn');
             let colorVarsEl = document.getElementById('colorVars');
+            let addTaskTimeEl = document.getElementById('addTaskTime');
+            let addTaskTimeTypeEl = document.getElementById('addTaskTimeType');
+            let addTaskTypeEl = document.getElementById('addTaskType');
+            let addTaskVarEl = document.getElementById('addTaskVar');
             class Slider {
                 constructor(name, isBrightness=false) {
                     this.name = name;
@@ -612,7 +642,7 @@
                     const varEl = document.createElement('div');
                     varEl.classList.add('taskVar');
                     if(task.var){
-                        varEl.innerText = "Var: "+task.var;
+                        varEl.innerText = 'Var: '+task.var;
                     }
                     liEl.appendChild(varEl);
 
@@ -651,6 +681,34 @@
                 }
             }
             setInterval(updateTaskTimes, 100);
+            const addTaskBtn = new Button('add', async _ => {
+                const params = {
+                    i: addTaskTypeEl.value,
+                    a: addTaskVarEl.value,
+                };
+                if(addTaskTimeTypeEl.value == "ABSOLUTE"){
+                    params.h = addTaskTimeEl.valueAsDate.getUTCHours();
+                    params.m = addTaskTimeEl.valueAsDate.getUTCMinutes();
+                    params.s = addTaskTimeEl.valueAsDate.getUTCSeconds();
+                }else{
+                    const ticks = addTaskTimeEl.valueAsNumber;
+                    params.t = ticks;
+                }
+                let searchParams = new URLSearchParams(params);
+                try {
+                    let response = await fetch('/createTask?' + searchParams);
+                    if (response.ok) {
+                        await updateServerStateFromResponse(response);
+                        return true;
+                    } else {
+                        doToastMessage(await response.text(), true);
+                    }
+                } catch (e) {
+                    doToastMessage('Failed to add task', true);
+                }
+                updateTaskList();
+            });
+            addTaskVarEl.parentElement.appendChild(addTaskBtn.el);
             async function timeout(ms) {
                 await new Promise((r)=>setTimeout(r, ms));
             }
