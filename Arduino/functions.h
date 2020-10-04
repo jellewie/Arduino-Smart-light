@@ -42,6 +42,7 @@ int ConvertModeToInt(String IN) {
     else
       return 0;
   }
+  IN.trim();
   IN.toUpperCase();
   for (byte i = 0; i < Modes_Amount; i++) {
     if (IN == ModesString[i])
