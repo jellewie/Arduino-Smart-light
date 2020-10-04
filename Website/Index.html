@@ -96,18 +96,19 @@
                 margin-top: -12.5px
             }
 
-            input[type="text"], input[type="time"]{
+            input[type="text"],input[type="time"] {
                 background: #00000021;
                 color: var(--ui-color);
                 border: solid 1px var(--ui-color);
-                border-radius: 5px;
-            }
-            input[type="time"]::-webkit-calendar-picker-indicator{
-                background-color: var(--ui-color-trans2);
+                border-radius: 5px
             }
 
-            input[type="text"]::placeholder{
-                color: var(--ui-color-trans2);
+            input[type="time"]::-webkit-calendar-picker-indicator {
+                background-color: var(--ui-color-trans2)
+            }
+
+            input[type="text"]::placeholder {
+                color: var(--ui-color-trans2)
             }
 
             #curtain {
@@ -151,62 +152,67 @@
                 cursor: pointer
             }
 
-            #taskList{
-                padding: 0;
+            #taskList {
+                padding: 0
             }
 
-            .taskItem{
+            .taskItem {
                 list-style: none;
                 display: flex;
                 align-items: center;
                 padding: 10px;
                 flex-wrap: nowrap;
-                white-space: nowrap;
+                white-space: nowrap
             }
 
-            .taskItem > *{
-                margin: 0px 8px;
+            .taskItem>* {
+                margin: 0 8px
             }
 
-            .taskTime{
+            .taskTime {
                 width: 80px;
-                position: relative;
+                position: relative
             }
-            .taskTime::after{
+
+            .taskTime::after {
                 content: ' ';
                 background: black;
                 width: 1px;
                 height: 23px;
                 display: inline-block;
-                right: 0px;
+                right: 0;
                 top: 50%;
                 position: absolute;
-                transform: translateY(-50%);
+                transform: translateY(-50%)
             }
 
-            .taskCloseBtn{
+            .taskCloseBtn {
                 width: 27px;
                 height: 27px;
                 cursor: pointer;
-                opacity: 0.6;
-                margin-left: auto;
+                opacity: .6;
+                margin-left: auto
             }
-            .taskCloseBtn:hover{
-                opacity: 1;
+
+            .taskCloseBtn:hover {
+                opacity: 1
             }
-            .taskCloseBtn::before, .taskCloseBtn::after{
+
+            .taskCloseBtn::before,.taskCloseBtn::after {
                 content: '';
                 background: black;
                 width: 2px;
                 height: 25px;
                 display: block;
-                position: absolute;
+                position: absolute
             }
-            .taskCloseBtn::before{
-                transform: translateX(12px) rotate(45deg);
+
+            .taskCloseBtn::before {
+                transform: translateX(12px) rotate(45deg)
             }
-            .taskCloseBtn::after{
-                transform: translateX(12px) rotate(-45deg);
+
+            .taskCloseBtn::after {
+                transform: translateX(12px) rotate(-45deg)
             }
 
             .selectLabel {
@@ -494,10 +500,11 @@
                 possibleValues: ['FALSE', 'TRUE']
             });
             settingsContainer.appendChild(document.createElement('br'));
-            new Button('Tasks', _ => {
+            new Button('Tasks',_=>{
                 setSettingsVisibility(false);
                 setTasksVisibility(true);
-            });
+            }
+            );
             let Bt = new RequestButton('Sync time','/time','Time updated');
             let Br = new RequestButton('Reset','/set?m=RESET','ESP restarting');
             settingsContainer.appendChild(document.createElement('br'));
@@ -506,21 +513,22 @@
             new LinkButton('Saved settings','/ip');
             curtainEl.addEventListener('click', _=>{
                 this.setSettingsVisibility(false);
-                this.setTasksVisibility(false);
-            });
+                this.setTasksVisibility(false)
+            }
+            );
             settingsBtn.addEventListener('click', _=>this.setSettingsVisibility(true));
             function setSettingsVisibility(visible) {
                 settingsPopupVisible = visible;
                 settingsContainerEl.classList.toggle('hidden', !visible);
                 updateCurtainEl();
             }
-            function setTasksVisibility(visible){
+            function setTasksVisibility(visible) {
                 tasksPopupVisible = visible;
                 tasksContainerEl.classList.toggle('hidden', !visible);
                 updateCurtainEl();
                 updateTaskList();
             }
-            function updateCurtainEl(){
+            function updateCurtainEl() {
                 const visible = settingsPopupVisible || tasksPopupVisible;
                 curtainEl.classList.toggle('hidden', !visible);
             }
@@ -587,7 +595,8 @@
                 }
             }
             async function updateServerStateFromResponse(response) {
-                if (!response.ok) return;
+                if (!response.ok)
+                    return;
                 let json = await response.json();
                 Dm.value = json.m;
                 Dbm.value = json.bm;
@@ -603,7 +612,7 @@
                 Sb.value = col.B;
                 Sl.value = col.L;
             }
-            async function updateTaskList(){
+            async function updateTaskList() {
                 let response = await fetch('/taskList');
                 if (response.ok) {
                     await updateTaskListFromResponse(response);
@@ -613,67 +622,65 @@
             }
             let currentTaskListTimeItems = [];
             async function updateTaskListFromResponse(response) {
-                if(!response.ok) return;
+                if (!response.ok)
+                    return;
                 const json = await response.json();
                 taskListEl.innerHTML = '';
                 currentTaskListTimeItems = [];
-                for(const task of json.tasks){
+                for (const task of json.tasks) {
                     const liEl = document.createElement('li');
                     liEl.classList.add('taskItem');
                     taskListEl.appendChild(liEl);
-
                     const timeEl = document.createElement('div');
                     timeEl.classList.add('taskTime');
                     timeEl.innerText = task.time;
                     liEl.appendChild(timeEl);
-
-                    if(task.timeFromNow){
+                    if (task.timeFromNow) {
                         currentTaskListTimeItems.push({
                             el: timeEl,
                             fireTime: performance.now() + task.timeFromNow,
                         });
                     }
-
                     const typeEl = document.createElement('div');
                     typeEl.classList.add('taskType');
                     typeEl.innerText = task.type;
                     liEl.appendChild(typeEl);
-
                     const varEl = document.createElement('div');
                     varEl.classList.add('taskVar');
-                    if(task.var){
-                        varEl.innerText = 'Var: '+task.var;
+                    if (task.var) {
+                        varEl.innerText = 'Var: ' + task.var;
                     }
                     liEl.appendChild(varEl);
-
                     const closeBtn = document.createElement('div');
                     closeBtn.classList.add('taskCloseBtn');
                     liEl.appendChild(closeBtn);
-                    closeBtn.addEventListener('click', async _ => {
                         const response = await fetch('/removeTask?id='+task.id);
-                        if(!response.ok) doToastMessage(await response.text(), true);
+                    closeBtn.addEventListener('click', async _=>{
+                        if (!response.ok)
+                            doToastMessage(await response.text(), true);
                         await updateTaskList();
-                    });
+                    }
+                    );
                 }
             }
-            function updateTaskTimes(){
-                for(const timeItem of currentTaskListTimeItems){
+            function updateTaskTimes() {
+                for (const timeItem of currentTaskListTimeItems) {
                     const dt = timeItem.fireTime - performance.now();
                     let str = '';
-                    if(dt < 0){
+                    if (dt < 0) {
                         str = 'now';
-                    }else{
-                        const dtSeconds = dt/1000;
-                        const dtMinutes = dtSeconds/60;
-                        const dtHours = dtMinutes/60;
+                    } else {
+                        const dtSeconds = dt / 1000;
+                        const dtMinutes = dtSeconds / 60;
+                        const dtHours = dtMinutes / 60;
                         const hours = Math.floor(dtHours);
-                        const minutes = Math.floor(dtMinutes - hours*60);
-                        const seconds = Math.floor(dtSeconds - hours*60*60 - minutes*60);
-                        str = (''+seconds).padStart(2,'0');
-                        if(hours > 0){
-                            str = (''+minutes).padStart(2,'0') + ':' + str;
+                        const minutes = Math.floor(dtMinutes - hours * 60);
+                        const seconds = Math.floor(dtSeconds - hours * 60 * 60 - minutes * 60);
+                        str = ('' + seconds).padStart(2, '0');
+                        if (hours > 0) {
+                            str = ('' + minutes).padStart(2, '0') + ':' + str;
                             str = hours + ':' + str;
-                        }else{
+                        } else {
                             str = minutes + ':' + str;
                         }
                     }
@@ -681,16 +688,16 @@
                 }
             }
             setInterval(updateTaskTimes, 100);
-            const addTaskBtn = new Button('add', async _ => {
+            const addTaskBtn = new Button('add',async _=>{
                 const params = {
                     i: addTaskTypeEl.value,
                     a: addTaskVarEl.value,
                 };
-                if(addTaskTimeTypeEl.value == "ABSOLUTE"){
+                if (addTaskTimeTypeEl.value == "ABSOLUTE") {
                     params.h = addTaskTimeEl.valueAsDate.getUTCHours();
                     params.m = addTaskTimeEl.valueAsDate.getUTCMinutes();
                     params.s = addTaskTimeEl.valueAsDate.getUTCSeconds();
-                }else{
+                } else {
                     const ticks = addTaskTimeEl.valueAsNumber;
                     params.t = ticks;
                 }
@@ -707,7 +714,8 @@
                     doToastMessage('Failed to add task', true);
                 }
                 updateTaskList();
-            });
+            }
+            );
             addTaskVarEl.parentElement.appendChild(addTaskBtn.el);
             async function timeout(ms) {
                 await new Promise((r)=>setTimeout(r, ms));
@@ -729,7 +737,8 @@
                 el.parentElement.removeChild(el);
             }
             async function installSw() {
-                if (!('serviceWorker'in window.navigator)) return;
+                if (!('serviceWorker'in window.navigator))
+                    return;
                 await navigator.serviceWorker.register('sw.js');
             }
             installSw();
