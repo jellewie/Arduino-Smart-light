@@ -51,7 +51,7 @@ int  daylightOffset_sec = 3600;           //SOFT_SETTING Set to your daylight of
 byte PotMinChange = 2;                    //SOFT_SETTING How much the pot_value needs to change before we process it
 byte PotStick = PotMinChange + 1;         //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;           //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
-char Name[16] = "smart-clock";            //SOFT_SETTING The mDNS, WIFI APmode SSID, and OTA name of the device. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+char Name[16] = "smart-clock";            //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
 bool UpdateLEDs;                          //If we need to physically update the LEDs
 bool TimeSet = false;                     //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                //Holds in which mode the light is currently in
@@ -87,9 +87,9 @@ void setup() {
   Serial.setTimeout(1);
 #endif //SerialEnabled
   attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
-  //==============================
+  //===========================================================================
   //Init LED and let them shortly blink
-  //==============================
+  //===========================================================================
   pinMode(PAO_LED, OUTPUT);
   FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
@@ -98,9 +98,9 @@ void setup() {
     FastLED.show();                                     //Update
     FastLED.delay(1);
   }
-  //==============================
+  //===========================================================================
   //Set up all server UrlRequest stuff
-  //==============================
+  //===========================================================================
   server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/task",       Tasks_handle_Connect);
@@ -113,29 +113,29 @@ void setup() {
   server.on("/time",        handle_UpdateTime);
   server.on("/info",        handle_Info);
   server.onNotFound(        handle_NotFound);         //When a client requests an unknown URI
-  //==============================
+  //===========================================================================
   //Over The Air update
-  //==============================
+  //===========================================================================
   OTA.Enabled = true;                                 //No security has been build in yet, so turn it on by default
-  //==============================
+  //===========================================================================
   //Set AnalogResolution, and init the potmeters
-  //==============================
+  //===========================================================================
   analogReadResolution(AnalogResolution);
   for (int i = 0; i < AverageAmount + 2; i++) {
     UpdateColor(false);                               //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
   }
   FastLED.setBrightness(8);                           //Set boot Brightness
-  //==============================
+  //===========================================================================
   //Add a SYNCTIME Task, this is just to initialise (will be overwritten with user data)
-  //==============================
+  //===========================================================================
   TASK TempTask;                                      //Create a space to put a new Task in
   TempTask.ID         = SYNCTIME;                     //Set the ID of the task to SYNCTIME
   TempTask.ExectuteAt = TimeS{4, 0, 0, 0};            //Set the init value to auto sync time at 04:00:00
   AddTask(TempTask);                                  //Add the Task command to the task list
-  //==============================
+  //===========================================================================
   //Load data from EEPROM, so we can apply the set bootmode
-  //==============================
+  //===========================================================================
   WiFiManager.LoadData();
   Mode = BootMode;                                    //Set the startup mode
 #ifdef SerialEnabled
@@ -143,9 +143,9 @@ void setup() {
 #endif //SerialEnabled
   loopLEDS();
   UpdateBrightness(true);                             //Force Update the brightness
-  //==============================
+  //===========================================================================
   //Set up mDNS responder     //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
-  //==============================
+  //===========================================================================
   bool MDNSStatus = MDNS.begin(Name);                 //Start mDNS with the given domain name
   if (MDNSStatus) MDNS.addService("http", "tcp", 80); //Add service to MDNS-SD
 #ifdef SerialEnabled
