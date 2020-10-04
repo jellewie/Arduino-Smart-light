@@ -103,8 +103,15 @@ void setup() {
   //===========================================================================
   server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
+
+  
   server.on("/task",       Tasks_handle_Connect);
   server.on("/settask",    Tasks_handle_Settings);
+  
+  server.on("/taskList",   Tasks_handle_GetTasks);
+  //server.on("/removeTask",   Tasks_handle_removeTask);
+  server.on("/createTask",   Tasks_handle_Settings);
+  
   server.on("/ota",               OTA_handle_uploadPage);
   server.on("/update", HTTP_POST, OTA_handle_update, OTA_handle_update2);
   server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URI "/"

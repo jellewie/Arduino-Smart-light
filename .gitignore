@@ -2,3 +2,4 @@
 *.lck
 _Local/
 Arduino/z_unused.h
+*.bin
