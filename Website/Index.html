@@ -704,12 +704,7 @@
                 let searchParams = new URLSearchParams(params);
                 try {
                     let response = await fetch('/createTask?' + searchParams);
-                    if (response.ok) {
-                        await updateServerStateFromResponse(response);
-                        return true;
-                    } else {
-                        doToastMessage(await response.text(), true);
-                    }
+                    doToastMessage(await response.text(), !response.ok);
                 } catch (e) {
                     doToastMessage('Failed to add task', true);
                 }
