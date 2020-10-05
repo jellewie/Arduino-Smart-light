@@ -21,7 +21,7 @@ String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", 
 const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why filling this in if we can automate that? :)
 
 //<ip>/task[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
-#define PreFixMode  "o"   //1=Add 2=Remove
+#define PreFixMode  "o"   //1=TASK_ADD, 2=TASK_REMOVE
 #define PreFixID    "i"   //Task Type (or ID for remove task)
 #define PreFixVar   "a"   //Task Variable
 #define PreFixTimeH "h"   //On which time the task needs to be executed
@@ -36,6 +36,7 @@ struct TASK {
   bool Executed = false;           //Just here to keep track of it a Time based task has been executed today
 };
 TASK TaskList[TaskLimit];
+enum {TASK_NOTGIVEN, TASK_ADD, TASK_REMOVE}; //These are commando's for PreFixMode
 
 //Declare some functions here, so we can cross reference then in the code. Basically just placeholders to the compiler does not whine about that they do not exist yet
 extern String ConvertTaskIDToString(byte IN);
@@ -303,130 +304,114 @@ void ExecuteTask() {
     }
   }
 }
-void Tasks_handle_Connect() {
-  String ERRORMSG = "";
-  String Message;
-  for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
-    if (TaskList[i].ID > 0) {                   //If there is a task
-      Message += "<form action=\"/settask?\" method=\"set\">#" + String(i) + " "
-                 "<input type=\"hidden\" name=\"o\" value=\"2\">"
-                 "<label>Do task </label>" + ConvertTaskIDToString(TaskList[i].ID) + "<input type=\"hidden\" name=\"i\" value=\"" + i + "\">";
-      if (TaskList[i].ExectuteAt.Ticks > 0)
-        Message += " in " + String(TaskList[i].ExectuteAt.Ticks - millis()) + "ms";
-      else
-        Message += " at " + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS) + "";
-      Message += " Var=" + VarDecompress(TaskList[i].ID, TaskList[i].Var) + " <button>Remove task</button></form>";
-    }
-  }
-  if (Message == "") Message += "No task in the tasklist<br>";
-
-  Message += "<br><form action=\"/settask?\" method=\"set\">"
-             "<input type=\"hidden\" name=\"o\" value=\"1\">"
-             "<div><label>Task type </label><input type=\"text\" name=\"i\" value=\"\"> Examples: SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME</div>"
-             "<div><label>Var </label><input type=\"text\" name=\"a\"> Custom value to give along, for example for DIMMING:(Stepsize,GoTo,TimeInterfall in ms) OR SWITCHMODE:(NewModeIdOrName)</div>"
-             "<div><label>Time h:m:s </label><input type=\"number\" name=\"h\" min=\"0\" max=\"24\"><input type=\"number\" name=\"m\" min=\"0\" max=\"59\"><input type=\"number\" name=\"s\" min=\"0\" max=\"59\"><label> or time in ms from now:</label><input type=\"number\" name=\"t\"> (will clear h:m:s time)</div>"
-             "<button>Add task</button></form>";
-
-  Message += "Current time is " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
-
-  if (ERRORMSG != "")
-    server.send(400, "text/html", "<html>" + ERRORMSG + "<br><br>" + Message + "<html>");
-  else
-    server.send(200, "text/html", "<html>" + Message + "<html>");
-
-#ifdef Server_SerialEnabled
-  Serial.println("SV: 200/400 Tasks_Connect " + ERRORMSG + Message);
-#endif //Server_SerialEnabled
-}
 void ScheduleWriteToEEPROM() {
-  RemoveTasksByID(SAVEEEPROM);        //Remove old EEPROM write command if they exist
+  RemoveTasksByID(SAVEEEPROM);                                //Remove old EEPROM write command if they exist
   TASK TempTask;
-  TempTask.ID = SAVEEEPROM;           //Create a new EEPROM write command
-  TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS; //Schedule to write data to EEPROM
-  AddTask(TempTask, true);                  //Add the command to the task list
+  TempTask.ID = SAVEEEPROM;                                   //Create a new EEPROM write command
+  TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS;   //Schedule to write data to EEPROM
+  AddTask(TempTask, true);                                    //Add the command to the task list
 }
 void Tasks_handle_Settings() {
   String ERRORMSG = "";
-  if (server.args() > 0) {                      //If manual time given
+  byte TaskCommand = 0;
+  if (server.args() > 0) {                                    //If manual time given
     TASK TempTask;
-    TempTask.ID = 255;                          //Used to store ID when adding, and i (number in list) for removeal
+    TempTask.ID = 255;                                        //Used to store ID when adding, and i (number in list) for removeal
     TempTask.ExectuteAt.HH = 255;
     TempTask.ExectuteAt.MM = 255;
     TempTask.ExectuteAt.SS = 255;
     TempTask.ExectuteAt.Ticks = 0;
-    byte TaskCommand = 0;
     for (int i = 0; i < server.args(); i++) {
       String ArguName = server.argName(i);
       ArguName.toLowerCase();
       String ArgValue = server.arg(i);
       if (ArgValue != "") {
-        if (ArguName == PreFixMode) {
-          TaskCommand = ArgValue.toInt();
-        } else if (ArguName == PreFixID) {
-          TempTask.ID = ConvertTaskIDToInt(ArgValue);
-        } else if (ArguName == PreFixVar) {
-          TempTask.Var = ArgValue;
-        } else if (ArguName == PreFixTimeH) {
-          TempTask.ExectuteAt.HH = ArgValue.toInt() > 23 ? 23 : ArgValue.toInt();
-        } else if (ArguName == PreFixTimeM) {
-          TempTask.ExectuteAt.MM = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
-        } else if (ArguName == PreFixTimeS) {
-          TempTask.ExectuteAt.SS = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
-        } else if (ArguName == PreFixTimeT) {
-          TempTask.ExectuteAt.Ticks = ArgValue.toInt();
-        } else
-          ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
+        if (ArguName == PreFixMode)         TaskCommand = ArgValue.toInt();
+        else if (ArguName == PreFixID)      TempTask.ID = ConvertTaskIDToInt(ArgValue);
+        else if (ArguName == PreFixVar)     TempTask.Var = ArgValue;
+        else if (ArguName == PreFixTimeH)   TempTask.ExectuteAt.HH = ArgValue.toInt() > 23 ? 23 : ArgValue.toInt();
+        else if (ArguName == PreFixTimeM)   TempTask.ExectuteAt.MM = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
+        else if (ArguName == PreFixTimeS)   TempTask.ExectuteAt.SS = ArgValue.toInt() > 59 ? 59 : ArgValue.toInt();
+        else if (ArguName == PreFixTimeT)   TempTask.ExectuteAt.Ticks = ArgValue.toInt();
+        else                                ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
       }
     }
     if (TempTask.ID == 255) {
       ERRORMSG += "No Task Type/ID given\n";
     } else {
       switch (TaskCommand) {
-        case 0: //Unknown ID
+        case TASK_NOTGIVEN:
           ERRORMSG += "No command given\n";
           break;
-        case 1: //Add
-          if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.HH > 24 and TempTask.ExectuteAt.MM > 60 and TempTask.ExectuteAt.SS > 60) {
-            ERRORMSG += "No (proper) Task time given\n";
-          } else {
-            if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
-              TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
-              TempTask.ExectuteAt.HH = 0;             //Reset the time, we dont use these
-              TempTask.ExectuteAt.MM = 0;
-              TempTask.ExectuteAt.SS = 0;
+        case TASK_ADD: {
+            if (TempTask.ExectuteAt.Ticks == 0 and TempTask.ExectuteAt.HH > 24 and TempTask.ExectuteAt.MM > 60 and TempTask.ExectuteAt.SS > 60) {
+              ERRORMSG += "No (proper) Task time given\n";
             } else {
-              if (!TimeSet)
-                ERRORMSG += "Warning time is not synced\n";
-              if (TempTask.ExectuteAt.HH > 24) TempTask.ExectuteAt.HH = 0;
-              if (TempTask.ExectuteAt.MM > 60) TempTask.ExectuteAt.MM = 0;
-              if (TempTask.ExectuteAt.SS > 60) TempTask.ExectuteAt.SS = 0;
+              if (TempTask.ExectuteAt.Ticks != 0) {     //If we have a delay, not a alarm based on time
+                TempTask.ExectuteAt.Ticks += millis();  //Set the delay to be relative from now
+                TempTask.ExectuteAt.HH = 0;             //Reset the time, we dont use these
+                TempTask.ExectuteAt.MM = 0;
+                TempTask.ExectuteAt.SS = 0;
+              } else {
+                if (!TimeSet)
+                  ERRORMSG += "Warning time is not synced\n";
+                if (TempTask.ExectuteAt.HH > 24) TempTask.ExectuteAt.HH = 0;
+                if (TempTask.ExectuteAt.MM > 60) TempTask.ExectuteAt.MM = 0;
+                if (TempTask.ExectuteAt.SS > 60) TempTask.ExectuteAt.SS = 0;
+              }
+              TempTask.Var = VarCompress(TempTask.ID, TempTask.Var);
+              if (AddTask(TempTask)) {
+                if (TempTask.ExectuteAt.Ticks == 0)     //If it is a time event (HH:MM:SS)
+                  ScheduleWriteToEEPROM();              //Schedule to save the changes to EEPROM
+              } else
+                ERRORMSG += "Could not add tasks\n";
             }
-            TempTask.Var = VarCompress(TempTask.ID, TempTask.Var);
-            if (AddTask(TempTask)) {
-              if (TempTask.ExectuteAt.Ticks == 0)     //If it is a time event (HH:MM:SS)
-                ScheduleWriteToEEPROM();              //Schedule to save the changes to EEPROM
-            } else
-              ERRORMSG += "Could not add tasks\n";
+            break;
           }
-          break;
-        case 2: //Remove
-          byte i = TempTask.ID;
-          byte TaskID = TaskList[i].ID;
-          if (RemoveTask(i)) {
-            if (i < 8 and TaskID != SAVEEEPROM)       //If this Task was (should) saved to EEPROM, and was not a SAVEEEPROM task
-              ScheduleWriteToEEPROM();                //Schedule to save the changes to EEPROM
-          } else
-            ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
-          break;
+        case TASK_REMOVE: { //Remove
+            byte i = TempTask.ID;
+            byte TaskID = TaskList[i].ID;
+            if (RemoveTask(i)) {
+              if (i < 8 and TaskID != SAVEEEPROM and TaskID != RESETESP)       //If this Task was (should) saved to EEPROM, and was not a SAVEEEPROM task
+                ScheduleWriteToEEPROM();                //Schedule to save the changes to EEPROM
+            } else
+              ERRORMSG += "Could not find task " + String(TempTask.ID) + " in the tasklist\n";
+            break;
+          }
       }
     }
   }
   if (ERRORMSG != "")
     server.send(400, "text/plain", ERRORMSG);
-  else
-    server.send(200, "text/plain", "OK");
-
+  else {
+    switch (TaskCommand) {
+      case TASK_ADD:    server.send(200, "text/plain", "Task added");     break;
+      case TASK_REMOVE: server.send(200, "text/plain", "Task removed");   break;
+      default:          server.send(200, "text/plain", "OK");             break;
+    }
+  }
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200/400 Tasks_Settings " + ERRORMSG);
+#endif //Server_SerialEnabled
+}
+void Tasks_handle_GetTasks() {
+  String ans;
+  for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
+    if (TaskList[i].ID > 0) {                   //If there is a task
+      if (ans != "") ans += ",";
+      ans += "{\"id\":" + String(i) + ","
+             "\"type\":\"" + ConvertTaskIDToString(TaskList[i].ID) + "\","
+             "\"var\":\"" + VarDecompress(TaskList[i].ID, TaskList[i].Var) + "\",";
+      if (TaskList[i].ExectuteAt.Ticks > 0)
+        ans += "\"timeFromNow\":" + String(TaskList[i].ExectuteAt.Ticks - millis());
+      else
+        ans += "\"time\":\"" + String(TaskList[i].ExectuteAt.HH) + ":" + String(TaskList[i].ExectuteAt.MM) + ":" + String(TaskList[i].ExectuteAt.SS) + "\"";
+      ans += "}";
+    }
+  }
+  ans = "{\"tasks\":[" + ans + "],\"currentTime\":[" + String(TimeCurrent.HH) + "," + String(TimeCurrent.MM) + "," + String(TimeCurrent.SS) + "]}";
+  server.send(200, "application/json", ans);
+#ifdef Server_SerialEnabled
+  Serial.println("SV: 200 Getcolors " + ans);
 #endif //Server_SerialEnabled
 }
