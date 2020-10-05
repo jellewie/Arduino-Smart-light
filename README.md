@@ -1,5 +1,3 @@
-# WIP
-This project is technically still Work In Process. I am in the process of rounding off, just a few more last touches before it first release. 
 if you have interest in buying one and live in The Netherlands, feel free to contact me.
 
 # Smart clock
