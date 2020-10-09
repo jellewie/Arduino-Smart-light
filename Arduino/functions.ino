@@ -1,4 +1,6 @@
-/* Written by JelleWho https://github.com/jellewie */
+/* Written by JelleWho https://github.com/jellewie
+  This file declairs the function types but does require some other file-functions and variables to work
+*/
 void UpdateColor(bool ForceUpdate) {
   POT R = RED.ReadStable(PotMinChange, PotStick, AverageAmount);
   POT G = GREEN.ReadStable(PotMinChange, PotStick, AverageAmount);

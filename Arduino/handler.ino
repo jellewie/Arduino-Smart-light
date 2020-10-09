@@ -2,9 +2,9 @@
    HTML written by JesperTheEnd https://github.com/jespertheend
 */
 
-//#define Server_SerialEnabled      //define this to enable serial feedback
+//#define Server_SerialEnabled                        //define this to enable serial feedback
 
-//<ip>/set?PreFix=Value[&....]      //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
+//<ip>/set?PreFix=Value[&....]                        //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixSetColorValueRed "r"
 #define PreFixSetColorValueGreen "g"
 #define PreFixSetColorValueBlue "b"
@@ -21,13 +21,13 @@
 #define PreFixSetClockOffset "o"
 #define PreFixSetClockAnalog "c"
 
-//<ip>/time[?PreFix=Value][&....]     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
+//<ip>/time[?PreFix=Value][&....]                     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
 void handle_Set() {
-  String ERRORMSG;                //emthy=dont change
+  String ERRORMSG;                                    //emthy=dont change
   bool DoWriteToEEPROM = false;
   int NewR = -1, NewG = -1, NewB = -1;
 #ifdef Server_SerialEnabled
@@ -48,10 +48,10 @@ void handle_Set() {
     } else if (ArguName == PreFixSetColorValueBlue) {
       NewB = constrain((ArgValue.toInt()), 0, 255);
     } else if (ArguName == PreFixSetModeTo) {
-      LastMode = -1;                                   //Make sure we init the new mode
+      LastMode = -1;                                  //Make sure we init the new mode
       Mode = ConvertModeToInt(ArgValue);
     } else if (ArguName == PreFixSetBrightness) {
-      if (Mode == ON) Mode = WIFI;      //If we are on manual, switch to WIFI
+      if (Mode == ON) Mode = WIFI;                    //If we are on manual, switch to WIFI
       AutoBrightness = false;
       FastLED.setBrightness(constrain((ArgValue.toInt()), 1, 255));
     } else if (ArguName == PreFixSetAutoBrightness) {
@@ -93,8 +93,8 @@ void handle_Set() {
 #endif //Server_SerialEnabled
 
   if (Mode == WIFI) AnimationCounter = 0;
-  if (AnimationCounter != 0) {            //Animation needs to be shown
-    if (NewR != -1) RGBColor[0] = NewR;   //Set animation color
+  if (AnimationCounter != 0) {                        //Animation needs to be shown
+    if (NewR != -1) RGBColor[0] = NewR;               //Set animation color
     if (NewG != -1) RGBColor[1] = NewG;
     if (NewB != -1) RGBColor[2] = NewB;
   } else {
@@ -112,16 +112,16 @@ void handle_Set() {
     }
   }
   if (DoWriteToEEPROM)
-    ScheduleWriteToEEPROM();    //If we need to write to EEPROM
+    ScheduleWriteToEEPROM();                          //If we need to write to EEPROM
   if (Mode == WIFI)
-    fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);   //Change the whole LED strip to have the color of the first set LED
+    fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);       //Change the whole LED strip to have the color of the first set LED
   else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
-    for (int i = 0; i < 100; i++) {               //Just wait for a few ms to make sure the "reset command recieved" has been send
+    for (int i = 0; i < 100; i++) {                   //Just wait for a few ms to make sure the "reset command recieved" has been send
       server.handleClient();
       delay(1);
     }
-    ESP.restart();                                //Restart the ESP
+    ESP.restart();                                    //Restart the ESP
   }
   if (ERRORMSG == "") {
     UpdateLEDs = true;
@@ -145,7 +145,7 @@ void handle_Getcolors() {
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
 
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
-  if (AnimationCounter != 0) {  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
+  if (AnimationCounter != 0) {                        //Animation needs to be shown (this is used to show animation color, instead of mostly black)
     r = RGBColor[0];
     g = RGBColor[1];
     b = RGBColor[2];
@@ -160,7 +160,7 @@ void handle_Getcolors() {
 }
 void handle_OnConnect() {
   if (!WiFiManager_Connected) {
-    WiFiManager_handle_Connect();       //Since we have no internet/WIFI connection, handle request as an APmode request
+    WiFiManager_handle_Connect();                     //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
   /*HTML USEFULL STEPS:
@@ -286,6 +286,7 @@ void handle_OnConnect() {
 #endif //Server_SerialEnabled
 }
 void handle_UpdateTime() {
+  CRGB RestoreToColor = LEDs[0];                //Save the RGB values, so we could restore these after sync animation
   String ERRORMSG;
   String message = String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   bool TimeUpdated = false;
@@ -306,27 +307,26 @@ void handle_UpdateTime() {
       } else
         ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
     }
-  } else {                                    //If no manual time given, just get it from a time server
-    if (UpdateTime())         //Update the time, and if not posible..
+  } else {                                            //If no manual time given, just get it from a time server
+    if (UpdateTime())                                 //Update the time, and if not posible..
       TimeUpdated = true;
     else
       ERRORMSG += "Could not get updated time from the server\n";
   }
-
-  if (TimeUpdated) {   //If time has updated
+  if (TimeUpdated) {                                  //If time has updated
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
     TimeSet = true;
+    if (Mode == CLOCK) UpdateAndShowClock(true, true);  //If we are curently in CLOCK mode, make sure to update the shown time
   } else {
     if (ERRORMSG == "")
       ERRORMSG = "Nothing to update the time to\n";
     message = "Current time is " + message;
   }
-
+  if (Mode != CLOCK) fill_solid(&(LEDs[0]), TotalLEDs, RestoreToColor); //If we are not in CLOCK mode restore the LEDs color
   if (ERRORMSG != "")
     server.send(400, "text/plain", ERRORMSG + message);
   else
     server.send(200, "text/plain", message);
-
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200/400 UpdateTime" + ERRORMSG + message);
 #endif //Server_SerialEnabled
@@ -343,11 +343,9 @@ void handle_Info() {
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
-
 #ifdef SerialEnabled
   Message += "\nSerial is enabled";
 #endif //SerialEnabled
-
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Info" + Message);

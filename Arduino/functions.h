@@ -1,4 +1,6 @@
-/* Written by JelleWho https://github.com/jellewie */
+/* Written by JelleWho https://github.com/jellewie
+  This file declairs the function types and does not reply on other files
+*/
 struct TimeS {
   byte HH, MM, SS;
   unsigned long Ticks;
