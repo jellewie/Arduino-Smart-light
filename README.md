@@ -35,8 +35,17 @@ There are 2 files that need to be printed
 2.	[Clock x2.stl](3DModel/Wall/Clock%20x2.stl) This needs to be printed twice, and is the bottom left and right.
 
 ## PCB & wires
-Please refer the in the [appendix](#appendix) - PCB & schematic for the schematic, but here are some common notes about the schematic, for example in [Input voltage](#Specifications) and [Power consumption](#Power consumption) more information is given about the specifications of the electrics.
+Please refer the in the [appendix](#appendix) - PCB & schematic for the schematic, but here are some common notes about the schematic, for example in [Input voltage](#Specifications) and [power consumption](#power-consumption) more information is given about the specifications of the electrics.
 
+# Quick start guide 
+Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
+1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
+**Optional for WIFI:**
+2.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
+3.	Connect to this Access Point, by default it will be called “smart-clock”.
+4.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
+~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
+5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
 # Features
 ## Button
 Although these options change a bit over time, here is a list of 3 actions what the button generally does, these can also change in different modes.
@@ -67,7 +76,7 @@ The 4 pot meters are Red, Green, Blue, and White. Where white stand for the lumi
 Here are the 2 most important pages listed with their descriptions. Keep in mind more functions could be added or a different layout could be used, but the intention should be the same as these.
 Some special functions might not be listed here. If important things missing feel free to contact me!
 ### Setup
-<img align="right" src="Images/ip.png" alt="WIFI page /ip">
+<img align="right" src="Images/ip.png" alt="WIFI page /ip" width=30%>
 
 The setup page will be accessible and shown in APmode, but can also be access by going to [smart-clock.local/ip](http://smart-clock.local/ip). An example of this page is shown in the figure on the right.
 The password is replaced with starts, and cannot be received without changing the firmware. 
@@ -154,15 +163,15 @@ The format of Tasks "TimeH,TimeM,TimeS,TaskType,Var"
 
 Some examples of TaskType and Var:
 	TaskType (x but converted to name) - Var (x but can be converted to name)
-	1. SWITCHMODE - New mode to switch to "x" either in string or ID form 
-	2. DIMMING - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
-	3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
-	4. RESETESP
-	5. CHANGERGB - Red,Green,Blue,OPT_Brightness "x,y,z" |OR| "x,y,z,w"
-	6. SAVEEEPROM
-	7. SYNCTIME
-	8. AUTOBRIGHTNESS - True/false "x" either in string or ID form 
-	9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
+1. SWITCHMODE - New mode to switch to "x" either in string or ID form 
+2. DIMMING - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
+3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
+4. RESETESP
+5. CHANGERGB - Red,Green,Blue,OPT_Brightness "x,y,z" |OR| "x,y,z,w"
+6. SAVEEEPROM
+7. SYNCTIME
+8. AUTOBRIGHTNESS - True/false "x" either in string or ID form 
+9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
 
 ### OTA (Over The Air update)
 This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota)
@@ -171,14 +180,6 @@ After which the 'Upload' button needs to be press for the update process to begi
 
 ### Full reset
 If a full reset is disired it can be achieved by going to http://smart-clock.local/reset. But note that accesing the page will directly wipe all userdata from existance and there will be no way to restore this (all settings store in the EEPROM, see [smart-clock.local/ip](http://smart-clock.local/ip)). If the wipe was succesfull it will be reported back and will execute a restart.
-
-# Quick start guide 
-Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
-1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
-2.	[Optional for WIFI] Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. Long press the button again to cancel this setup.
-3.	Connect to this Access Point, by default it will be called “smart-clock”.
-4.	When connected go to 192.168.4.1 this will show a page where the WIFI name and password can be set, do not forget to submit. The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page.
-5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
 
 # Specifications 
 ## Input voltage
