@@ -75,7 +75,7 @@ Leave fields blank (or for the password leaving only stars) to not update those 
 By default the SSID and password is limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 128. Going over these values results in unexpected behaviour. 
 
 ### Getting it’s IP
-User devices that support mDNS, like Windows and Apple, can use [smart-clock.local/info](smart-clock.local/info) to obtain its IP.
+User devices that support mDNS, like Windows and Apple, can use [smart-clock.local/info](http://smart-clock.local/info) to obtain its IP.
 
 Alternatively the IP can be shown in the LEDs themself. To trigger this see [Button](#Button).
 The LEDs are divided into 10 sections, and each byte in the IP range will be shown one at a time, to goto the next section press the button shortly again. The numbers are like a clock and in clockwise direction, top/right is 0 and the one right/down of that is 1. Where RGB will be the order of the numbers, so red will have a x100 multiplication and green will have x10, so when the IP is 198.168.1.150 and it shows the last section (150) then section 1 will be Red, 5 will be green and 0 will be blue. This is shown in the figure below
@@ -135,28 +135,28 @@ For the use of clock mode the right time zone needs to be set up, these are stor
 
 Clock mode can only be started when WIFI has been connected and the user switches mode, after switching to Clockmode the lamp will turn PURPLE/GREEN/PURPLE/GREEN this means it is getting the time from a time server.
 
-Also the clock can be manual updated with [smart-clock.local/time?h=2&m=4&s=1](http://smart-clock.local/time?h=2&m=4&s=1) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
+Also the clock can be manual updated with [smart-clock.local/time?h=3&m=59&s=50](http://smart-clock.local/time?h=3&m=59&s=50) where H is hours, M is minutes, and S is seconds. The clock also automatically updates every day at 4:00
 
 Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#soft-settings)
 
 ### Task List
-This page can be accesed on [smart-clock.local/task](http://smart-clock.local/task)
+This page can be accesed on by opening the settings menu and clicking on the button 'Tasks'
 There can be 16 tasks, and the first 8 will be saved to EEPROM and will be restored after boot. 
 By default the SYNCTIME had been added at 4:0:0
 
 The layout of Tasks in this list is as follows
 - I, the number in the list (0-15) assigned automatically
 - Time, 3x in the format of HH:MM:SS (x)(y)(z) |OR| time in ms to execute (w)
-- Var, this can be a custom variable
 - ID, the type of task and automatically convered to show the name. (TaskString in Task.h)
+- Var, this can be a custom variable (few examples are given below)
 
-The definition of there format is
+Some examples of ID and Var:
 	ID (x but converted to name) - Var (x but can be converted to name)
-	1. SWITCHMODE - New mode to switch to (x)
-	2. DIMMING - Stepsize,GoTo,TimeInterfall in ms (x,y,z)
-	3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms (x,y,z)
+	1. SWITCHMODE - New mode to switch to "x" either in string or ID form 
+	2. DIMMING - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
+	3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
 	4. RESETESP
-	5. CHANGERGB - Red,Green,Blue,OPT_Brightness (x,y,z) |OR| (x,y,z,w)
+	5. CHANGERGB - Red,Green,Blue,OPT_Brightness "x,y,z" |OR| "x,y,z,w"
 	6. SAVEEEPROM
 	7. SYNCTIME
 
@@ -164,6 +164,9 @@ The definition of there format is
 This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota)
 On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
 After which the 'Upload' button needs to be press for the update process to begin, The unit will automatically update and reboot afterwards.
+
+### Full reset
+If a full reset is disired it can be achieved by going to http://smart-clock.local/reset. But note that accesing the page will directly wipe all userdata from existance and there will be no way to restore this (all settings store in the EEPROM, see [smart-clock.local/ip](http://smart-clock.local/ip)). If the wipe was succesfull it will be reported back and will execute a restart.
 
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.

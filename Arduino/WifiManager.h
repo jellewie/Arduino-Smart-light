@@ -472,6 +472,17 @@ class CWiFiManager {
       EEPROM_USED = Value.length();
       return true;
     }
+    bool ClearEEPROM() {
+#ifdef WiFiManager_SerialEnabled
+      Serial.println("WM: EEPROM CLEAR");
+#endif //WiFiManager_SerialEnabled
+      if (!EEPROM.begin(EEPROM_size))
+        return false;
+      for (int i = 0; i < EEPROM_size; i++)         //For each character to save
+        EEPROM.write(i, NULL);                        //Write it to the EEPROM
+      EEPROM.commit();
+      return true;
+    }
     bool RunServer() {
       if (WiFiManager_Connected) server.handleClient();
       return WiFiManager_Connected;
@@ -561,5 +572,12 @@ void WiFiManager_handle_Connect() {
 }
 void WiFiManager_handle_Settings() {
   WiFiManager.handle_Settings();
+}
+void WiFiManager_handle_Reset() {
+  if (WiFiManager.ClearEEPROM()) {
+    server.send(200, "text/plain", "EEPROM cleared");
+    ESP.restart();                                //Restart the ESP
+  }
+  server.send(400, "text/plain", "Error trying to clear EEPROM");
 }
 #endif

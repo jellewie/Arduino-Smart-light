@@ -230,7 +230,7 @@ void handle_OnConnect() {
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "new Button('Tasks', _ =>{setSettingsVisibility(false); setTasksVisibility(true);});"
                       "let Bt=new RequestButton('Sync time','/time','Time updated');"
-                      "let Br=new RequestButton('Reset','/set?m=RESET','ESP restarting');"
+                      "let Br=new RequestButton('Restart','/set?m=RESET','ESP restarting');"
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "new LinkButton('OTA','/ota');"

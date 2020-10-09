@@ -103,6 +103,7 @@ void setup() {
   //===========================================================================
   server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
   server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
+  server.on("/reset",     WiFiManager_handle_Reset);
   
   server.on("/taskList",   Tasks_handle_GetTasks);
   server.on("/removeTask",   Tasks_handle_Settings);
