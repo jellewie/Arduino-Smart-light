@@ -61,6 +61,8 @@ int AnimationCounter;                     //Time in seconds that a AnimationCoun
 TimeS TimeCurrent;                        //Where we save the time to
 extern bool WiFiManager_Connected;        //Extern meaning we are declairing it somewhere later
 extern bool WiFiManager_WriteEEPROM();    //^
+extern byte TotalAnimations;                  //^ Required for Clock.h
+extern void StartAnimation(byte ID, int Time);//^ Required for Clock.h
 
 #include <FastLED.h>
 CRGB LEDs[TotalLEDs];
@@ -80,6 +82,7 @@ StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 #include "WifiManager.h"
+#include "Clock.h"
 
 void setup() {
 #ifdef SerialEnabled
