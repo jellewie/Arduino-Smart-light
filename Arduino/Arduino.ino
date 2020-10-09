@@ -59,7 +59,7 @@ byte LastMode = -1;                       //Just to keep track if we are steppin
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                        //Where we save the time to
-extern bool WiFiManager_WriteEEPROM();    //^
+extern bool WiFiManager_WriteEEPROM();        //Extern meaning we are declairing it somewhere later
 extern byte TotalAnimations;                  //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);//^ Required for Clock.h
 

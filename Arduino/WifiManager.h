@@ -471,7 +471,7 @@ class CWiFiManager {
       if (!EEPROM.begin(EEPROM_size))
         return false;
       for (int i = 0; i < EEPROM_size; i++)         //For each character to save
-        EEPROM.write(i, NULL);                      //Clear the EEPROM bit
+        EEPROM.write(i, 0);                         //Clear the EEPROM bit
       EEPROM.commit();
       return true;
     }
