@@ -94,9 +94,9 @@ void handle_Set() {
 
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                        //Animation needs to be shown
-    if (NewR != -1) RGBColor[0] = NewR;               //Set animation color
-    if (NewG != -1) RGBColor[1] = NewG;
-    if (NewB != -1) RGBColor[2] = NewB;
+    if (NewR != -1) AnimationRGB[0] = NewR;               //Set animation color
+    if (NewG != -1) AnimationRGB[1] = NewG;
+    if (NewB != -1) AnimationRGB[2] = NewB;
   } else {
     if (NewR != -1) {
       Mode = WIFI;
@@ -146,9 +146,9 @@ void handle_Getcolors() {
 
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {                        //Animation needs to be shown (this is used to show animation color, instead of mostly black)
-    r = RGBColor[0];
-    g = RGBColor[1];
-    b = RGBColor[2];
+    r = AnimationRGB[0];
+    g = AnimationRGB[1];
+    b = AnimationRGB[2];
   }
 
   ans += "\"RGBL\":[{\"R\":" + String(r) + ",\"G\":" + String(g) + ",\"B\":" + String(b) + ",\"L\":" + String(FastLED.getBrightness()) + "}]}";
@@ -216,7 +216,7 @@ void handle_OnConnect() {
                       "let Sg=new Slider('Green');"
                       "let Sb=new Slider('Blue');"
 
-                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
+                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
                       "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK']});"
                       "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2']});"
 

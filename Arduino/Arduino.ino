@@ -82,6 +82,7 @@ StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 #include "WifiManager.h"
 #include "Clock.h"
+#include "Animation.h"
 
 void setup() {
 #ifdef SerialEnabled
@@ -250,55 +251,24 @@ void loopLEDS() {
       break;
 
     //Animations
-    case BLINK:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(2, -2);
-      UpdateLEDs = true;
-      break;
-    case BPM:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(8, -2);
-      UpdateLEDs = true;
-      break;
-    case CONFETTI:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(6, -2);
-      UpdateLEDs = true;
-      break;
-    case FLASH:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(1, -2);
-      UpdateLEDs = true;
-      break;
-    case GLITTER:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(7, -2);
-      UpdateLEDs = true;
-      break;
-    case JUGGLE:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(4, -2);
-      UpdateLEDs = true;
-      break;
-    case MOVE:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(0, -2);
-      UpdateLEDs = true;
-      break;
-    case RAINBOW:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(3, -2);
-      UpdateLEDs = true;
-      break;
-    case SINELON:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(5, -2);
-      UpdateLEDs = true;
-      break;
-    case SINELON2:
-      if (LastMode != Mode)                           //If mode changed
-        StartAnimation(9, -2);
-      UpdateLEDs = true;
+    case MOVE:        if (LastMode != Mode) StartAnimation(0, -2);  break;    //If mode changed, start the animation
+    case FLASH:       if (LastMode != Mode) StartAnimation(1, -2);  break;
+    case BLINK:       if (LastMode != Mode) StartAnimation(2, -2);  break;
+    case RAINBOW:     if (LastMode != Mode) StartAnimation(3, -2);  break;
+    case JUGGLE:      if (LastMode != Mode) StartAnimation(4, -2);  break;
+    case SINELON:     if (LastMode != Mode) StartAnimation(5, -2);  break;
+    case CONFETTI:    if (LastMode != Mode) StartAnimation(6, -2);  break;
+    case GLITTER:     if (LastMode != Mode) StartAnimation(7, -2);  break;
+    case BPM:         if (LastMode != Mode) StartAnimation(8, -2);  break;
+    case SINELON2:    if (LastMode != Mode) StartAnimation(9, -2);  break;
+    case FLASH2:      if (LastMode != Mode) StartAnimation(10, -2); break;
+    case SMILEY:      if (LastMode != Mode) StartAnimation(11, -2); break;
+
+    default:
+      AnimationCounter = 0;                                                   //Stop animation
+#ifdef SerialEnabled
+      Serial.println("mode with ID " + String(Mode) + " not found");
+#endif //SerialEnabled
       break;
   }
   LastMode = Mode;
