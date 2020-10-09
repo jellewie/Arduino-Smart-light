@@ -130,8 +130,7 @@ bool DoTask(TASK Item) {
         WiFiManager_WriteEEPROM();
       } break;
     case SYNCTIME: {
-        if (!UpdateTime())                        //Get a new sync timestamp from the server
-          WiFiManager_Connected = false;
+        UpdateTime();                                 //Get a new sync timestamp from the server
       } break;
     case AUTOBRIGHTNESS: {
         AutoBrightness = IsTrue(Item.Var);
@@ -150,11 +149,11 @@ String VarCompress(byte ID, String IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("CV: VarDecompress '" + String(IN) + "'");
 #endif //Convert_SerialEnabled
-  IN.replace("\"", "'");                          //Make sure to change char(") since we can't use that, change to char(')
-  IN.replace("\\", "/");                          //Make sure to change char(\) since we can't use that, change to char(/)
+  IN.replace("\"", "'");                              //Make sure to change char(") since we can't use that, change to char(')
+  IN.replace("\\", "/");                              //Make sure to change char(\) since we can't use that, change to char(/)
   switch (ID) {
     case NONE: {
-        return "";                                //We do not use it, clear it so save space
+        return "";                                    //We do not use it, clear it so save space
       } break;
     case SWITCHMODE: {
         return String(ConvertModeToInt(IN));
@@ -162,14 +161,14 @@ String VarCompress(byte ID, String IN) {
     //DIMMING
     //BRIGHTEN
     case RESETESP: {
-        return "";                                //We do not use it, clear it so save space
+        return "";                                    //We do not use it, clear it so save space
       } break;
     //CHANGERGB
     case SAVEEEPROM: {
-        return "";                                //We do not use it, clear it so save space
+        return "";                                    //We do not use it, clear it so save space
       } break;
     case SYNCTIME: {
-        return "";                                //We do not use it, clear it so save space
+        return "";                                    //We do not use it, clear it so save space
       } break;
     case AUTOBRIGHTNESS: {
         return String(IsTrue(IN));
@@ -265,10 +264,10 @@ bool AddTask(TASK Item, bool _Reversed) {
   Serial.print("TK: AddTask");
 #endif //Task_SerialEnabled
   if (_Reversed) {
-    for (int i = TaskLimit; i > 0; i--)           //For each task that is allowed (start at end and count down)
+    for (int i = TaskLimit; i > 0; i--)               //For each task that is allowed (start at end and count down)
       if (AddTaskCheck(Item, i)) return true;
   } else {
-    for (int i = 0; i < TaskLimit; i++)           //For each task that is allowed (start at begin and count up)
+    for (int i = 0; i < TaskLimit; i++)               //For each task that is allowed (start at begin and count up)
       if (AddTaskCheck(Item, i)) return true;
   }
 #ifdef Task_SerialEnabled
@@ -278,21 +277,21 @@ bool AddTask(TASK Item, bool _Reversed) {
 }
 bool RemoveTask(byte i) {
   //Remove a task by its nummer in the TaskList
-  if (TaskList[i].ID > 0) {                       //If there is a task
-    TaskList[i].ID = 0;                           //Clear this task entry
+  if (TaskList[i].ID > 0) {                           //If there is a task
+    TaskList[i].ID = 0;                               //Clear this task entry
 #ifdef Task_SerialEnabled
     Serial.println("TK: Removed Task " + String(i));
 #endif //Task_SerialEnabled
-    return true;                                  //EXIT, task removed
+    return true;                                      //EXIT, task removed
   }
   return false;
 }
 void RemoveTasksByID(byte ID) {
   //Remove ALL tasks with a sertain ID
   if (ID == 0) return;
-  for (byte i = 0; i < TaskLimit; i++) {          //For each task in the list
-    if (TaskList[i].ID == ID) {                   //If there is a task
-      TaskList[i].ID = 0;                         //Clear this task entry
+  for (byte i = 0; i < TaskLimit; i++) {              //For each task in the list
+    if (TaskList[i].ID == ID) {                       //If there is a task
+      TaskList[i].ID = 0;                             //Clear this task entry
 #ifdef Task_SerialEnabled
       Serial.print("TK: RemoveTasksByID " + String(i));
 #endif //Task_SerialEnabled
@@ -322,18 +321,18 @@ void ExecuteTask() {
   }
 }
 void ScheduleWriteToEEPROM() {
-  RemoveTasksByID(SAVEEEPROM);                                //Remove old EEPROM write command if they exist
+  RemoveTasksByID(SAVEEEPROM);                        //Remove old EEPROM write command if they exist
   TASK TempTask;
-  TempTask.ID = SAVEEEPROM;                                   //Create a new EEPROM write command
-  TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS;   //Schedule to write data to EEPROM
-  AddTask(TempTask, true);                                    //Add the command to the task list
+  TempTask.ID = SAVEEEPROM;                           //Create a new EEPROM write command
+  TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS; //Schedule to write data to EEPROM
+  AddTask(TempTask, true);                            //Add the command to the task list
 }
 void Tasks_handle_Settings() {
   String ERRORMSG = "";
   byte TaskCommand = 0;
-  if (server.args() > 0) {                                    //If manual time given
+  if (server.args() > 0) {                            //If manual time given
     TASK TempTask;
-    TempTask.ID = 255;                                        //Used to store ID when adding, and i (number in list) for removeal
+    TempTask.ID = 255;                                //Used to store ID when adding, and i (number in list) for removeal
     TempTask.ExectuteAt.HH = 255;
     TempTask.ExectuteAt.MM = 255;
     TempTask.ExectuteAt.SS = 255;
@@ -378,8 +377,8 @@ void Tasks_handle_Settings() {
               }
               TempTask.Var = VarCompress(TempTask.ID, TempTask.Var);
               if (AddTask(TempTask)) {
-                if (TempTask.ExectuteAt.Ticks == 0)     //If it is a time event (HH:MM:SS)
-                  ScheduleWriteToEEPROM();              //Schedule to save the changes to EEPROM
+                if (TempTask.ExectuteAt.Ticks == 0)   //If it is a time event (HH:MM:SS)
+                  ScheduleWriteToEEPROM();            //Schedule to save the changes to EEPROM
               } else
                 ERRORMSG += "Could not add tasks\n";
             }
@@ -413,8 +412,8 @@ void Tasks_handle_Settings() {
 }
 void Tasks_handle_GetTasks() {
   String ans;
-  for (byte i = 0; i < TaskLimit; i++) {        //For each task in the list
-    if (TaskList[i].ID > 0) {                   //If there is a task
+  for (byte i = 0; i < TaskLimit; i++) {              //For each task in the list
+    if (TaskList[i].ID > 0) {                         //If there is a task
       if (ans != "") ans += ",";
       ans += "{\"id\":" + String(i) + ","
              "\"type\":\"" + ConvertTaskIDToString(TaskList[i].ID) + "\","

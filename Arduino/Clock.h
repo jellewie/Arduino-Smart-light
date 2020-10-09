@@ -2,7 +2,7 @@
 #define Clock_ConnectionTimeOutMS 10000
 
 bool UpdateTime() {
-  if (!WiFiManager_Connected) return false;   //If WIFI not connected, stop right away
+  if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false;      //If WIFI is not connected, stop right away
   fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212
@@ -44,7 +44,7 @@ byte LEDtoPosition(byte LEDID) {
 void ClearAndSetupClock() {
   FastLED.clear();
   if (ClockHourLines) {
-    for (int i = 0; i <= 55; i += 5)        //Create the (12) hourly stripes
+    for (int i = 0; i <= 55; i += 5)                  //Create the (12) hourly stripes
       LEDs[LEDtoPosition(i)] += CRGB(ClockHourLines, ClockHourLines, ClockHourLines);
   }
 }
@@ -55,15 +55,14 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
   //==============================
   //Update the internal time clock
   //==============================
-  static bool FirstUpdate = true;    //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
+  static bool FirstUpdate = true;                     //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
 #ifdef Time_SerialEnabled
   if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate");
 #endif //Time_SerialEnabled
   while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) {
     if (FirstUpdate) {
       FirstUpdate = false;
-      if (!UpdateTime())                        //Get a new sync timestamp from the server
-        WiFiManager_Connected = false;
+      UpdateTime();                                  //Get a new sync timestamp from the server
     } else {
       TimeCurrent.Ticks += 1000;
     }
@@ -83,13 +82,13 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
         StartAnimation(random(0, TotalAnimations), HourlyAnimationS); //Start a random Animation
-        ShowClock = false;                      //Do not show the clock, an animation will be shown
+        ShowClock = false;                            //Do not show the clock, an animation will be shown
       }
     }
     if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
   }
-  if (!WiFiManager_Connected)                    //If we are no longer connected to WIFI
+  if (WiFi.status() != WL_CONNECTED)                  //If we are no longer connected to WIFI
     if (WiFiManager.TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
   //==============================
   //Show the time on the LEDs if needed

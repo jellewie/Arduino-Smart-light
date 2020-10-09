@@ -59,7 +59,6 @@ byte LastMode = -1;                       //Just to keep track if we are steppin
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                        //Where we save the time to
-extern bool WiFiManager_Connected;        //Extern meaning we are declairing it somewhere later
 extern bool WiFiManager_WriteEEPROM();    //^
 extern byte TotalAnimations;                  //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);//^ Required for Clock.h
@@ -104,14 +103,11 @@ void setup() {
   //===========================================================================
   //Set up all server UrlRequest stuff
   //===========================================================================
-  server.on("/ip",        WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
-  server.on("/setup",     WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
-  server.on("/reset",     WiFiManager_handle_Reset);
-
-  server.on("/taskList",   Tasks_handle_GetTasks);
-  server.on("/removeTask",   Tasks_handle_Settings);
-  server.on("/createTask",   Tasks_handle_Settings);
-
+  server.on("/ip",            WiFiManager_handle_Connect);  //Must be declaired before "WiFiManager.Start()" for APMode
+  server.on("/setup",         WiFiManager_handle_Settings); //Must be declaired before "WiFiManager.Start()" for APMode
+  server.on("/taskList",        Tasks_handle_GetTasks);
+  server.on("/removeTask",      Tasks_handle_Settings);
+  server.on("/createTask",      Tasks_handle_Settings);
   server.on("/ota",               OTA_handle_uploadPage);
   server.on("/update", HTTP_POST, OTA_handle_update, OTA_handle_update2);
   server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URI "/"
@@ -119,6 +115,7 @@ void setup() {
   server.on("/get",         handle_Getcolors);
   server.on("/time",        handle_UpdateTime);
   server.on("/info",        handle_Info);
+  server.on("/reset",       handle_Reset);
   server.onNotFound(        handle_NotFound);         //When a client requests an unknown URI
   //===========================================================================
   //Over The Air update
@@ -194,7 +191,7 @@ void loop() {
       Mode = DoublePressMode;                         //Cool RGB color palet mode
     if (Value.StartLongPress) {
       Mode = WIFI;
-      if (WiFiManager_Connected) {                    //If WIFI was already started
+      if (WiFi.status() == WL_CONNECTED) {            //If WIFI was already started
         ShowIP();
         LastMode = Mode;
       }

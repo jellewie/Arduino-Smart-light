@@ -159,7 +159,7 @@ void handle_Getcolors() {
 #endif //Server_SerialEnabled
 }
 void handle_OnConnect() {
-  if (!WiFiManager_Connected) {
+  if (WiFi.status() != WL_CONNECTED) {
     WiFiManager_handle_Connect();                     //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
@@ -350,6 +350,13 @@ void handle_Info() {
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Info" + Message);
 #endif //Server_SerialEnabled
+}
+void handle_Reset() {
+  if (WiFiManager.ClearEEPROM()) {
+    server.send(200, "text/plain", "EEPROM cleared");
+    ESP.restart();                                //Restart the ESP
+  }
+  server.send(400, "text/plain", "Error trying to clear EEPROM");
 }
 void handle_NotFound() {
   String Message = "ERROR URL NOT FOUND: '";
