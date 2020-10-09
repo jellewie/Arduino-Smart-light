@@ -1,27 +1,33 @@
-if you have interest in buying one and live in The Netherlands, feel free to contact me.
-
 # Smart clock
 A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI and manual control, Clock mode, multiple animations, and transitions.
+
+If you have interest in buying one and live in The Netherlands, feel free to contact me.
 
 <img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
 <img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 
-# What you need to make one
+# Creating a unit
+You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
+
 ## Hardware
 - a [PCB lamp](https://easyeda.com/jellewietsma/smart-light) or [PCB wall](https://easyeda.com/jellewietsma/smart-clock)
 - All parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
 - Others things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
-## Firmware (To compile)
+
+## Firmware 
+### (To compile)
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
 - [ESP32](https://dl.espressif.com/dl/package_esp32_index.json).
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
 
-Upon release an .HEX file will also be supplied, this could then be uploaded with an HEX uploader of choice.
+### To upload
+The firmware needs to be flashed once to enable OTA bin file upload, this can be done with any bin file uploader for the ESP32 of choice.
 
-# Creating a unit
-You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
+The bin files can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases) the newest version is always recommended. After the first upload [OTA](#ota-over-the-air-update) can be used to update the firmware.
+Note that [SoftSettings](#soft-settings) (user settings) are reserved while updating this way, altough a backup would not hurt here.
+
 ## Printing
 ### Desk model
 There are 4 files that need to be printed
@@ -29,6 +35,7 @@ There are 4 files that need to be printed
 2.	[Lamp shield.stl](3DModel/Desk/Shield.stl) is just a simple shield to add aluminium foil on, and will be intern so can be printed quick and dirty.
 3.	[Lamp stand.stl](3DModel/Desk/Stand.stl) can have 3 times a pair embedded magnets in it, if the magnets are desired a layer pause need to be used.
 4.	[Diffuser.gcode](3DModel/Desk/Diffuser.gcode) A perfect spiral Gcode, this can be created with [Jespers Perfect Spiral-Gcode](https://github.com/jespertheend/spiral-gcode).
+
 ### Wall model
 There are 2 files that need to be printed
 1.	[Clock Top.stl](3DModel/Wall/Clock%20Top.stl) This is the top of the clock, which houses the PCB controls.
@@ -40,12 +47,14 @@ Please refer the in the [appendix](#appendix) - PCB & schematic for the schemati
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
+2.	The [potmeters](#pot-meter) or [button](#button) change the light
 **Optional for WIFI:**
-2.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
-3.	Connect to this Access Point, by default it will be called “smart-clock”.
-4.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
+3.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
+4.	Connect to this Access Point, by default it will be called “smart-clock”.
+5.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
 ~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
-5.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
+6.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
+
 # Features
 ## Button
 Although these options change a bit over time, here is a list of 3 actions what the button generally does, these can also change in different modes.
@@ -57,6 +66,7 @@ Although these options change a bit over time, here is a list of 3 actions what 
 - If in APmode it will cancel and reboot.
 - If it was connected to WIFI it will show its IP, Which is explained in [WIFI page](#wifi-page) - Getting it’s IP.
 - If it isn’t connected to WIFI it will start connecting to WIFI (and possibly go into AP mode, that is explained in 
+
 ## LED status
 In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP (LED_BUILDIN) this LED reflects some more errors.
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
@@ -70,11 +80,14 @@ Some statuses are also reflected by the LED strip itself, but due to the difficu
 - **PURPLE/BLUE/PURPLE/BLUE** It is starting the WIFI connect code.
 - **PURPLE/RED/PURPLE/RED** It is starting the Acces Point code (WIFI could not connect).
 - **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code.
+
 ## Pot meter
 The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
+
 ## WIFI page
 Here are the 2 most important pages listed with their descriptions. Keep in mind more functions could be added or a different layout could be used, but the intention should be the same as these.
 Some special functions might not be listed here. If important things missing feel free to contact me!
+
 ### Setup
 <img align="right" src="Images/ip.png" alt="WIFI page /ip" width=30%>
 
