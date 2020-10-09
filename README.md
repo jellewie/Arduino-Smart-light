@@ -15,18 +15,22 @@ You can skip to [Quick start guide](#quick-start-guide) if you already own a sma
 - Others things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
 
 ## Firmware 
-### (To compile)
+The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) bin file upload. Either with Arduino IDE and compile it, or using a bin uploader of choice.
+Note that [SoftSettings](#soft-settings) (user settings) are reserved as long as the FLASH is not wiped.
+
+### To compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
-- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json).
+- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an aditional board manager in Arduino IDE.
+- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the buildin libaray anager in Arduino IDE.
+
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
 
 ### To upload
-The firmware needs to be flashed once to enable OTA bin file upload, this can be done with any bin file uploader for the ESP32 of choice.
+Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
 
-The bin files can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases) the newest version is always recommended. After the first upload [OTA](#ota-over-the-air-update) can be used to update the firmware.
-Note that [SoftSettings](#soft-settings) (user settings) are reserved while updating this way, altough a backup would not hurt here.
+The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
 
 ## Printing
 ### Desk model
@@ -78,7 +82,7 @@ In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP 
 Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
 - **White short blink** It is booting up.
 - **PURPLE/BLUE/PURPLE/BLUE** It is starting the WIFI connect code.
-- **PURPLE/RED/PURPLE/RED** It is starting the Acces Point code (WIFI could not connect).
+- **PURPLE/RED/PURPLE/RED** It is starting the Access Point code (WIFI could not connect).
 - **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code.
 
 ## Pot meter
@@ -120,14 +124,14 @@ An example of the settings page is shown in the figure on the right.
 - **Doublepress mode** is the mode the light will switch to when a double press on the button is made.
 - **Auto brightness** will set the brightness automatically.
 - **Hourly animation** is when the light is in the clock mode an hourly animation needs to be played.
-- **Hourly lines** when in clock mode, will add lines to each hour, the value is the amount on a byte scale (0-255) dimmed by the brightness itself.
+- **Hourly lines** when in clock mode, will add lines to each hour, the value is the amount on a byte scale (0-255) dimmed by the brightness itself..
 - **Analog hours** will let the hour indicator take 60 instead of 12 steps, so it will not stick to the whole hours indication.
-- **Enable OTA** will enable Arduino Over The Air updates, so the firmware can be updated remotely with the Arduino IDE.
+- **Enable OTA** will enable [Over The Air updates](#ota-over-the-air-update), so the firmware can be updated over the WiFi.
 - **Sync time** will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
 - **Reset** will fully restart the ESP.
-- **Info** will open the info page with some information like the version compile date
+- **Info** will open the info page with some information like the version compile date.
 - **Task** this will show a task menu, so tasks can be scheduled or removed.
-- **Saved settings** just redirects you to [smart-clock.local/ip](http://smart-clock.local/ip) to show you the values saved in the EEPROM
+- **Saved settings** just redirects you to [smart-clock.local/ip](http://smart-clock.local/ip) to show you the values saved in the EEPROM.
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
@@ -192,7 +196,7 @@ On this page is a 'choose file' button where the new version can be selected. Ma
 After which the 'Upload' button needs to be press for the update process to begin, The unit will automatically update and reboot afterwards.
 
 ### Full reset
-If a full reset is disired it can be achieved by going to http://smart-clock.local/reset. But note that accesing the page will directly wipe all userdata from existance and there will be no way to restore this (all settings store in the EEPROM, see [smart-clock.local/ip](http://smart-clock.local/ip)). If the wipe was succesfull it will be reported back and will execute a restart.
+If a full reset is desired it can be achieved by going to http://smart-clock.local/reset. But note that accesing the page will directly wipe all userdata from existance and there will be no way to restore this (all [#soft-settings](#soft-settings) store in the EEPROM). If the wipe was succesfull it will be reported back and will execute a restart.
 
 # Specifications 
 ## Input voltage
