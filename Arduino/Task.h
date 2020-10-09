@@ -15,8 +15,8 @@
 #define TaskLimit 16        //defined as an byte in for loops, so 255 at max
 //#define Task_SerialEnabled
 #define EEPROMSaveDelayMS 30000   //Save to EEPROM in X ms
-enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME}; //Just to make the code easier to read
-String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", "CHANGERGB", "SAVEEEPROM", "SYNCTIME"}; //ALL CAPS!
+enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME, AUTOBRIGHTNESS, HOURLYANIMATIONS}; //Just to make the code easier to read
+String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", "CHANGERGB", "SAVEEEPROM", "SYNCTIME", "AUTOBRIGHTNESS", "HOURLYANIMATIONS"}; //ALL CAPS!
 
 const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why filling this in if we can automate that? :)
 
@@ -133,6 +133,12 @@ bool DoTask(TASK Item) {
         if (!UpdateTime())                        //Get a new sync timestamp from the server
           WiFiManager_Connected = false;
       } break;
+    case AUTOBRIGHTNESS: {
+        AutoBrightness = IsTrue(Item.Var);
+      } break;
+    case HOURLYANIMATIONS: {
+        HourlyAnimationS = constrain(Item.Var.toInt(), 0, 255);
+      } break;
     default:
       returnValue = false;
       break;
@@ -159,12 +165,17 @@ String VarCompress(byte ID, String IN) {
         return "";                                //We do not use it, clear it so save space
       } break;
     //CHANGERGB
-    //CHANGERGB
     case SAVEEEPROM: {
         return "";                                //We do not use it, clear it so save space
       } break;
     case SYNCTIME: {
         return "";                                //We do not use it, clear it so save space
+      } break;
+    case AUTOBRIGHTNESS: {
+        return String(IsTrue(IN));
+      } break;
+    case HOURLYANIMATIONS: {
+        return String(constrain(IN.toInt(), 0, 255));
       } break;
   }
   return IN;
@@ -178,9 +189,15 @@ String VarDecompress(byte ID, String IN) {
     case SWITCHMODE: {
         return ConvertModeToString(IN.toInt());
       } break;
+    case AUTOBRIGHTNESS: {
+        return IsTrueToString(IN);
+      } break;
   }
   return IN;
 }
+//==============================
+//End of user variables
+//==============================
 String ConvertTaskIDToString(byte IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("CV: ConvertTaskToString '" + String(IN) + "'");

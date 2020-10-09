@@ -129,6 +129,7 @@ Note that the character " and TAB (EEPROM_Seperator) can not be used, these will
 - **PotStick** If this close to HIGH or LOW stick to it.
 - **PotMin** On how much pot_value_change need to change, to set mode to manual.
 - **Name** The mDNS, WIFI APmode SSID, and OTA name of the device. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+- **Task#** 8 tasks (0-7), the format is described in [task-list](#task-list)
 
 ### Clock mode
 For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 
@@ -140,18 +141,19 @@ Also the clock can be manual updated with [smart-clock.local/time?h=3&m=59&s=50]
 Furthermore the clock has some softsettings like ClockHourLines, but these are descibed in [Soft settings](#soft-settings)
 
 ### Task List
+<img align="right" src="Images/Tasks.png" alt="Tasks page" width=50%>
 This page can be accesed on by opening the settings menu and clicking on the button 'Tasks'
 There can be 16 tasks, and the first 8 will be saved to EEPROM and will be restored after boot. 
 By default the SYNCTIME had been added at 4:0:0
 
-The layout of Tasks in this list is as follows
-- I, the number in the list (0-15) assigned automatically
-- Time, 3x in the format of HH:MM:SS (x)(y)(z) |OR| time in ms to execute (w)
-- ID, the type of task and automatically convered to show the name. (TaskString in Task.h)
+The format of Tasks "TimeH,TimeM,TimeS,TaskType,Var"
+- I, the number in the list (0-15) assigned automatically 
+- Time, 3x in the format of HH:MM:SS "x,y,z" |OR| time in ms to execute "w" (w are not saved in EEPROM)
+- TaskType, the type of task and automatically convered to show the name. (see TaskString in Task.h)
 - Var, this can be a custom variable (few examples are given below)
 
-Some examples of ID and Var:
-	ID (x but converted to name) - Var (x but can be converted to name)
+Some examples of TaskType and Var:
+	TaskType (x but converted to name) - Var (x but can be converted to name)
 	1. SWITCHMODE - New mode to switch to "x" either in string or ID form 
 	2. DIMMING - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
 	3. BRIGHTEN - Stepsize,GoTo,TimeInterfall in ms "x,y,z"
@@ -159,6 +161,8 @@ Some examples of ID and Var:
 	5. CHANGERGB - Red,Green,Blue,OPT_Brightness "x,y,z" |OR| "x,y,z,w"
 	6. SAVEEEPROM
 	7. SYNCTIME
+	8. AUTOBRIGHTNESS - True/false "x" either in string or ID form 
+	9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
 
 ### OTA (Over The Air update)
 This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota)
@@ -178,11 +182,11 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 
 # Specifications 
 ## Input voltage
-The power supply is either 5V or 12V. The difference in the voltage is the used LED strip. If the WS2812B (older model) is used it would need to be 5V, but if the WS2815 are used then 12V is required. The newer model WS2815 with redundant data lines is 12V. 
+The power supply is either 5V or 12V. The difference in the voltage is the used LED strip. If the WS2812B is used it would need to be 5V, but if the WS2815 (with redundant data lines) is used then 12V is required.
 
 <img align="right" src="Images/positive polarity.png" alt="positive polarity">
 
-The pinout of the DC jack has by default positive polarity. Meaning the outer tube, as shown in the figure right, is the ground connection. The lamp will fail to work otherwise (but is able to handle the shock).
+The pinout of the DC jack has by default positive polarity. Meaning the outer tube -as shown in the figure right- is the ground connection. The lamp will fail to work otherwise (but is able to handle the shock).
 ## Power consumption
 The lamp will consume 18Watts at maximum, so as an example for 12V a 1.5A (or 5V at 3.6A) power supply is required to allow full brightness. Although actual measurements came closer to 12Watt.
 
