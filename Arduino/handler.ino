@@ -175,7 +175,7 @@ void handle_OnConnect() {
                       "<div id=\"curtain\" class=\"hidden\"></div>"
                       "<div id=\"settingsContainer\" class=\"popup slideIn hidden\"></div>"
                       "<div id=\"tasksContainer\" class=\"popup slideIn hidden\"><ul id=\"taskList\"></ul><div id=\"newTaskSection\"><input id=\"addTaskTime\" type=\"time\" step=\"1\" value=\"00:00:00\"><select id=\"addTaskTimeType\"><option>ABSOLUTE</option><option>RELATIVE</option></select><select id=\"addTaskType\">"
-                      
+
                       "<option>SWITCHMODE</option>"
                       "<option>DIMMING</option>"
                       "<option>BRIGHTEN</option>"
@@ -185,7 +185,7 @@ void handle_OnConnect() {
                       "<option>SYNCTIME</option>"
                       "<option>AUTOBRIGHTNESS</option>"
                       "<option>HOURLYANIMATIONS</option>"
-                      
+
                       "</select><input id=\"addTaskVar\" type=\"text\" placeholder=\"var\"></div></div>"
                       "<svg viewBox=\"0 0 50 50\" xmlns=\"http://www.w3.org/2000/svg\" id=\"settingsBtn\"><defs><mask id=\"mask\"><g><path d=\"M10 31.5 L2 29 L2 21 L10 18.5 L6 11 L11 6 L18.5 10 L21 2 L29 2 L31.5 10 L39 6 L44 11 L40 18.5 L48 21 L48 29 L40 31.5 L44 39 L39 44 L31.5 40 L29 48 L21 48 L18.5 40 L11 44 L6 39\" fill=\"white\"/><circle cx=\"25\" cy=\"25\" r=\"18\" fill=\"white\"/><circle cx=\"25\" cy=\"25\" r=\"10\" fill=\"black\"/></g></mask></defs><rect x=\"0\" y=\"0\" width=\"100\" height=\"100\" mask=\"url(#mask)\" style=\"fill:var(--ui-color)\"/></svg>"
 
