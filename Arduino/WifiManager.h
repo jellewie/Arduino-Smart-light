@@ -44,7 +44,7 @@ class CWiFiManager {
     char password[16] = "";                         //Also efines howmany characters can be in the SSID
     char ssid[16] = "";                             //^
     //#define strip_ip, gateway_ip, subnet_mask to use static IP
-    char* APSSID = Name;
+    char* APSSID = Name;                            //If you want to define the name somewhere else use 'char* APSSID = Name'
     const int EEPROM_size = 255;                    //Max Amount of chars of 'SSID + PASSWORD' (+1) (+extra custom vars)
     const byte Pin_LED  = LED_BUILTIN;              //The LED to give feedback on (like blink on error)
     bool Set_Value(byte ValueID, String Value) {
@@ -424,7 +424,7 @@ class CWiFiManager {
       }
       return true;
     }
-    byte Start() {                                  //Start all WIFI stugg
+    byte Start() {                                  //Start all WIFI stuff
       Status_Start();
       //starts wifi stuff, only returns when WiFiManager_Connected. will create Acces Point when needed
       /* <Return> <meaning>
@@ -534,6 +534,10 @@ class CWiFiManager {
         WiFiManager_Connected = false;              //Flag that WIFI is off, and we need to reconnect (In case user requested to switch WIFI)
       }
     }
+    void CheckAndReconnectIfNeeded() {
+      //Checks if WIFI is connected, and if so tries to reconnect
+      if (String(WiFi.localIP()) = "0.0.0.0") Start();
+    }
 #ifdef WiFiManager_SerialEnabled
     String ConvertWifistatus(byte IN) {
       switch (IN) {
@@ -567,6 +571,8 @@ class CWiFiManager {
 #endif //WiFiManager_SerialEnabled
 };
 CWiFiManager WiFiManager;
+
+//ISR must return nothing and take no arguments, so we need this sh*t
 void WiFiManager_handle_Connect() {
   WiFiManager.handle_Connect();
 }
