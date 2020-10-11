@@ -286,7 +286,6 @@ void handle_OnConnect() {
 #endif //Server_SerialEnabled
 }
 void handle_UpdateTime() {
-  CRGB RestoreToColor = LEDs[0];                //Save the RGB values, so we could restore these after sync animation
   String ERRORMSG;
   String message = String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   bool TimeUpdated = false;
@@ -322,7 +321,7 @@ void handle_UpdateTime() {
       ERRORMSG = "Nothing to update the time to\n";
     message = "Current time is " + message;
   }
-  if (Mode != CLOCK) fill_solid(&(LEDs[0]), TotalLEDs, RestoreToColor); //If we are not in CLOCK mode restore the LEDs color
+  LastMode = -1;    //Re-init the mode
   if (ERRORMSG != "")
     server.send(400, "text/plain", ERRORMSG + message);
   else
