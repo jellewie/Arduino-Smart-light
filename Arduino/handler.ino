@@ -218,7 +218,7 @@ void handle_OnConnect() {
 
                       "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
                       "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK']});"
-                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','GLITTER','JUGGLE','MOVE','RAINBOW','SINELON','SINELON2']});"
+                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','RAINBOW']});"
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "let Di=new DropDown({name:'Auto brightness',setParamName:'i',possibleValues:['FALSE','TRUE']});"

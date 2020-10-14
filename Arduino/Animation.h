@@ -1,7 +1,7 @@
 /* Written by JelleWho https://github.com/jellewie
 
   =====How to add an animation=====
-  Animation.ino:  Add the funtion to 'switch (CurrentAnimation)' as a new case 'case x+1: Animation#();  break;'.
+  Animation.ino:  Add the funtion to 'switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
                   'AnimationRGB' can be used for the user set RGB color
                   'Start' Can be used to detect the start of the animation
                   Note that 'UpdateLEDs = true;' must be set to update the leds
@@ -169,7 +169,56 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
 #endif //SerialEnabled
   }
   switch (CurrentAnimation) {
-    case 0: {                                                                 //Move
+    case 0: {                                                                 //BLINK
+        static byte _Counter;
+        static bool _Direction;
+        if (Start) {
+          _Counter = 0;
+          _Direction = random8(0, 2);
+        }
+        EVERY_N_MILLISECONDS((10000 / TotalLEDs) - 1) {
+          LED_Blink(0, TotalLEDs, AnimationRGB, 1, &_Counter, _Direction);
+          UpdateLEDs = true;
+        }
+      } break;
+    case 1: {                                                                 //BPM
+        CRGBPalette16 palette = PartyColors_p; //(const CRGBPalette16 &pal, uint8_t index, uint8_t brightness=255, TBlendType blendType=LINEARBLEND)
+        byte beat = beatsin8(20, 64, 255);
+#define gHue 9
+        for (byte i = 0; i < TotalLEDs; i++)
+          LEDs[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
+        UpdateLEDs = true;
+      } break;
+    case 2: {                                                                 //CONFETTI
+        fadeToBlackBy(LEDs, TotalLEDs, 1);                                    //Dim a color by (X/256ths)
+        EVERY_N_MILLISECONDS(50) {
+          LEDs[random8(TotalLEDs)] += AnimationRGB;
+        }
+        SetNewColor();
+        UpdateLEDs = true;
+      } break;
+    case 3: {                                                                 //FLASH
+        EVERY_N_MILLISECONDS(500) {
+          LED_Flash(0, TotalLEDs, AnimationRGB);
+          UpdateLEDs = true;
+        }
+      } break;
+    case 4: {                                                                 //GLITTER
+        fadeToBlackBy(LEDs, TotalLEDs, 1);                                    //Dim a color by (X/256ths)
+        if (random8() < 40)                                                   //x/255 change to exectue:
+          LEDs[random8(TotalLEDs)] += AnimationRGB;
+        UpdateLEDs = true;
+      } break;
+    case 5: {                                                                 //JUGGLE
+        fadeToBlackBy(LEDs, TotalLEDs, 20);
+        byte dothue = 0;
+        for (byte i = 0; i < 8; i++) {
+          LEDs[beatsin8( i + 7, 0, TotalLEDs - 1 )] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
+          dothue += 32;
+        }
+        UpdateLEDs = true;
+      } break;
+    case 6: {                                                                 //MOVE
         static byte _Sets, _Length, _Counter;
         static bool _Direction;
         if (Start) {
@@ -183,83 +232,22 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
           UpdateLEDs = true;
         }
       } break;
-    case 1: {                                                                 //Flash
-        EVERY_N_MILLISECONDS(500) {
-          LED_Flash(0, TotalLEDs, AnimationRGB);
-          UpdateLEDs = true;
-        }
-      } break;
-    case 2: {                                                                 //Blink
-        static byte _Counter;
-        static bool _Direction;
-        if (Start) {
-          _Counter = 0;
-          _Direction = random8(0, 2);
-        }
-        EVERY_N_MILLISECONDS((10000 / TotalLEDs) - 1) {
-          LED_Blink(0, TotalLEDs, AnimationRGB, 1, &_Counter, _Direction);
-          UpdateLEDs = true;
-        }
-      } break;
-    case 3: {                                                                 //Rainbow
+    case 7: {                                                                 //RAINBOW
         EVERY_N_MILLISECONDS(10) {
           LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);
           UpdateLEDs = true;
         }
       } break;
-    case 4: {                                                                 //Beatsin
-        fadeToBlackBy(LEDs, TotalLEDs, 20);
-        byte dothue = 0;
-        for (byte i = 0; i < 8; i++) {
-          LEDs[beatsin16( i + 7, 0, TotalLEDs - 1 )] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
-          dothue += 32;
-        }
-        UpdateLEDs = true;
-      } break;
-    case 5: {                                                                 //Sinelon
+    case 8: {                                                                 //SINELON
         AnimationSinelon(AnimationRGB, 10, Start, 13);
         UpdateLEDs = true;
       } break;
-    case 6: {                                                                 //Confetti
-        fadeToBlackBy(LEDs, TotalLEDs, 1);                                    //Dim a color by (X/256ths)
-        EVERY_N_MILLISECONDS(50) {
-          LEDs[random8(TotalLEDs)] += AnimationRGB;
-        }
-        SetNewColor();
-        UpdateLEDs = true;
-      } break;
-    case 7: {                                                                 //Glitter
-        fadeToBlackBy(LEDs, TotalLEDs, 1);                                    //Dim a color by (X/256ths)
-        if (random8() < 40)                                                   //x/255 change to exectue:
-          LEDs[random8(TotalLEDs)] += AnimationRGB;
-        UpdateLEDs = true;
-      } break;
-    case 8: {                                                                 //BPM
-        CRGBPalette16 palette = PartyColors_p; //(const CRGBPalette16 &pal, uint8_t index, uint8_t brightness=255, TBlendType blendType=LINEARBLEND)
-        byte beat = beatsin8(20, 64, 255);
-#define gHue 9
-        for (byte i = 0; i < TotalLEDs; i++)
-          LEDs[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
-        UpdateLEDs = true;
-      } break;
-    case 9: {                                                                 //Sinelon2
+    case 9: {                                                                 //SINELON2
         if (AnimationSinelon(AnimationRGB, 2, Start, 13))
           SetNewColor();
         UpdateLEDs = true;
       } break;
-    case 10: {                                                                //Flash2
-        EVERY_N_MILLISECONDS(500) {
-          static bool _NextNewColor;
-          if (_NextNewColor) {
-            SetNewColor();
-            _NextNewColor = false;
-          }
-          if (!LED_Flash(0, TotalLEDs, AnimationRGB))
-            _NextNewColor = true;
-          UpdateLEDs = true;
-        }
-      } break;
-    case 11: {                                                                //Smiley
+    case 10: {                                                                //SMILEY
         static bool BlinkLeft;
         static byte BlinkCounter;
         static byte BlinkEachxLoops = 20;
@@ -287,6 +275,20 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
           UpdateLEDs = true;
         }
       } break;
+    case 11: {                                                                //FLASH2
+        EVERY_N_MILLISECONDS(500) {
+          static bool _NextNewColor;
+          if (_NextNewColor) {
+            SetNewColor();
+            _NextNewColor = false;
+          }
+          if (!LED_Flash(0, TotalLEDs, AnimationRGB))
+            _NextNewColor = true;
+          UpdateLEDs = true;
+        }
+      } break;
+
+
     default:
       AnimationCounter = 0;                                                   //Stop animation
 #ifdef SerialEnabled
@@ -294,7 +296,6 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
 #endif //SerialEnabled
       break;
   }
-  //FastLED.show();                                                             //Update the LEDs
 }
 //==================================================
 void StartAnimation(byte ID, int Time) {

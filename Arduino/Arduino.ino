@@ -251,25 +251,26 @@ void loopLEDS() {
           UpdateAndShowClock(true);
       } break;
 
-    //Animations
-    case MOVE:        if (LastMode != Mode) StartAnimation(0, -2);  break;    //If mode changed, start the animation
-    case FLASH:       if (LastMode != Mode) StartAnimation(1, -2);  break;
-    case BLINK:       if (LastMode != Mode) StartAnimation(2, -2);  break;
-    case RAINBOW:     if (LastMode != Mode) StartAnimation(3, -2);  break;
-    case JUGGLE:      if (LastMode != Mode) StartAnimation(4, -2);  break;
-    case SINELON:     if (LastMode != Mode) StartAnimation(5, -2);  break;
-    case CONFETTI:    if (LastMode != Mode) StartAnimation(6, -2);  break;
-    case GLITTER:     if (LastMode != Mode) StartAnimation(7, -2);  break;
-    case BPM:         if (LastMode != Mode) StartAnimation(8, -2);  break;
+    case BLINK:       if (LastMode != Mode) StartAnimation(0, -2);  break;
+    case BPM:         if (LastMode != Mode) StartAnimation(1, -2);  break;
+    case CONFETTI:    if (LastMode != Mode) StartAnimation(2, -2);  break;
+    case FLASH:       if (LastMode != Mode) StartAnimation(3, -2);  break;
+    case GLITTER:     if (LastMode != Mode) StartAnimation(4, -2);  break;
+    case JUGGLE:      if (LastMode != Mode) StartAnimation(5, -2);  break;
+    case MOVE:        if (LastMode != Mode) StartAnimation(6, -2);  break;
+    case RAINBOW:     if (LastMode != Mode) StartAnimation(7, -2);  break;
+    case SINELON:     if (LastMode != Mode) StartAnimation(8, -2);  break;
     case SINELON2:    if (LastMode != Mode) StartAnimation(9, -2);  break;
-    case FLASH2:      if (LastMode != Mode) StartAnimation(10, -2); break;
-    case SMILEY:      if (LastMode != Mode) StartAnimation(11, -2); break;
+    case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2);  break;
+    case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2);  break;
+    case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2);  break;
 
     default:
-      AnimationCounter = 0;                                                   //Stop animation
 #ifdef SerialEnabled
       Serial.println("mode with ID " + String(Mode) + " not found");
 #endif //SerialEnabled
+      Mode = ON;
+      AnimationCounter = 0;                                                   //Stop animation
       break;
   }
   LastMode = Mode;
