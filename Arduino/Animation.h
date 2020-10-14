@@ -13,7 +13,7 @@
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                              //Which AnimationCounter Animation is selected
-byte TotalAnimations = 11;
+byte TotalAnimations = 12;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -305,7 +305,40 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
           UpdateLEDs = true;
         }
       } break;
+    case 12: {                                                                //PACMAN
 
+        //TODO maybe add a rare female PACMAN
+
+#define PacmanMouthOpen 16
+#define PacmanMouthOpenhalf PacmanMouthOpen / 2
+#define PacmanStartT 15 - PacmanMouthOpenhalf
+#define PacmanStartB 15
+        static byte _Counter, _Counter2;
+        static bool _Direcion, _Direcion2, _LeftMouth;
+        if (Start) {
+          _LeftMouth = random8(0, 2);
+          _Counter = 0;
+          _Counter2 = 0;
+          _Direcion = false;
+          _Direcion2 = false;
+          LED_Fill(0, TotalLEDs, CRGB(255, 255, 0));
+          if (_LeftMouth)
+            LED_Fill(60 - LEDtoPosition(PacmanStartT - 1), 2, CRGB(0, 0, 0)); //Cut out the eye
+          else
+            LED_Fill(LEDtoPosition(PacmanStartT - 4), 2, CRGB(0, 0, 0));      //Cut out the eye
+          UpdateLEDs = true;
+        }
+        EVERY_N_MILLISECONDS(25) {
+          if (_LeftMouth) {
+            LED_BackAndForth(60 - LEDtoPosition(PacmanStartT), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip
+            LED_BackAndForth(60 - LEDtoPosition(PacmanStartB), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
+          } else {
+            LED_BackAndForth(LEDtoPosition(PacmanStartT), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip
+            LED_BackAndForth(LEDtoPosition(PacmanStartB), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
+          }
+          UpdateLEDs = true;
+        }
+      } break;
 
     default:
       AnimationCounter = 0;                                                   //Stop animation
