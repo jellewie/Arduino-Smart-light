@@ -211,44 +211,45 @@ void loopLEDS() {
   if (AnimationCounter != 0)                          //Animation needs to be shown
     ShowAnimation(false);
   switch (Mode) {
-    case OFF:
-      if (LastMode != Mode) {
-        AnimationCounter = 0;
-        FastLED.clear();
-        UpdateLEDs = true;
-      }
-      break;
-    case ON:
-      if (LastMode != Mode) {                         //If mode changed
-        AnimationCounter = 0;
-        UpdateColor(true);
-      }
-      break;
-    case WIFI:
-      if (LastMode != Mode) {                         //If mode changed
-        AnimationCounter = 0;
-        StartWIFIstuff();                             //Start WIFI if we haven't
-      }
-      break;
-    case RESET:
-      if (LastMode != Mode) {                         //If mode changed
-        AnimationCounter = 0;
-      }
-      if (WiFiManager.TickEveryMS(50)) {
-        if (LEDs[0] != CRGB(0, 0, 0))
+    case OFF: {
+        if (LastMode != Mode) {
+          AnimationCounter = 0;
           FastLED.clear();
-        else
-          fill_solid(&(LEDs[0]), TotalLEDs, CRGB(255, 0, 0));
-        UpdateLEDs = true;
-      }
-    case CLOCK:
-      if (LastMode != Mode) {                         //If mode changed
-        AnimationCounter = 0;
-        StartWIFIstuff();                             //Start WIFI if we haven't
-      }
-      if (AnimationCounter == 0)//If no (hourly) animation is playing
-        UpdateAndShowClock(true);
-      break;
+          UpdateLEDs = true;
+        }
+      } break;
+    case ON: {
+        if (LastMode != Mode) {                         //If mode changed
+          AnimationCounter = 0;
+          UpdateColor(true);
+        }
+      } break;
+    case WIFI: {
+        if (LastMode != Mode) {                         //If mode changed
+          AnimationCounter = 0;
+          StartWIFIstuff();                             //Start WIFI if we haven't
+        }
+      } break;
+    case RESET: {
+        if (LastMode != Mode) {                         //If mode changed
+          AnimationCounter = 0;
+        }
+        if (WiFiManager.TickEveryMS(50)) {
+          if (LEDs[0] != CRGB(0, 0, 0))
+            FastLED.clear();
+          else
+            fill_solid(&(LEDs[0]), TotalLEDs, CRGB(255, 0, 0));
+          UpdateLEDs = true;
+        }
+      } break;
+    case CLOCK: {
+        if (LastMode != Mode) {                         //If mode changed
+          AnimationCounter = 0;
+          StartWIFIstuff();                             //Start WIFI if we haven't
+        }
+        if (AnimationCounter == 0)//If no (hourly) animation is playing
+          UpdateAndShowClock(true);
+      } break;
 
     //Animations
     case MOVE:        if (LastMode != Mode) StartAnimation(0, -2);  break;    //If mode changed, start the animation
