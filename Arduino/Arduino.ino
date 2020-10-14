@@ -263,7 +263,7 @@ void loopLEDS() {
     case SINELON2:    if (LastMode != Mode) StartAnimation(9, -2);  break;
     case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2);  break;
     case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2);  break;
-    case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2);  break;
+    
 
     default:
 #ifdef SerialEnabled
