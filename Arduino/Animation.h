@@ -4,6 +4,7 @@
   Animation.ino:  Add the funtion to 'switch (CurrentAnimation)' as a new case 'case x+1: Animation#();  break;'.
                   'AnimationRGB' can be used for the user set RGB color
                   'Start' Can be used to detect the start of the animation
+                  Note that 'UpdateLEDs = true;' must be set to update the leds
   Animation.ino:  Update 'TotalAnimations' to be x+1
   =====To add it as a new mode (and not just animation)=====
   functions.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
@@ -203,6 +204,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
     case 3: {                                                                 //Rainbow
         EVERY_N_MILLISECONDS(10) {
           LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);
+          UpdateLEDs = true;
         }
       } break;
     case 4: {                                                                 //Beatsin
@@ -230,6 +232,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
         fadeToBlackBy(LEDs, TotalLEDs, 1);                                    //Dim a color by (X/256ths)
         if (random8() < 40)                                                   //x/255 change to exectue:
           LEDs[random8(TotalLEDs)] += AnimationRGB;
+        UpdateLEDs = true;
       } break;
     case 8: {                                                                 //BPM
         CRGBPalette16 palette = PartyColors_p; //(const CRGBPalette16 &pal, uint8_t index, uint8_t brightness=255, TBlendType blendType=LINEARBLEND)
@@ -266,9 +269,11 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
           BlinkEachxLoops = random8(20, 50);
           LED_Fill(LEDtoPosition(5),   4, AnimationRGB);                      //Right eye
           LED_Fill(LEDtoPosition(50),  4, AnimationRGB);                      //Left eye
+          UpdateLEDs = true;
         }
         EVERY_N_MILLISECONDS(200) {
           LED_Wobble(LEDtoPosition(15), 30, CRGB(255, 0, 0), 1, 20);
+          UpdateLEDs = true;
         }
         EVERY_N_MILLISECONDS(100) {
           BlinkCounter++;
@@ -277,10 +282,10 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
             if (BlinkLeft)
               LED_Flash(LEDtoPosition(5), 4, AnimationRGB);                   //Right eye
             else
-              LED_Flash(LEDtoPosition(15), 4, AnimationRGB);                  //Left eye
+              LED_Flash(LEDtoPosition(50), 4, AnimationRGB);                  //Left eye
           }
+          UpdateLEDs = true;
         }
-        UpdateLEDs = true;
       } break;
     default:
       AnimationCounter = 0;                                                   //Stop animation
@@ -289,7 +294,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
 #endif //SerialEnabled
       break;
   }
-  FastLED.show();                                                             //Update the LEDs
+  //FastLED.show();                                                             //Update the LEDs
 }
 //==================================================
 void StartAnimation(byte ID, int Time) {
