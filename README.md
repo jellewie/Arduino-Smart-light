@@ -120,7 +120,7 @@ The control page is the default landing page the user will land on. An example o
 An example of the settings page is shown in the figure on the right.
 
 - **Mode** is the current mode the light is in.
-- **Bootmode** is the mode the light will go into on start-up.
+- **Bootmode** is the mode the light will go into on start-up. Altough not all modes are visible on the webpage it supports all modes. To do this a custom webrequest needs to be made (in this case and in the time of writing [smart-clock.local/set?m=MOVE](smart-clock.local/set?m=MOVE)).
 - **Doublepress mode** is the mode the light will switch to when a double press on the button is made.
 - **Auto brightness** will set the brightness automatically.
 - **Hourly animation** is when the light is in the clock mode an hourly animation needs to be played.

@@ -125,6 +125,24 @@ void LED_Blink(byte From, byte Amount, CRGB rgb, byte AlwaysOn, byte *Counter, b
   if (*Counter > Amount)                                            //If we are at max length
     *Counter = 0;                                                   //Reset counter
 }
+void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true);
+void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Direcion, bool Reverse, bool Reset) {
+  //Fills then emties the range of leds one by one
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0));
+
+  if (Reverse)
+    LED_Fill(From + Amount - *Counter, *Counter, rgb);            //Set the counter amount of LEDs on
+  else
+    LED_Fill(From, *Counter, rgb);                                    //Set the counter amount of LEDs on
+
+  if (*Direcion)
+    *Counter -= 1;                                                  //This will make the animation_on 1 shorter each time
+  else
+    *Counter += 1;                                                  //This will make the animation_on 1 longer each time
+  if (*Counter >= Amount or * Counter == 0)                          //If we are at max length or at the start
+    *Direcion = !*Direcion;                                         //Flip direction
+}
 //==================================================
 //And some not universal LED functions:
 //==================================================
