@@ -306,35 +306,46 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
         }
       } break;
     case 12: {                                                                //PACMAN
-
-        //TODO maybe add a rare female PACMAN
-
 #define PacmanMouthOpen 16
 #define PacmanMouthOpenhalf PacmanMouthOpen / 2
-#define PacmanStartT 15 - PacmanMouthOpenhalf
-#define PacmanStartB 15
-        static byte _Counter, _Counter2;
-        static bool _Direcion, _Direcion2, _LeftMouth;
+#define PacmanMouthMiddle 15
+#define PacmanStartU PacmanMouthMiddle - PacmanMouthOpenhalf
+#define PacmanEyeLength 2
+#define PacmanEyeOffset 2
+#define PacmanBowTieLength 6
+#define PacmanBowTieOffset 8
+        static byte _Counter, _Counter2, _LEDPosU, _LEDPosL;
+        static bool _Direcion, _Direcion2, _Left, _Miss;
         if (Start) {
-          _LeftMouth = random8(0, 2);
+          _Left = random8(0, 2);
+          if (random8(0, 4) == 0)                                             //Make miss apearing more rare
+            _Miss = random8(0, 2);
+          else
+            _Miss = false;
           _Counter = 0;
           _Counter2 = 0;
           _Direcion = false;
           _Direcion2 = false;
-          LED_Fill(0, TotalLEDs, CRGB(255, 255, 0));
-          if (_LeftMouth)
-            LED_Fill(60 - LEDtoPosition(PacmanStartT - 1), 2, CRGB(0, 0, 0)); //Cut out the eye
-          else
-            LED_Fill(LEDtoPosition(PacmanStartT - 4), 2, CRGB(0, 0, 0));      //Cut out the eye
+          LED_Fill(0, TotalLEDs, CRGB(255, 255, 0));                         //Fill the whol stip with yellow, we will but stuff out/overwrite it if we need so
+          if (_Left) {
+            _LEDPosU = PacmanStartU - TotalLEDs / 2;
+            _LEDPosL = PacmanMouthMiddle - TotalLEDs / 2;
+            LED_Fill(LEDtoPosition(TotalLEDs - PacmanEyeLength - (PacmanStartU - PacmanEyeLength - PacmanEyeOffset)), PacmanEyeLength, CRGB(0, 0, 0));                          //Cut out the eye
+            if (_Miss) LED_Fill(LEDtoPosition(TotalLEDs - PacmanBowTieLength - (PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset)), PacmanBowTieLength, CRGB(255, 0, 0)); //Set here bow tie
+          } else {
+            _LEDPosU = PacmanStartU;
+            _LEDPosL = PacmanMouthMiddle;
+            LED_Fill(LEDtoPosition(PacmanStartU - PacmanEyeLength - PacmanEyeOffset), PacmanEyeLength, CRGB(0, 0, 0));                        //Cut out the eye
+            if (_Miss) LED_Fill(LEDtoPosition(PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset), PacmanBowTieLength, CRGB(255, 0, 0));  //Set here bow tie
+          }
           UpdateLEDs = true;
         }
         EVERY_N_MILLISECONDS(25) {
-          if (_LeftMouth) {
-            LED_BackAndForth(60 - LEDtoPosition(PacmanStartT), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip
-            LED_BackAndForth(60 - LEDtoPosition(PacmanStartB), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
-          } else {
-            LED_BackAndForth(LEDtoPosition(PacmanStartT), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip
-            LED_BackAndForth(LEDtoPosition(PacmanStartB), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
+          LED_BackAndForth(LEDtoPosition(_LEDPosU), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip (or lower if direction is reversed)
+          LED_BackAndForth(LEDtoPosition(_LEDPosL), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
+          if (_Miss) {
+            LED_Fill(LEDtoPosition(_LEDPosU + _Counter)                           , 1, CRGB(255, 0, 0));  //Color the lips
+            LED_Fill(LEDtoPosition(_LEDPosL + PacmanMouthOpenhalf - _Counter2 - 1), 1, CRGB(255, 0, 0));
           }
           UpdateLEDs = true;
         }
