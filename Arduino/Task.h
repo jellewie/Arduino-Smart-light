@@ -127,7 +127,7 @@ bool DoTask(TASK Item) {
         UpdateLEDs = true;
       } break;
     case SAVEEEPROM: {
-        WiFiManager_WriteEEPROM();
+        WiFiManager.WriteEEPROM();
       } break;
     case SYNCTIME: {
         UpdateTime();                                 //Get a new sync timestamp from the server

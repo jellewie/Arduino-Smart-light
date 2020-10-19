@@ -39,7 +39,7 @@ byte LEDtoPosition(byte LEDID) {
 
   //x-30                  = Rotates 180 degrees
   //(TotalLEDs-Amount)-x  = Flip in Y-Y axes
-  
+
   LEDID += ClockOffset;
   while (LEDID >= TotalLEDs)
     LEDID -= TotalLEDs;
@@ -92,8 +92,11 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
     if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
   }
-  if (WiFi.status() != WL_CONNECTED)                  //If we are no longer connected to WIFI
-    if (WiFiManager.TickEveryMS(2000)) digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
+  if (WiFi.status() != WL_CONNECTED) {                 //If we are no longer connected to WIFI
+    EVERY_N_MILLISECONDS(2000) {
+      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
+    }
+  }
   //==============================
   //Show the time on the LEDs if needed
   //==============================

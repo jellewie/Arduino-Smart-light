@@ -41,7 +41,7 @@ byte DoublePressMode = RAINBOW;           //SOFT_SETTING What mode to change to 
 bool AutoBrightness = false;              //SOFT_SETTING If the auto brightness is enabled
 float AutoBrightnessP = 1.04;             //SOFT_SETTING Brightness = Y=P*(X-N)+O [255/(255-AutoBrightnessN)]
 byte AutoBrightnessN = 10;                //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
-byte AutoBrightnessO = 4;                 //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
+byte AutoBrightnessO = 5;                 //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
 byte ClockHourLines = 0;                  //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool ClockHourAnalog = false;             //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
 byte ClockOffset = 30;                    //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
@@ -59,19 +59,30 @@ byte LastMode = -1;                       //Just to keep track if we are steppin
 const byte TotalLEDs = 60;                //The total amounts of LEDs in the strip
 int AnimationCounter;                     //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                        //Where we save the time to
-extern bool WiFiManager_WriteEEPROM();        //Extern meaning we are declairing it somewhere later
 extern byte TotalAnimations;                  //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);//^ Required for Clock.h
 
+#define WiFiManagerUser_Set_Value_Defined         //Define we want to hook into WiFiManager
+#define WiFiManagerUser_Get_Value_Defined         //^
+#define WiFiManagerUser_Status_Start_Defined      //^
+#define WiFiManagerUser_Status_Done_Defined       //^
+#define WiFiManagerUser_Status_Blink_Defined      //^
+#define WiFiManagerUser_Status_StartAP_Defined    //^
+#define WiFiManagerUser_HandleAP_Defined          //^
+#define WiFiManagerUser_VariableNames_Defined     //Define that we want to use the custom user variables (Dont forget to settup WiFiManager_VariableNames and WiFiManager_Settings)
+const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
+const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
+const byte EEPROM_size = 255;                     //Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 33
+#define WiFiManagerUser_APSSID_Defined
+char* APSSID = Name;                              //If you want to define the name somewhere else use 'char* APSSID = Name'
+#include "WiFiManager/WiFiManager.h"              //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed      https://github.com/jellewie/Arduino-WiFiManager
+
+#include <ESPmDNS.h>
 #include <FastLED.h>
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
-#include "time.h"                         //We need this for the clock function to get the time (Time library)
-#include <WiFi.h>                         //we need this for WIFI stuff (duh)
-#include <WebServer.h>
-#include <ESPmDNS.h>
-WebServer server(80);
+#include "time.h"                                 //We need this for the clock function to get the time (Time library)
 #include "OTA.h"
 #include "Task.h"
 Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
@@ -80,7 +91,7 @@ StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
-#include "WifiManager.h"
+#include "WiFiManagerUser.h"                      //Define custon functions to hook into WiFiManager
 #include "Clock.h"
 #include "Animation.h"
 
@@ -159,7 +170,7 @@ void setup() {
   else
     Serial.println("SE: Error setting up MDNS responder!");
 #endif
-#ifdef SetupTime_SerialEnabled   //Just a way to measure setup speed, so the performance can be checked
+#ifdef SetupTime_SerialEnabled                        //Just a way to measure setup speed, so the performance can be checked
   Serial.println("ST: Setup took ms:\t" + String(millis()));
 #endif //SetupTime_SerialEnabled
 }
@@ -234,11 +245,8 @@ void loopLEDS() {
         if (LastMode != Mode) {                         //If mode changed
           AnimationCounter = 0;
         }
-        if (WiFiManager.TickEveryMS(50)) {
-          if (LEDs[0] != CRGB(0, 0, 0))
-            FastLED.clear();
-          else
-            fill_solid(&(LEDs[0]), TotalLEDs, CRGB(255, 0, 0));
+        EVERY_N_MILLISECONDS(50) {
+          LED_Flash(0, TotalLEDs, CRGB(255, 0, 0));     //Toggle the leds RED/OFF to show we are restarting soon
           UpdateLEDs = true;
         }
       } break;
@@ -247,7 +255,7 @@ void loopLEDS() {
           AnimationCounter = 0;
           StartWIFIstuff();                             //Start WIFI if we haven't
         }
-        if (AnimationCounter == 0)//If no (hourly) animation is playing
+        if (AnimationCounter == 0)                      //If no (hourly) animation is playing
           UpdateAndShowClock(true);
       } break;
 
@@ -288,7 +296,4 @@ void UpdateLED() {
 //ISR must return nothing and take no arguments, so we need this sh*t
 void ISR_ButtonsA() {
   ButtonsA.Pinchange();
-}
-bool WiFiManager_WriteEEPROM() {
-  return WiFiManager.WriteEEPROM();
 }
