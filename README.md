@@ -33,6 +33,7 @@ Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file 
 The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
 
 ## Printing
+There multible types of model, the 'Desk model' is used in this readme as example project. But the other models have the same features, just a diffrent shape. All STL files have a predefined tolerance of 0.2mm buildin.
 ### Desk model
 There are 4 files that need to be printed
 1.	[Lamp body.stl](3DModel/Desk/Body.stl) is the main body. It is suggested to do at least 0.5mm walls so light will not shine though as much.
