@@ -71,7 +71,6 @@ extern void StartAnimation(byte ID, int Time);//^ Required for Clock.h
 #define WiFiManagerUser_HandleAP_Defined          //^
 #define WiFiManagerUser_VariableNames_Defined     //Define that we want to use the custom user variables (Dont forget to settup WiFiManager_VariableNames and WiFiManager_Settings)
 const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
-const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 const byte EEPROM_size = 255;                     //Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 33
 #define WiFiManagerUser_APSSID_Defined
 char* APSSID = Name;                              //If you want to define the name somewhere else use 'char* APSSID = Name'

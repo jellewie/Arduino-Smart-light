@@ -22,8 +22,8 @@ WebServer server(80);
 
 #ifndef WiFiManagerUser_VariableNames_Defined
 const String WiFiManager_VariableNames[] = {"SSID", "Password"};
-const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 #endif //WiFiManagerUser_VariableNames_Defined
+const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
 
 class CWiFiManager {
   private:
