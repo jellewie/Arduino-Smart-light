@@ -1,16 +1,13 @@
 # Smart clock
 A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI and manual control, Clock mode, multiple animations, and transitions.
 
-<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
-<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 If you have interest in buying one and live in The Netherlands, feel free to contact me.
-
 
 You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
 
-
 You can skip to [OTA updater](#ota-over-the-air-update) if you just want to update it.
-
+<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
+<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 # Creating a unit
 ## Hardware
 - A [PCB for the lamp/wall model](https://easyeda.com/jellewietsma/smart-light), or a lot of patient copying the schematic and doing it by hand.
