@@ -1,24 +1,23 @@
 # Smart clock
 A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI and manual control, Clock mode, multiple animations, and transitions.
 
-If you have interest in buying one and live in The Netherlands, feel free to contact me.
-
 <img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
 <img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
+If you have interest in buying one and live in The Netherlands, feel free to contact me.
+
+You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
+You can skip to [OTA updater](#ota-over-the-air-update) if you just want to update it.
 
 # Creating a unit
-You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
-
 ## Hardware
 - a [PCB lamp](https://easyeda.com/jellewietsma/smart-light) or [PCB wall](https://easyeda.com/jellewietsma/smart-clock)
 - All parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
 - Others things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
 
 ## Firmware 
-The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) bin file upload. Either with Arduino IDE and compile it, or using a bin uploader of choice.
-Note that [SoftSettings](#soft-settings) (user settings) are reserved as long as the FLASH is not wiped.
+The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) BIN file upload. Either with Arduino IDE and compile it, or using a BIN uploader of choice.
 
-### To compile
+### Compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
 - [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an aditional board manager in Arduino IDE.
 - [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the buildin libaray anager in Arduino IDE.
@@ -27,7 +26,7 @@ Note that [SoftSettings](#soft-settings) (user settings) are reserved as long as
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
 
-### To upload
+### BIN
 Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
 
 The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
@@ -52,13 +51,14 @@ Please refer the in the [appendix](#appendix) - PCB & schematic for the schemati
 # Quick start guide 
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
-2.	The [potmeters](#pot-meter) or [button](#button) change the light
+2.	The [potmeters](#pot-meter) or [button](#button) will change the light.
+
 **Optional for WIFI:**
-3.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
-4.	Connect to this Access Point, by default it will be called “smart-clock”.
-5.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
+1.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
+2.	Connect to this Access Point, by default it will be called “smart-clock”.
+3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
 ~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
-6.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
+4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
 
 # Features
 ## Button
@@ -77,7 +77,7 @@ In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP 
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
 - **blink 100ms** WIFI setup failed, APmode has started.
 - **blink 500ms** it is connecting to its known WIFI.
-- **blink 1000ms** OTA is on.
+- **blink 1000ms** [OTA](#ota-over-the-air-update) is on.
 - **blink 2000ms** WIFI is lost, so the current time (we are in CLOCK mode) cannot be updated.
 
 Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
@@ -127,7 +127,7 @@ An example of the settings page is shown in the figure on the right.
 - **Hourly animation** is when the light is in the clock mode an hourly animation needs to be played.
 - **Hourly lines** when in clock mode, will add lines to each hour, the value is the amount on a byte scale (0-255) dimmed by the brightness itself..
 - **Analog hours** will let the hour indicator take 60 instead of 12 steps, so it will not stick to the whole hours indication.
-- **Enable OTA** will enable [Over The Air updates](#ota-over-the-air-update), so the firmware can be updated over the WiFi.
+- **Enable OTA** will direct to the [OTA](#ota-over-the-air-update) update page, where the firmware can be updated over the WiFi.
 - **Sync time** will get the current updated time from the server, this function is called automatically every day on 04:00 if the light is in clock mode.
 - **Reset** will fully restart the ESP.
 - **Info** will open the info page with some information like the version compile date.
@@ -192,12 +192,13 @@ Some examples of TaskType and Var:
 9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
 
 ### OTA (Over The Air update)
-This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota)
+This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) and enables you to update firmware over WiFi.
 On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
 After which the 'Upload' button needs to be press for the update process to begin, The unit will automatically update and reboot afterwards.
+Note that [SoftSettings](#soft-settings) are reserved as long as the [FLASH is not wiped](#full-reset).
 
 ### Full reset
-If a full reset is desired it can be achieved by going to http://smart-clock.local/reset. But note that accesing the page will directly wipe all userdata from existance and there will be no way to restore this (all [#soft-settings](#soft-settings) store in the EEPROM). If the wipe was succesfull it will be reported back and will execute a restart.
+If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accesing the page will directly wipe all [SoftSettings](#soft-settings) from existance and there will be no way to restore it back. If the wipe was succesfull it will be reported back and will execute a restart.
 
 # Specifications 
 ## Input voltage
@@ -215,7 +216,7 @@ The idle power consumption is about 0.65Watt (measured with LEDs turned off, and
 * Firmware
 [This is included in this repository](Arduino)
 * PCB & schematic
-[Smart light](https://easyeda.com/jellewietsma/smart-light)
-[Smart clock](https://easyeda.com/jellewietsma/smart-clock)
+[This is included in this repository](Schematic-PCB)
+Beta/ updated version on [EasyEDA](https://easyeda.com/jellewietsma/smart-light)
 * 3D models
 [These are included in this repository](3DModel)
