@@ -5,22 +5,25 @@ A smart 3D printed light clock/lamp, that includes, but is not limited to; WIFI 
 <img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 If you have interest in buying one and live in The Netherlands, feel free to contact me.
 
+
 You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
+
+
 You can skip to [OTA updater](#ota-over-the-air-update) if you just want to update it.
 
 # Creating a unit
 ## Hardware
-- a [PCB lamp](https://easyeda.com/jellewietsma/smart-light) or [PCB wall](https://easyeda.com/jellewietsma/smart-clock)
-- All parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
-- Others things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
+- A [PCB for the lamp/wall model](https://easyeda.com/jellewietsma/smart-light), or a lot of patient copying the schematic and doing it by hand.
+- Parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
+- Other things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
 
 ## Firmware 
 The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) BIN file upload. Either with Arduino IDE and compile it, or using a BIN uploader of choice.
 
 ### Compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
-- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an aditional board manager in Arduino IDE.
-- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the buildin libaray anager in Arduino IDE.
+- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an additional board manager in Arduino IDE.
+- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the built-in library anager in Arduino IDE.
 
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
@@ -32,7 +35,7 @@ Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file 
 The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
 
 ## Printing
-There multible types of model, the 'Desk model' is used in this readme as example project. But the other models have the same features, just a diffrent shape. All STL files have a predefined tolerance of 0.2mm buildin.
+There multiple types of model, the 'Desk model' is used in this readme as example project. But the other models have the same features, just a different shape. All STL files have a predefined tolerance of 0.2mm build-in.
 ### Desk model
 There are 4 files that need to be printed
 1.	[Lamp body.stl](3DModel/Desk/Body.stl) is the main body. It is suggested to do at least 0.5mm walls so light will not shine though as much.
@@ -138,19 +141,19 @@ An example of the settings page is shown in the figure on the right.
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
 The most up-to-date values can be found in the top of the [WifiManager.h](Arduino/WifiManager.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
-Note that the character " and TAB (EEPROM_Seperator) can not be used, these will be replace with ' and SPACE respectively
+Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
 - **AutoBrightness** Turns on brightness if enabled, the curve of which can be set with N and P.
 - **AutoBrightnessN** Used to calculate auto brightness =P*(X-N)+O. please see https://www.desmos.com/calculator/5tpxxofamn
 - **AutoBrightnessP** ^ Just the lowest raw sensor value you can find
-- **AutoBrightnessO** ^ Just an brigtness offset, so it can be set to be globaly more bright
+- **AutoBrightnessO** ^ Just a brightness offset, so it can be set to be globally more bright
 - **ClockHourLines** how bright each hour mark needs to be on a scale of 0 (OFF) to 255.
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just stick to wholes and use 12.
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations.
-- **ClockAnalog** Makes it so the LEDs dont step, but smootly transition. This does cost considerable more processing power. Makes ClockHourAnalog useless. https://www.desmos.com/calculator/zkl6idhjvx
-- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so thats 3600 seconds.
+- **ClockAnalog** Makes it so the LEDs do not step but smoothly transition. This does cost considerable more processing power. Makes ClockHourAnalog useless. https://www.desmos.com/calculator/zkl6idhjvx
+- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so that is 3600 seconds.
 - **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds.
 - **PotMinChange** How much the pot_value needs to change before we process it.
 - **PotStick** If this close to HIGH or LOW stick to it.
@@ -169,14 +172,14 @@ Furthermore the clock has some softsettings like ClockHourLines, but these are d
 
 ### Task List
 <img align="right" src="Images/Tasks.png" alt="Tasks page" width=50%>
-This page can be accesed on by opening the settings menu and clicking on the button 'Tasks'
+This page can be accessed on by opening the settings menu and clicking on the button 'Tasks'
 There can be 16 tasks, and the first 8 will be saved to EEPROM and will be restored after boot. 
 By default the SYNCTIME had been added at 4:0:0
 
 The format of Tasks "TimeH,TimeM,TimeS,TaskType,Var"
 - I, the number in the list (0-15) assigned automatically 
 - Time, 3x in the format of HH:MM:SS "x,y,z" |OR| time in ms to execute "w" (w are not saved in EEPROM)
-- TaskType, the type of task and automatically convered to show the name. (see TaskString in Task.h)
+- TaskType, the type of task and automatically converted to show the name. (see TaskString in Task.h)
 - Var, this can be a custom variable (few examples are given below)
 
 Some examples of TaskType and Var:
@@ -194,11 +197,11 @@ Some examples of TaskType and Var:
 ### OTA (Over The Air update)
 This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) and enables you to update firmware over WiFi.
 On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
-After which the 'Upload' button needs to be press for the update process to begin, The unit will automatically update and reboot afterwards.
+After which the 'Upload' button needs to be press for the update process to begin, the unit will automatically update and reboot afterwards.
 Note that [SoftSettings](#soft-settings) are reserved as long as the [FLASH is not wiped](#full-reset).
 
 ### Full reset
-If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accesing the page will directly wipe all [SoftSettings](#soft-settings) from existance and there will be no way to restore it back. If the wipe was succesfull it will be reported back and will execute a restart.
+If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore it back. If the wipe was successful it will be reported back and will execute a restart.
 
 # Specifications 
 ## Input voltage
