@@ -34,16 +34,26 @@ The BIN files themself can be found at [releases](https://github.com/jellewie/Ar
 ## Printing
 There multiple types of model, the 'Desk model' is used in this readme as example project. But the other models have the same features, just a different shape. All STL files have a predefined tolerance of 0.2mm build-in.
 ### Desk model
-There are 4 files that need to be printed
-1.	[Lamp body.stl](3DModel/Desk/Body.stl) is the main body. It is suggested to do at least 0.5mm walls so light will not shine though as much.
+The model is [Desk.ipt](3DModel/Desk/Desk.ipt), for this model there are 4 files that need to be printed.
+1.	[Lamp body.stl](3DModel/Desk/Body.stl) is the main body. It is suggested to do at least (0.4mm*3lines=1.2mm) walls so light will not shine though as much. It is printed on its face (like the STL orientation) and only the inner part needs a bit of support (overhang angle 90 degrees, density 2%).
 2.	[Lamp shield.stl](3DModel/Desk/Shield.stl) is just a simple shield to add aluminium foil on, and will be intern so can be printed quick and dirty.
-3.	[Lamp stand.stl](3DModel/Desk/Stand.stl) can have 3 times a pair embedded magnets in it, if the magnets are desired a layer pause need to be used.
-4.	[Diffuser.gcode](3DModel/Desk/Diffuser.gcode) A perfect spiral Gcode, this can be created with [Jespers Perfect Spiral-Gcode](https://github.com/jespertheend/spiral-gcode).
+3.	[Lamp stand.stl](3DModel/Desk/Stand.stl) can have 3 times a pair embedded magnets in it, if the magnets are desired a layer pause need to be used. this model should be printed in the normal standing position on the round flat part.
+4.	[Diffuser.gcode](3DModel/Desk/Diffuser.gcode) A perfect spiral Gcode, this can be created with [Jespers Perfect Spiral-Gcode](https://github.com/jespertheend/spiral-gcode). Altough a STL file is also included.
 
 ### Wall model
-There are 2 files that need to be printed
+This model and PCB is 'Work In Progress'!
+
+There are 2 variants, and fully 3d printed model, and a CNC model.
+
+#### 3D printed only
+The model is [Wall Clock.ipt](3DModel/Wall/Wall%20Clock.ipt), for this model there are 2 files that need to be printed.
 1.	[Clock Top.stl](3DModel/Wall/Clock%20Top.stl) This is the top of the clock, which houses the PCB controls.
 2.	[Clock x2.stl](3DModel/Wall/Clock%20x2.stl) This needs to be printed twice, and is the bottom left and right.
+
+#### CNC
+The model is [Wall Clock CNC.ipt](3DModel/Wall/Wall%20Clock&20CNC.ipt).
+1.  [Wall Clock CNC.ipt](3DModel/Wall/Wall%20Clock&20CNC.ipt) This is the part that needs to be cut, it has thicker walls and no LED seperates
+2 	The CNC ipt mentioned above does have hidden LED seperates in the file, the idea was to 3d print them but this is still a WIP idea thing.
 
 ## PCB & wires
 Please refer the in the [appendix](#appendix) - PCB & schematic for the schematic, but here are some common notes about the schematic, for example in [Input voltage](#Specifications) and [power consumption](#power-consumption) more information is given about the specifications of the electrics.
