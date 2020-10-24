@@ -613,7 +613,7 @@
                 Sl.value = col.L;
             }
             async function updateTaskList() {
-                let response = await fetch('/taskList');
+                let response = await fetch('/gettasks');
                 if (response.ok) {
                     await updateTaskListFromResponse(response);
                 } else {
@@ -654,7 +654,7 @@
                     const closeBtn = document.createElement('div');
                     closeBtn.classList.add('taskCloseBtn');
                     liEl.appendChild(closeBtn);
-                        const response = await fetch('/removeTask?o=2&i='+task.id);
+                        const response = await fetch('/settask?o=2&i='+task.id);
                     closeBtn.addEventListener('click', async _=>{
                         if (!response.ok)
                             doToastMessage(await response.text(), true);
@@ -703,7 +703,7 @@
                 }
                 let searchParams = new URLSearchParams(params);
                 try {
-                    let response = await fetch('/createTask?o=1&' + searchParams);
+                    let response = await fetch('/settask?o=1&' + searchParams);
                     doToastMessage(await response.text(), !response.ok);
                 } catch (e) {
                     doToastMessage('Failed to add task', true);
