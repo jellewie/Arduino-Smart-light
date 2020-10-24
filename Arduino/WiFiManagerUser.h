@@ -15,27 +15,31 @@
    -"Set_Value"       Set the action on what to do on startup with this value
    -"Get_Value"       [optional] Set the action on what to fill in in the boxes in the 'AP settings portal'
 */
-const byte Pin_LED  = LED_BUILTIN;                              //Just here for some examples, It's the LED to give feedback on (like blink on error)
-//===========================================================================
+byte ToByte(String IN, byte MAX = 255);
+byte ToByte(String IN, byte MAX) {
+  //Converts a String to a byte, taking into account the upper limit.
+  //Used for WiFiManagerUser_Set_Value
+  return IN.toInt() > MAX ? MAX : IN.toInt();
+}
 bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
   switch (ValueID) {                                            //Note the numbers are shifted from what is in memory, 0 is the first user value
-    case 0:   BootMode = ConvertModeToInt(Value);         return true;  break;
-    case 1:   HourlyAnimationS = Value.toInt();           return true;  break;
-    case 2:   DoublePressMode = ConvertModeToInt(Value);  return true;  break;
-    case 3:   AutoBrightness = IsTrue(Value);             return true;  break;
-    case 4:   AutoBrightnessN = Value.toInt();            return true;  break;
-    case 5:   AutoBrightnessP = Value.toFloat();          return true;  break;
-    case 6:   AutoBrightnessO = Value.toInt();            return true;  break;
-    case 7:   ClockHourLines = Value.toInt();             return true;  break;
-    case 8:   ClockHourAnalog = IsTrue(Value);            return true;  break;
-    case 9:   ClockOffset = Value.toInt();                return true;  break;
-    case 10:  ClockAnalog = IsTrue(Value);                return true;  break;
-    case 11:  gmtOffset_sec = Value.toInt();              return true;  break;
-    case 12:  daylightOffset_sec = Value.toInt();         return true;  break;
-    case 13:  PotMinChange = Value.toInt();               return true;  break;
-    case 14:  PotStick = Value.toInt();                   return true;  break;
-    case 15:  PotMin = Value.toInt();                     return true;  break;
-    case 16:  Value.toCharArray(Name, 16);                return true;  break;
+    case 0:   BootMode           = ConvertModeToInt(Value);   return true;  break;
+    case 1:   HourlyAnimationS   = ToByte(Value);             return true;  break;
+    case 2:   DoublePressMode    = ConvertModeToInt(Value);   return true;  break;
+    case 3:   AutoBrightness     = IsTrue(Value);             return true;  break;
+    case 4:   AutoBrightnessN    = ToByte(Value);             return true;  break;
+    case 5:   AutoBrightnessP    = Value.toFloat();           return true;  break;
+    case 6:   AutoBrightnessO    = ToByte(Value);             return true;  break;
+    case 7:   ClockHourLines     = ToByte(Value);             return true;  break;
+    case 8:   ClockHourAnalog    = IsTrue(Value);             return true;  break;
+    case 9:   ClockOffset        = ToByte(Value, TotalLEDs);  return true;  break;
+    case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
+    case 11:  gmtOffset_sec      = Value.toInt();             return true;  break;
+    case 12:  daylightOffset_sec = Value.toInt();             return true;  break;
+    case 13:  PotMinChange       = ToByte(Value);             return true;  break;
+    case 14:  PotStick           = ToByte(Value);             return true;  break;
+    case 15:  PotMin             = ToByte(Value);             return true;  break;
+    case 16:  Value.toCharArray(Name, 16);                    return true;  break;
     //==============================
     //Tasks
     //==============================
@@ -57,13 +61,12 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         return true;
       }
   }
-  return false;                                                 //Report back that the ValueID is unknown, and we could not set it
+  return false;                                                             //Report back that the ValueID is unknown, and we could not set it
 }
-//===========================================================================
 String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
   //if its 'Safe' to return the real value (for example the password will return '****' or '1234')
   //'Convert' the value to a readable string for the user (bool '0/1' to 'FALSE/TRUE')
-  switch (ValueID) {                                            //Note the numbers are shifted from what is in memory, 0 is the first user value
+  switch (ValueID) {                                                        //Note the numbers are shifted from what is in memory, 0 is the first user value
     case 0:   return Convert ? ConvertModeToString(BootMode)        : String(BootMode);         break;
     case 1:   return String(HourlyAnimationS);                                                  break;
     case 2:   return Convert ? ConvertModeToString(DoublePressMode) : String(DoublePressMode);  break;
@@ -94,46 +97,54 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
   }
   return "";
 }
-//===========================================================================
-void WiFiManagerUser_Status_Start() { //Called before start of WiFi
-  pinMode(Pin_LED, OUTPUT);
-  digitalWrite(Pin_LED, HIGH);
+void WiFiManagerUser_Status_Start() {                                   //Called before start of WiFi
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 1th quater blue 1222
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 2rd quater blue 1212
+  FastLED.show();                                                       //Update leds to show wifi is starting
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
 }
-//===========================================================================
-void WiFiManagerUser_Status_Done() { //Called after succesfull connection to WiFi
-  digitalWrite(Pin_LED, LOW);
+void WiFiManagerUser_Status_Done() {                                    //Called after succesfull connection to WiFi
+  WiFiManager.StartServer();                                            //Enable responce to web request
+  WiFiManager.EnableSetup(true);                                        //Enable the setup page, disable for more security
+  digitalWrite(LED_BUILTIN, LOW);
+  if (BootMode != OFF) {
+    FastLED.clear();
+    Mode = BootMode;                                                    //Go into the right mode
+  } else {
+    fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
+    FastLED.show();                                                     //Update leds to show wifi is done
+  }
 }
-//===========================================================================
-void WiFiManagerUser_Status_Blink() { //Used when trying to connect/not connected
-  digitalWrite(Pin_LED, !digitalRead(Pin_LED));
+void WiFiManagerUser_Status_Blink() {                                   //Used when trying to connect/not connected
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 }
-//===========================================================================
-void WiFiManagerUser_Status_StartAP() {
+void WiFiManagerUser_Status_StartAP() {                                 //Called before start of APmode
   fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
   fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 1th quater red  1222
   fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 2rd quater red  1212
-  FastLED.show();                               //Update leds to show we are entering APmode
+  FastLED.show();                                                       //Update leds to show we are entering APmode
   FastLED.delay(1);
 #ifdef LEDstatus_SerialEnabled
   Serial.println("LS: Setting LEDs to 'entering APmode'");
 #endif //LEDstatus_SerialEnabled
 }
-//===========================================================================
-bool WiFiManagerUser_HandleAP() {                               //Called when in the While loop in APMode, this so you can exit it
+bool WiFiManagerUser_HandleAP() {                                       //Called when in the While loop in APMode, this so you can exit it
   //Return true to leave APmode
-#define TimeOutApMode 15 * 60 * 1000;                           //Example for a timeout, (time in ms)
+#define TimeOutApMode 15 * 60 * 1000;                                   //Example for a timeout, (time in ms)
   unsigned long StopApAt = millis() + TimeOutApMode;
-  if (millis() > StopApAt)    return true;                      //If we are running for to long, then flag we need to exit APMode
+  if (millis() > StopApAt)    return true;                              //If we are running for to long, then flag we need to exit APMode
   return false;
 
-  Button_Time Value = ButtonsA.CheckButton();                   //Read buttonstate
+  Button_Time Value = ButtonsA.CheckButton();                           //Read buttonstate
   if (Value.StartLongPress) {
 #ifdef SerialEnabled
     Serial.println("WM: StartLongPress; reset BootMode and restart");
 #endif //SerialEnabled
-    BootMode = OFF;                                             //Change bootmode (so we wont enable WIFI on startup)
+    BootMode = OFF;                                                     //Change bootmode (so we wont enable WIFI on startup)
     WiFiManager.WriteEEPROM();
-    ESP.restart();                                              //Restart the ESP
+    ESP.restart();                                                      //Restart the ESP
   }
   return false;
 }

@@ -10,16 +10,21 @@
 #define WiFiManager_h
 
 //#define WiFiManager_SerialEnabled               	//Disable to not send Serial debug feedback
-//#define dnsServerEnabled							//Not stable yet
+//#define WiFiManager_DNS							/Doesn't always seem completly stable
 #include <WebServer.h>								//includes <WiFi.h>
 #include "Arduino.h"
 #include <EEPROM.h>
-#ifdef dnsServerEnabled
+#ifdef WiFiManager_DNS
 #include <DNSServer.h>
 DNSServer dnsServer;
-#endif //dnsServerEnabled
+#endif //WiFiManager_DNS
 WebServer server(80);
-
+#ifdef WiFiManager_OTA
+#include <Update.h>
+#endif //WiFiManager_OTA
+#ifdef WiFiManager_mDNS
+#include <ESPmDNS.h>
+#endif //WiFiManager_mDNS
 #ifndef WiFiManagerUser_VariableNames_Defined
 const String WiFiManager_VariableNames[] = {"SSID", "Password"};
 #endif //WiFiManagerUser_VariableNames_Defined
@@ -44,20 +49,19 @@ class CWiFiManager {
 #ifndef WiFiManagerUser_ssid_Defined
 	char ssid[16] = "";                             //^
 #endif //WiFiManagerUser_ssid_Defined
-#ifndef WiFiManagerUser_APSSID
-	char APSSID[16] = "ESP32";                      //If you want to define the name somewhere else use 'char* APSSID = Name'
-#endif //WiFiManagerUser_APSSID_Defined
+#ifndef WiFiManagerUser_Name_Defined
+	char Name[16] = "ESP32";                      //If you want to define the name somewhere else use 'char* Name = Name'
+#endif //WiFiManagerUser_Name_Defined
 #ifndef WiFiManagerUser_VariableNames_Defined
-	const int EEPROM_size = 33;                     //Set EEPROM size to default: Max Amount of chars of 'SSID + PASSWORD' (+1)
+	const byte EEPROM_size = 33;                    //Set EEPROM size to default: Max Amount of chars of 'SSID + PASSWORD' (+1)
 #endif //WiFiManagerUser_VariableNames_Defined
-    void Status_Start();
-    void Status_Done();
-    void Status_Blink();
-    void Status_StartAP();
-    bool HandleAP();                     			//Called when in the While loop in APMode, this so the user can cancel it
-	bool Set_Value(byte, String);
-    String Get_Value(byte, bool, bool);
-	
+    void Status_Start();							//[UserHook]
+    void Status_Done();								//[UserHook]
+    void Status_Blink();							//[UserHook]
+    void Status_StartAP();							//[UserHook]
+    bool HandleAP();                     			//[UserHook] 
+	bool Set_Value(byte, String);        			//[UserHook] 
+    String Get_Value(byte, bool, bool);        		//[UserHook] 
     void StartServer();                       		//Start the webserver
     void EnableSetup(bool);            				//Enable/disable setup page
 	void RunServer();								//Proces server client commands if needed
@@ -68,6 +72,15 @@ class CWiFiManager {
 	bool CheckAndReconnectIfNeeded(bool);
 	byte Start();                             		//Start all WIFI stuff
 	byte LoadData();                          		//Only load data from EEPROM to memory
+#ifdef WiFiManager_OTA
+	bool OTA_Enabled = true;
+#ifndef WiFiManagerUser_UpdateWebpage_Defined
+	const String UpdateWebpage = "https://github.com/jellewie";
+#endif //WiFiManagerUser_UpdateWebpage_Defined
+	void handle_uploadPage();
+	void handle_update();
+	void handle_update2();
+#endif //WiFiManager_OTA
 };
 
 CWiFiManager WiFiManager;

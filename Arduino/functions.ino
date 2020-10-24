@@ -57,27 +57,6 @@ void UpdateBrightness(bool ForceUpdate) {
 #endif //SerialEnabled
   }
 }
-bool StartWIFIstuff() {
-  //Returns TRUE if WIFI was already started, returns FALSE if it wasn't
-  if (WiFi.status() == WL_CONNECTED) return true;                               //If WIFI already on, stop and return true
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 1th quater blue 1222
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 2rd quater blue 1212
-  FastLED.show();                                                       //Update leds to show wifi is starting
-#ifdef LEDstatus_SerialEnabled
-  Serial.println("LS: Setting LEDs to 'wifi is starting'");
-#endif //LEDstatus_SerialEnabled
-  if (WiFiManager.Start() == 1) {                                       //Run the wifi startup
-    WiFiManager.StartServer();                                          //Enable responce to web request
-    WiFiManager.EnableSetup(true);                                      //Enable the setup page, disable for more security
-    fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
-    FastLED.show();                                                     //Update leds to show wifi is done
-#ifdef LEDstatus_SerialEnabled
-    Serial.println("LS: Setting LEDs to 'wifi is done'");
-#endif //LEDstatus_SerialEnabled
-  }
-  return false;
-}
 void ShowIP() {
   //The LEDs are divided into 10 sections, and each char in the IP range will be shown one at a time. Left down will be 0 and the next clockwise will be 1.
   //Where RGB will be the order of the numbers, so red will have a *100 multiplication and green will have *10

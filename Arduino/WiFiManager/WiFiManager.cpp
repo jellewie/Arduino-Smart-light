@@ -138,6 +138,17 @@ void WiFiManager_handle_Connect() {
 void WiFiManager_handle_Settings() {
   WiFiManager.handle_Settings();
 }
+#ifdef WiFiManager_OTA
+void WiFiManager_OTA_handle_uploadPage() {
+  WiFiManager.handle_uploadPage();
+}
+void WiFiManager_OTA_handle_update() {
+  WiFiManager.handle_update();
+}
+void WiFiManager_OTA_handle_update2() {
+  WiFiManager.handle_update2();
+}
+#endif //WiFiManager_OTA
 //===========================================================================
 void CWiFiManager::StartServer() {
   static bool ServerStarted = false;	
@@ -145,6 +156,10 @@ void CWiFiManager::StartServer() {
     ServerStarted = true;
     server.on("/",          WiFiManager_handle_Connect);
     server.on("/setup",     WiFiManager_handle_Settings);
+#ifdef WiFiManager_OTA
+	server.on("/ota",       WiFiManager_OTA_handle_uploadPage);
+	server.on("/update", 	HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
+#endif //WiFiManager_OTA
     server.begin();                                   	//Begin server
   }
 }
@@ -176,36 +191,45 @@ byte CWiFiManager::APMode() {
     2 Soft-AP setup Failed
     3 custom exit
   */
-  if (!WiFi.softAP(APSSID))                           	//config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
+  WiFi.mode(WIFI_AP_STA);								//https://github.com/espressif/arduino-esp32/blob/1287c529330d0c11853b9f23ddf254e4a0bc9aaf/libraries/WiFi/src/WiFiType.h#L33
+  if (!WiFi.softAP(Name))                           	//config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
     return 2;
   Status_StartAP();
   EnableSetup(true);                                  	//Flag we need to responce to settings commands
   StartServer();                                      	//Start server (if we havn't already)
-#ifdef dnsServerEnabled
-  dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));	//Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
-#endif //dnsServerEnabled
+#ifdef WiFiManager_DNS
+  bool _Status = dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));	//Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
 #ifdef WiFiManager_SerialEnabled
-  Serial.print("WM: APMode on; SSID=" + String(APSSID) + " ip=");
+  if (_Status)
+    Serial.println("WM: DNS server started");
+  else
+    Serial.println("WM: DNS server failed to start");
+#endif //WiFiManager_SerialEnabled
+#endif //WiFiManager_DNS
+#ifdef WiFiManager_SerialEnabled
+  Serial.print("WM: APMode on; SSID=" + String(Name) + " ip=");
   Serial.println(WiFi.softAPIP());
 #endif //WiFiManager_SerialEnabled
   while (WaitOnAPMode) {
     if (TickEveryMS(100)) Status_Blink();             	//Let the LED blink to show we are not connected
     server.handleClient();
-#ifdef dnsServerEnabled
+#ifdef WiFiManager_DNS
     dnsServer.processNextRequest();
-#endif //dnsServerEnabled
+#endif //WiFiManager_DNS
     if (HandleAP()) {
 #ifdef SerialEnabled
       Serial.println("WM: Manual leaving APMode");
 #endif //SerialEnabled
       EnableSetup(false);                             	//Flag to stop responce to settings commands
-#ifdef dnsServerEnabled
+#ifdef WiFiManager_DNS
       dnsServer.stop();
-#endif //dnsServerEnabled
+#endif //WiFiManager_DNS
       return 3;
     }
   }
-  //dnsServer.stop();
+#ifdef WiFiManager_DNS
+  dnsServer.stop();
+#endif //WiFiManager_DNS
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: Leaving APmode");
 #endif //WiFiManager_SerialEnabled
@@ -291,6 +315,7 @@ byte CWiFiManager::Start() {
      2 Can't begin EEPROM
      3 Can't write [all] data to EEPROM
   */
+  if (WiFi.status() == WL_CONNECTED) return true;    	//If WIFI already on, stop and return true
   Status_Start();
   if (ssid[0] == 0 and password[0] == 0)              	//If the ssid and password are not yet in memory
     if (byte temp = LoadData()) return temp;          	//Load the EEPROM to get the ssid and password. Exit with code if failed
@@ -298,12 +323,22 @@ byte CWiFiManager::Start() {
     if (!Connect(ConnectionTimeOutMS))                	//Try to connected to ssid+password
       APMode();                                       	//If we could not connector for whatever reason, Entering APmode
   }
-  Status_Done();
+#ifdef WiFiManager_mDNS									//https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
+  bool MDNSStatus = MDNS.begin(Name);                 	//Start mDNS with the given domain name
+  if (MDNSStatus) MDNS.addService("http", "tcp", 80); 	//Add service to MDNS-SD
+#ifdef WiFiManager_SerialEnabled
+  if (MDNSStatus)
+    Serial.println("WM: mDNS responder started with name '" + String(Name) + "'");
+  else
+    Serial.println("WM: ERROR setting up mDNS responder! with name '" + String(Name) + "'");
+#endif //WiFiManager_SerialEnabled
+#endif //WiFiManager_mDNS
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: Connected; SSID=" + String(ssid) + " ip=");
   Serial.println(WiFi.localIP());
 #endif //WiFiManager_SerialEnabled
-  return 1;
+  Status_Done();
+  return true;
 }
 bool CWiFiManager::WriteEEPROM() {
   String Value;                                       	//Save to mem:
@@ -340,7 +375,7 @@ void CWiFiManager::RunServer() {
 }
 void CWiFiManager::handle_Connect() {
   if (!SettingsEnabled) return;                       	//If settingscommand is disabled: Stop right away, and do noting
-  String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>" + String(APSSID) + " settings</strong><br><br><form action=\"/setup?\" method=\"get\">";
+  String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>" + String(Name) + " settings</strong><br><br><form action=\"/setup?\" method=\"get\">";
   for (byte i = 1; i < WiFiManager_Settings + 1; i++)
     HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + " </label><input type=\"text\" name=\"" + i + "\" value=\"" + Get_Value(i, false, true) + "\"></div>";
   HTML += "<button>Send</button></form>"
@@ -396,3 +431,49 @@ bool CWiFiManager::CheckAndReconnectIfNeeded(bool AllowAPmode) {
   }
   return true;
 }
+#ifdef WiFiManager_OTA
+void CWiFiManager::handle_uploadPage() {
+#ifdef WiFiManager_SerialEnabled
+      Serial.println("OTA_handle_UploadPage, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
+#endif //WiFiManager_SerialEnabled
+      if (!OTA_Enabled) return;                    		//If OTA is disabled, stop here and do not respond
+      String html = "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script><a href=\"" + UpdateWebpage + "\">" + UpdateWebpage + "</a><br><br><form method='POST' action='#' enctype='multipart/form-data' id='upload_form'><input type='file' name='update'><input type='submit' value='Upload'></form><div id='prg'>progress: 0%</div><script>$('form').submit(function(c){c.preventDefault();var a=$('#upload_form')[0];var b=new FormData(a);$.ajax({url:'/update',type:'POST',data:b,contentType:false,processData:false,xhr:function(){var d=new window.XMLHttpRequest();d.upload.addEventListener('progress',function(e){if(e.lengthComputable){var f=e.loaded/e.total;$('#prg').html('progress: '+Math.round(f*100)+'%')}},false);return d},success:function(f,e){console.log('success!')},error:function(e,d,f){}})});</script>";
+      server.send(200, "text/html", html);
+    }
+void CWiFiManager::handle_update() {
+#ifdef WiFiManager_SerialEnabled
+      Serial.printf("OTA: Update, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
+#endif //WiFiManager_SerialEnabled
+      if (!OTA_Enabled) return;                    		//If OTA is disabled, stop here and do not respond
+      server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+      ESP.restart();
+    }
+void CWiFiManager::handle_update2() {
+      if (!OTA_Enabled) return;                       	//If OTA is disabled, stop here and do not respond
+      HTTPUpload& upload = server.upload();
+#ifdef WiFiManager_SerialEnabled
+      if (!OTA_Enabled) return;                        	//If OTA is disabled, stop here and do not respond
+      if (upload.status == UPLOAD_FILE_START) {
+        Serial.printf("Update: %s\n", upload.filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {      	//start with max available size
+          Update.printError(Serial);
+        }
+      } else if (upload.status == UPLOAD_FILE_WRITE) {	//flashing firmware to ESP
+        if (Update.write(upload.buf, upload.currentSize) != upload.currentSize)
+          Update.printError(Serial);
+      } else if (upload.status == UPLOAD_FILE_END) {
+        if (Update.end(true))                          	//true to set the size to the current progress
+          Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        else
+          Update.printError(Serial);
+      }
+#else
+      if (upload.status == UPLOAD_FILE_START)
+        Update.begin(UPDATE_SIZE_UNKNOWN);          	//start with max available size
+      else if (upload.status == UPLOAD_FILE_WRITE)    	//flashing firmware to ESP
+        Update.write(upload.buf, upload.currentSize);
+      else if (upload.status == UPLOAD_FILE_END)
+        Update.end(true);
+#endif //WiFiManager_SerialEnabled
+    }
+#endif //WiFiManager_OTA
