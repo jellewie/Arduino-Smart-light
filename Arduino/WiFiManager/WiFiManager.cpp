@@ -198,9 +198,10 @@ byte CWiFiManager::APMode() {
   EnableSetup(true);                                  	//Flag we need to responce to settings commands
   StartServer();                                      	//Start server (if we havn't already)
 #ifdef WiFiManager_DNS
-  bool _Status = dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));	//Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
-#ifdef WiFiManager_SerialEnabled
-  if (_Status)
+#ifndef WiFiManager_SerialEnabled
+  dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));	//Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
+#else
+  if (dnsServer.start(53, "*", IPAddress(192, 168, 4, 1)))
     Serial.println("WM: DNS server started");
   else
     Serial.println("WM: DNS server failed to start");

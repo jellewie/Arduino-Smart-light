@@ -1,7 +1,7 @@
 /* Written by JelleWho https://github.com/jellewie
 
   =====How to add an animation=====
-  Animation.ino:  Add the funtion to 'switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
+  Animation.ino:  Add the funtion to 'ShowAnimation::switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
                   'AnimationRGB' can be used for the user set RGB color
                   'Start' Can be used to detect the start of the animation
                   Note that 'UpdateLEDs = true;' must be set to update the leds

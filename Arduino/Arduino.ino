@@ -77,13 +77,13 @@ const byte EEPROM_size = 255;
 const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/releases";
 #include "WiFiManager/WiFiManager.h"              //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed      https://github.com/jellewie/Arduino-WiFiManager
 
-#include <FastLED.h>
+#include <FastLED.h>                              //Include the libary FastLED (If you get a error here, make sure it's installed!)
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
 #include "time.h"                                 //We need this for the clock function to get the time (Time library)
 #include "Task.h"
-Button ButtonsA = buttons({PDI_Button, LED_BUILTIN});
+Button ButtonsA = buttons({PDI_Button, PAO_LED});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
@@ -102,7 +102,6 @@ void setup() {
   //===========================================================================
   //Init LED and let them shortly blink
   //===========================================================================
-  pinMode(PAO_LED, OUTPUT);
   FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(1);     //Set start brightness to be amost off
   for (int i = 255; i >= 0; i = i - 255) { //Blink on boot
@@ -238,20 +237,19 @@ void loopLEDS() {
           UpdateAndShowClock(true);
       } break;
 
-    case BLINK:       if (LastMode != Mode) StartAnimation(0, -2);  break;
-    case BPM:         if (LastMode != Mode) StartAnimation(1, -2);  break;
-    case CONFETTI:    if (LastMode != Mode) StartAnimation(2, -2);  break;
-    case FLASH:       if (LastMode != Mode) StartAnimation(3, -2);  break;
-    case GLITTER:     if (LastMode != Mode) StartAnimation(4, -2);  break;
-    case JUGGLE:      if (LastMode != Mode) StartAnimation(5, -2);  break;
-    case MOVE:        if (LastMode != Mode) StartAnimation(6, -2);  break;
-    case RAINBOW:     if (LastMode != Mode) StartAnimation(7, -2);  break;
-    case SINELON:     if (LastMode != Mode) StartAnimation(8, -2);  break;
-    case SINELON2:    if (LastMode != Mode) StartAnimation(9, -2);  break;
-    case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2);  break;
-    case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2);  break;
-    case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2);  break;
-
+    case BLINK:       if (LastMode != Mode) StartAnimation(0,  -2); break;
+    case BPM:         if (LastMode != Mode) StartAnimation(1,  -2); break;
+    case CONFETTI:    if (LastMode != Mode) StartAnimation(2,  -2); break;
+    case FLASH:       if (LastMode != Mode) StartAnimation(3,  -2); break;
+    case GLITTER:     if (LastMode != Mode) StartAnimation(4,  -2); break;
+    case JUGGLE:      if (LastMode != Mode) StartAnimation(5,  -2); break;
+    case MOVE:        if (LastMode != Mode) StartAnimation(6,  -2); break;
+    case RAINBOW:     if (LastMode != Mode) StartAnimation(7,  -2); break;
+    case SINELON:     if (LastMode != Mode) StartAnimation(8,  -2); break;
+    case SINELON2:    if (LastMode != Mode) StartAnimation(9,  -2); break;
+    case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2); break;
+    case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
+    case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
     default:
 #ifdef SerialEnabled
       Serial.println("mode with ID " + String(Mode) + " not found");
