@@ -314,14 +314,11 @@ void handle_UpdateTime() {
   }
   if (TimeUpdated) {                                  //If time has updated
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
-    TimeSet = true;
-    if (Mode == CLOCK) UpdateAndShowClock(true, true);  //If we are curently in CLOCK mode, make sure to update the shown time
   } else {
     if (ERRORMSG == "")
       ERRORMSG = "Nothing to update the time to\n";
     message = "Current time is " + message;
   }
-  LastMode = -1;    //Re-init the mode
   if (ERRORMSG != "")
     server.send(400, "text/plain", ERRORMSG + message);
   else

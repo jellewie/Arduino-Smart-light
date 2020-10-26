@@ -1,38 +1,6 @@
 /* Written by JelleWho https://github.com/jellewie */
 #define Clock_ConnectionTimeOutMS 10000
 
-bool UpdateTime() {
-  if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false;      //If WIFI is not connected, stop right away
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212
-  FastLED.show();                                                       //Update leds to show updating time
-  FastLED.clear();
-  UpdateLEDs = true;
-#ifdef LEDstatus_SerialEnabled
-  Serial.println("LS: Setting LEDs to 'updating time'");
-#endif //LEDstatus_SerialEnabled
-#ifdef Time_SerialEnabled
-  Serial.println("TM: Get server time");
-#endif //Time_SerialEnabled
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo, Clock_ConnectionTimeOutMS)) {
-#ifdef Time_SerialEnabled
-    Serial.println("TM: Failed to obtain time");
-#endif //Time_SerialEnabled
-    return false;
-  }
-#ifdef Time_SerialEnabled
-  Serial.println(&timeinfo, "TM: %A, %B %d %Y %H:%M:%S");
-#endif //Time_SerialEnabled
-  TimeCurrent.Ticks = millis();
-  TimeCurrent.HH = timeinfo.tm_hour;
-  TimeCurrent.MM = timeinfo.tm_min;
-  TimeCurrent.SS = timeinfo.tm_sec;
-  TimeSet = true;
-  return true;
-}
 byte LEDtoPosition(byte LEDID) {
   //Takes ClockOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
   //Basicly adding ClockOffset to the LED and wrapping LEDS around
@@ -138,4 +106,39 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       }
     }
   }
+}
+bool UpdateTime() {
+  if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false;      //If WIFI is not connected, stop right away
+  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
+  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
+  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212
+  FastLED.show();                                                       //Update leds to show updating time
+  FastLED.clear();
+  UpdateLEDs = true;
+#ifdef LEDstatus_SerialEnabled
+  Serial.println("LS: Setting LEDs to 'updating time'");
+#endif //LEDstatus_SerialEnabled
+#ifdef Time_SerialEnabled
+  Serial.println("TM: Get server time");
+#endif //Time_SerialEnabled
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo, Clock_ConnectionTimeOutMS)) {
+#ifdef Time_SerialEnabled
+    Serial.println("TM: Failed to obtain time");
+#endif //Time_SerialEnabled
+    LastMode = -1;    //Re-init the mode
+    return false;
+  }
+#ifdef Time_SerialEnabled
+  Serial.println(&timeinfo, "TM: %A, %B %d %Y %H:%M:%S");
+#endif //Time_SerialEnabled
+  TimeCurrent.Ticks = millis();
+  TimeCurrent.HH = timeinfo.tm_hour;
+  TimeCurrent.MM = timeinfo.tm_min;
+  TimeCurrent.SS = timeinfo.tm_sec;
+  TimeSet = true;
+  if (Mode == CLOCK) UpdateAndShowClock(true, true);  //If we are curently in CLOCK mode, make sure to update the shown time
+  LastMode = -1;    //Re-init the mode
+  return true;
 }
