@@ -1,10 +1,11 @@
 /* Written by JelleWho https://github.com/jellewie */
-#ifndef Button_h                    //This prevents including this file more than once
+#ifndef Button_h                      //This prevents including this file more than once
 #define Button_h
-const int Time_StartLongPressMS  = 3000;  //After how much Ms we should consider a press a long press
-const int Time_ESPrestartMS      = 15000; //After how much Ms we should restart the ESP, note this is only triggered on released, or on a CheckButtons() call
-const byte Time_StartDoublePress = 200;   //Withing how much Ms of the last release should the button be pressed for it to be a double press?
-const byte Time_RejectStarts     = 80;    //Just some rejection
+
+#define Time_StartLongPressMS 3000    //After howmuch Ms we should consider a press a long press
+#define Time_ESPrestartMS 15000       //After howmuch Ms we should restart the ESP, note this is only triggered on released, or on a CheckButtons() call
+#define Time_StartDoublePress 200     //Withing howmuch Ms of the last release should the button be pressed for it to be a double press?
+#define Time_RejectStarts 80          //Just some rejection
 struct buttons {
   byte PIN_Button;
   byte PIN_LED;
@@ -13,7 +14,7 @@ struct buttons {
 struct Button_Time {
   bool StartPress;      //Triggered once on start press
   bool StartLongPress;  //Triggered once if timePressed > LongPress
-  bool StartDoublePress;//Triggered once on start press if the last button was les then DoublePress time ago
+  bool StartDoublePress;//Triggered once on start press if the last button was less then DoublePress time ago
   bool StartRelease;    //Triggered once on stop press
   bool Pressed;         //If button is pressed
   bool PressedLong;     //If timePressed > LongPress
@@ -36,7 +37,7 @@ class Button {
       pinMode(Data.PIN_Button, INPUT);            //Set the button pin as INPUT
       if (Data.PIN_LED != 0)                      //If a LED pin is given
         pinMode(Data.PIN_LED, OUTPUT);            //Set the LED pin as output
-      State.PressEnded = true;
+      Pinchange();                                //Init the pin, this will make sure it starts in the right HIGH or LOW state
     }
     Button_Time CheckButton() {
       if (!State.PressEnded)
@@ -78,9 +79,9 @@ class Button {
         State.PressEnded = false;
         StartLongFlagged = false;
         StartReleaseFlagged = false;
-        ButtonStartTime = millis();                               //Save the start time
-        unsigned long ElapsedTimeSinceLast = ButtonStartTime - LastButtonEndTime;
+        unsigned long ElapsedTimeSinceLast = millis() - LastButtonEndTime;
         if (ElapsedTimeSinceLast > Time_RejectStarts) {
+          ButtonStartTime = millis();                             //Save the start time
           State.StartPress = true;
           if (ElapsedTimeSinceLast < Time_StartDoublePress) {
             State.StartDoublePress = true;
