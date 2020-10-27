@@ -5,6 +5,8 @@
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
 #endif
 
+//#define WiFiManager_DNS                           //is still causing some troubles with (some?) ESP32s
+
 //#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled           //WM:
@@ -72,7 +74,6 @@ extern void StartAnimation(byte ID, int Time);    //^ Required for Clock.h
 const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
 const byte EEPROM_size = 255;
 #define WiFiManager_mDNS
-#define WiFiManager_DNS                           //Was causing some troubles with stableness, but seems fine now?
 #define WiFiManager_OTA
 #define WiFiManagerUser_UpdateWebpage_Defined
 const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/releases";

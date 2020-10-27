@@ -66,11 +66,9 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 **Optional for WIFI:**
 1.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
 2.	Connect to this Access Point, by default it will be called “smart-clock”.
-3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings).
-This page also shows 'Clockoffset' which is the rotation factor of the LEDs (for example there are 60 LEDs so filling in 30 will rotate the whole clock by 30). 
-Also on this page is the 'BootMode' which is the mode to boot in. put it to 'CLOCK' to have it start WiFi and show the clock after a start-up.
+3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings), for example 'Clockoffset' is the rotation of the LEDs (there are 60 LEDs so filling in 30 will rotate the clock by 50%). 
 ~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
-4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/info](http://smart-clock.local/info) can be used.
+4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/](http://smart-clock.local/) can also be used.
 
 # Features
 ## Button
