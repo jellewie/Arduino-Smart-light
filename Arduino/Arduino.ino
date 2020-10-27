@@ -56,6 +56,7 @@ byte LastMode = -1;                               //Just to keep track if we are
 const byte TotalLEDs = 60;                        //The total amounts of LEDs in the strip
 int AnimationCounter;                             //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                //Where we save the time to
+byte ModeBeforeOff = ON;
 extern byte TotalAnimations;                      //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);    //^ Required for Clock.h
 
@@ -172,10 +173,12 @@ void loop() {
     if (Value.StartRelease)     Serial.println("StartRelease");
 #endif //SerialEnabled
     if (Value.StartPress) {
-      if (Mode == OFF)
-        Mode = ON;
-      else
+      if (Mode == OFF) {
+        Mode = ModeBeforeOff == OFF ? ON : ModeBeforeOff; //If (ModeBeforeOff is OFF) then {set mode to be ON} else {set to ModeBeforeOff}
+      } else {
+        ModeBeforeOff = Mode;
         Mode = OFF;
+      }
     }
     if (Value.StartDoublePress)
       Mode = DoublePressMode;                         //Cool RGB color palet mode
