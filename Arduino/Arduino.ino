@@ -135,7 +135,7 @@ void setup() {
   //Add a SYNCTIME Task, this is just to initialise (will be overwritten with user data)
   //===========================================================================
   TASK TempTask;                                      //Create a space to put a new Task in
-  TempTask.ID         = SYNCTIME;                     //Set the ID of the task to SYNCTIME
+  TempTask.Type       = SYNCTIME;                     //Set the ID of the task to SYNCTIME
   TempTask.ExectuteAt = TimeS{4, 0, 0, 0};            //Set the init value to auto sync time at 04:00:00
   AddTask(TempTask);                                  //Add the Task command to the task list
   //===========================================================================

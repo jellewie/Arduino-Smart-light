@@ -49,8 +49,8 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         String _Vars[5];                                                    //Create a space to but the cut string in
         CutVariable(Value, &_Vars[0], 5);                                   //Deconstruct the string, and put it into parts
         TASK TempTask;                                                      //Create a space to put a new Task in
-        TempTask.ID                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
-        if (TempTask.ID != 0 and TempTask.ID != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
+        TempTask.Type                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
+        if (TempTask.Type != 0 and TempTask.Type != SAVEEEPROM) {               //If a task ID is given, and it was not SAVEEEPROM
           RemoveTask(i);            //Clear the spot this should go into, NOTE: this might not be an outdated value, but should be fine since the call function loops thought the list
           TempTask.ExectuteAt.HH    = constrain(_Vars[1].toInt(), 0, 23);
           TempTask.ExectuteAt.MM    = constrain(_Vars[2].toInt(), 0, 59);
@@ -90,8 +90,8 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     default:
       if (ValueID < 17 + 8) {
         byte i = ValueID - 17;
-        if (TaskList[i].ID != 0 and TaskList[i].ExectuteAt.Ticks == 0)
-          return String(TaskList[i].ID) + "," + String(TaskList[i].ExectuteAt.HH) + "," + String(TaskList[i].ExectuteAt.MM) + "," + String(TaskList[i].ExectuteAt.SS) + "," + TaskList[i].Var;
+        if (TaskList[i].Type != 0 and TaskList[i].ExectuteAt.Ticks == 0)
+          return String(TaskList[i].Type) + "," + String(TaskList[i].ExectuteAt.HH) + "," + String(TaskList[i].ExectuteAt.MM) + "," + String(TaskList[i].ExectuteAt.SS) + "," + TaskList[i].Var;
         return "0";
       }
   }
