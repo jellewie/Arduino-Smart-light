@@ -1,7 +1,7 @@
 /* Written by JelleWho https://github.com/jellewie */
 #define Clock_ConnectionTimeOutMS 10000
 
-byte LEDtoPosition(byte LEDID) {
+byte LEDtoPosition(int LEDID) {
   //Takes ClockOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
   //Basicly adding ClockOffset to the LED and wrapping LEDS around
 
@@ -9,7 +9,9 @@ byte LEDtoPosition(byte LEDID) {
   //(TotalLEDs-Amount)-x  = Flip in Y-Y axes
 
   LEDID += ClockOffset;
-  while (LEDID >= TotalLEDs)
+  while (LEDID >= 16383 or LEDID < 0) //When a negative overflow
+    LEDID += TotalLEDs;
+  while (LEDID >= TotalLEDs)          //When a positive overflow
     LEDID -= TotalLEDs;
   return LEDID;
 }

@@ -310,7 +310,7 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
 #define PacmanMouthOpenhalf PacmanMouthOpen / 2
 #define PacmanMouthMiddle 15
 #define PacmanStartU PacmanMouthMiddle - PacmanMouthOpenhalf
-#define PacmanEyeLength 2
+#define PacmanEyeLength 4
 #define PacmanEyeOffset 2
 #define PacmanBowTieLength 6
 #define PacmanBowTieOffset 8
@@ -328,14 +328,14 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
           _Direcion2 = false;
           LED_Fill(0, TotalLEDs, CRGB(255, 255, 0));                         //Fill the whol stip with yellow, we will but stuff out/overwrite it if we need so
           if (_Left) {
-            _LEDPosU = PacmanStartU - TotalLEDs / 2;
-            _LEDPosL = PacmanMouthMiddle - TotalLEDs / 2;
-            LED_Fill(LEDtoPosition(TotalLEDs - PacmanEyeLength - (PacmanStartU - PacmanEyeLength - PacmanEyeOffset)), PacmanEyeLength, CRGB(0, 0, 0));                          //Cut out the eye
+            _LEDPosU = PacmanStartU + TotalLEDs / 2;
+            _LEDPosL = PacmanMouthMiddle + TotalLEDs / 2;
+            LED_Fill(           LEDtoPosition(TotalLEDs - PacmanEyeLength    - (PacmanStartU - PacmanEyeLength    - PacmanEyeOffset)   ), PacmanEyeLength   , CRGB(0, 0, 0));                          //Cut out the eye
             if (_Miss) LED_Fill(LEDtoPosition(TotalLEDs - PacmanBowTieLength - (PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset)), PacmanBowTieLength, CRGB(255, 0, 0)); //Set here bow tie
           } else {
             _LEDPosU = PacmanStartU;
             _LEDPosL = PacmanMouthMiddle;
-            LED_Fill(LEDtoPosition(PacmanStartU - PacmanEyeLength - PacmanEyeOffset), PacmanEyeLength, CRGB(0, 0, 0));                        //Cut out the eye
+            LED_Fill(           LEDtoPosition(PacmanStartU - PacmanEyeLength    - PacmanEyeOffset   ), PacmanEyeLength   , CRGB(0, 0, 0));    //Cut out the eye
             if (_Miss) LED_Fill(LEDtoPosition(PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset), PacmanBowTieLength, CRGB(255, 0, 0));  //Set here bow tie
           }
           UpdateLEDs = true;
