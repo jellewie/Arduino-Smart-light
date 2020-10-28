@@ -1,7 +1,7 @@
 /* Written by JelleWho https://github.com/jellewie */
 #define Clock_ConnectionTimeOutMS 10000
 
-byte LEDtoPosition(int LEDID) {
+byte LEDtoPosition(signed int LEDID) {
   //Takes ClockOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
   //Basicly adding ClockOffset to the LED and wrapping LEDS around
 
@@ -9,9 +9,9 @@ byte LEDtoPosition(int LEDID) {
   //(TotalLEDs-Amount)-x  = Flip in Y-Y axes
 
   LEDID += ClockOffset;
-  while (LEDID >= 16383 or LEDID < 0) //When a negative overflow
+  while (LEDID < 0)                                   //When a negative overflow
     LEDID += TotalLEDs;
-  while (LEDID >= TotalLEDs)          //When a positive overflow
+  while (LEDID >= TotalLEDs)                          //When a positive overflow
     LEDID -= TotalLEDs;
   return LEDID;
 }
@@ -33,7 +33,7 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
 #ifdef Time_SerialEnabled
   if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate");
 #endif //Time_SerialEnabled
-  while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) {
+  while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) { //While more than 1 second pased, or its the first update
     if (FirstUpdate) {
       FirstUpdate = false;
       UpdateTime();                                  //Get a new sync timestamp from the server
