@@ -41,9 +41,6 @@ You can skip to [OTA updater](#ota-over-the-air-update) if you just want to upda
  - [Appendix](#appendix)
 </p></details>
 
-<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
-<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
-
 # Quick start guide
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
@@ -55,6 +52,9 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings), for example 'Clockoffset' is the rotation of the LEDs (there are 60 LEDs so filling in 30 will rotate the clock by 50%). 
 ~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
 4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/](http://smart-clock.local/) can also be used.
+
+<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
+<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 
 # Creating a unit
 ## Hardware
