@@ -6,33 +6,66 @@ If you have interest in buying one and live in The Netherlands, feel free to con
 You can skip to [Quick start guide](#quick-start-guide) if you already own a smart-clock, and just want to run the set-up.
 
 You can skip to [OTA updater](#ota-over-the-air-update) if you just want to update it.
+
+# Index
+<details><summary>Show/hide</summary><p>
+
+ - [Quick start guide](#quick-start-guide)
+ - [Creating a unit](#creating-a-unit)
+    - [Hardware](#hardware)
+    - [Creating the model](#creating-the-model)
+       - [Desk model](#desk-model)
+       - [Wall model](#wall-model)
+          - [3D printed only](#3d-printed-only)
+          - [CNC](#cnc)
+    - [PCB & wires](#pcb--wires)
+    - [Firmware ](#firmware)
+       - [Compile](#compile)
+       - [BIN](#bin)
+ - [Features](#features)
+    - [Button](#button)
+    - [LED status](#led-status)
+    - [Potentiometer](#potentiometer)
+    - [WIFI page](#wifi-page)
+       - [Setup](#setup)
+       - [Getting it’s IP](#getting-its-ip)
+       - [Control](#control)
+       - [Soft settings](#soft-settings)
+       - [Clock mode](#clock-mode)
+       - [Task List](#task-list)
+       - [OTA (Over The Air update)](#ota-over-the-air-update)
+       - [Full reset](#full-reset)
+ - [Specifications ](#specifications)
+    - [Input voltage](#input-voltage)
+    - [Power consumption](#power-consumption)
+ - [Appendix](#appendix)
+</p></details>
+
 <img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
 <img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
+
+# Quick start guide
+Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
+1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
+2.	The [potmeters](#pot-meter) or [button](#button) will change the light.
+
+**Optional for WIFI:**
+1.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
+2.	Connect to this Access Point, by default it will be called “smart-clock”.
+3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings), for example 'Clockoffset' is the rotation of the LEDs (there are 60 LEDs so filling in 30 will rotate the clock by 50%). 
+~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
+4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/](http://smart-clock.local/) can also be used.
+
 # Creating a unit
 ## Hardware
 - A [PCB for the lamp/wall model](https://easyeda.com/jellewietsma/smart-light), or a lot of patient copying the schematic and doing it by hand.
-- Parts listed in the BOM of the PCB, these include resistors, capacitors, buttons, potmeters, and an ESP32
-- Other things like Potmeter caps, DC jack cable and adapter, but also some magnets if you want the magnetic option for the desk version (these are by default 4x10mm round magnets)
+- Parts listed in the [BOM](BOM.md) (or the BOM on EasyEDA), these include resistors, capacitors, buttons, potmeters, and an ESP32 as examples.
+- An [model](#creating-the-model) to put everything in. This can either be completly 3D printed, or CNCed, and can also differ in model itzelf like the [DESK](#desk-model) or the [WALL](#wall-model) model.
 
-## Firmware 
-The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) BIN file upload. Either with Arduino IDE and compile it, or using a BIN uploader of choice.
+## Creating the model
+There multiple types of model, the '[DESK model](#desk-model)' is used in this readme as example project. But the other models have the same features, just a different shape. 
 
-### Compile
-- [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
-- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an additional board manager in Arduino IDE.
-- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the built-in library anager in Arduino IDE.
-
-- [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
-- [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
-- [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
-
-### BIN
-Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
-
-The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
-
-## Printing
-There multiple types of model, the 'Desk model' is used in this readme as example project. But the other models have the same features, just a different shape. All STL files have a predefined tolerance of 0.2mm build-in.
+All STL files for 3D-printing have a predefined tolerance of 0.2mm build-in.
 ### Desk model
 The model is [Desk.ipt](3DModel/Desk/Desk.ipt), for this model there are 4 files that need to be printed.
 1.	[Lamp body.stl](3DModel/Desk/Body.stl) is the main body. It is suggested to do at least (0.4mm*3lines=1.2mm) walls so light will not shine though as much. It is printed on its face (like the STL orientation) and only the inner part needs a bit of support (overhang angle 90 degrees, density 2%).
@@ -53,22 +86,27 @@ The model is [Wall Clock.ipt](3DModel/Wall/Wall%20Clock.ipt), for this model the
 #### CNC
 The model is [Wall Clock CNC.ipt](3DModel/Wall/Wall%20Clock&20CNC.ipt).
 1.  [Wall Clock CNC.ipt](3DModel/Wall/Wall%20Clock&20CNC.ipt) This is the part that needs to be cut, it has thicker walls and no LED seperates
-2 	The CNC ipt mentioned above does have hidden LED seperates in the file, the idea was to 3d print them but this is still a WIP idea thing.
+2.	The CNC .ipt mentioned above does have hidden LED seperates in the file, the idea was to 3d print them but this is still a WIP idea thing.
 
 ## PCB & wires
 Please refer the in the [appendix](#appendix) - PCB & schematic for the schematic, but here are some common notes about the schematic, for example in [Input voltage](#Specifications) and [power consumption](#power-consumption) more information is given about the specifications of the electrics.
 
-# Quick start guide 
-Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
-1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
-2.	The [potmeters](#pot-meter) or [button](#button) will change the light.
+## Firmware 
+The firmware needs to be flashed once to enable [OTA](#ota-over-the-air-update) BIN file upload. Either with Arduino IDE and compile it, or using a BIN uploader of choice.
 
-**Optional for WIFI:**
-1.	Long press the button, this will make the LEDs go PURPLE/RED/PURPLE/RED this means it is trying to connect to Wi-Fi, if this takes more than 10 seconds it will have created an Access Point. (Long press the button again to cancel this setup)
-2.	Connect to this Access Point, by default it will be called “smart-clock”.
-3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings), for example 'Clockoffset' is the rotation of the LEDs (there are 60 LEDs so filling in 30 will rotate the clock by 50%). 
-~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
-4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/](http://smart-clock.local/) can also be used.
+### Compile
+- [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
+- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an additional board manager in Arduino IDE.
+- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the built-in library anager in Arduino IDE.
+
+- [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
+- [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
+- [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
+
+### BIN
+Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
+
+The BIN files themself can be found at [releases](https://github.com/jellewie/Arduino-Smart-light/releases). The newest version is always recommended and can be updated with [OTA](#ota-over-the-air-update).
 
 # Features
 ## Button
@@ -83,25 +121,24 @@ Although these options change a bit over time, here is a list of 3 actions what 
 - If it isn’t connected to WIFI it will start connecting to WIFI (and possibly go into AP mode, that is explained in 
 
 ## LED status
-In the back of the desk lamp is a LED. This is also the LED into PCB of the ESP (LED_BUILDIN) this LED reflects some more errors.
+In the back of the [desk](#desk-model) model is a LED (below the button). This is also the LED on the PCB of the ESP (LED_BUILDIN) this LED reflects thes errors:
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
 - **blink 100ms** WIFI setup failed, APmode has started.
-- **blink 500ms** it is connecting to its known WIFI.
-- **blink 1000ms** [OTA](#ota-over-the-air-update) is on.
 - **blink 2000ms** WIFI is lost, so the current time (we are in CLOCK mode) cannot be updated.
+- **blink 500ms** it is connecting to the given WIFI.
 
-Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are not used much.
+Some statuses are also reflected by the LED strip itself, but due to the difficulty driving these in some WIFI modes, these are static set at the start of the status.
 - **White short blink** It is booting up.
 - **PURPLE/BLUE/PURPLE/BLUE** It is starting the WIFI connect code.
 - **PURPLE/RED/PURPLE/RED** It is starting the Access Point code (WIFI could not connect).
 - **PURPLE/GREEN/PURPLE/GREEN** It is starting the get server time code.
 
-## Pot meter
-The 4 pot meters are Red, Green, Blue, and White. Where white stand for the luminescence. When any of these are turned the mode will switch to on/manual and the RGB value will be shown.
+## Potentiometer
+The 4 Potentiometers are Red, Green, Blue, and White. Where white stand for the luminescence. 
+When any of the RGB Potentiometers are turned the mode will switch to on/manual and the RGB value will be shown.
 
 ## WIFI page
-Here are the 2 most important pages listed with their descriptions. Keep in mind more functions could be added or a different layout could be used, but the intention should be the same as these.
-Some special functions might not be listed here. If important things missing feel free to contact me!
+The 2 most important pages are the [Setup](#setup) page, where the user can setup the light. And the [main landing page](#control) where the UI is that the user uses to contol the smart-clock.
 
 ### Setup
 <img align="right" src="Images/ip.png" alt="WIFI page /ip" width=30%>
@@ -230,3 +267,5 @@ The idle power consumption is about 0.65Watt (measured with LEDs turned off, and
 Beta/ updated version on [EasyEDA](https://easyeda.com/jellewietsma/smart-light)
 * 3D models
 [These are included in this repository](3DModel)
+* BOM
+[This is included in this repository](BOM.md)
