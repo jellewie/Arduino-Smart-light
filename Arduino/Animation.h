@@ -13,7 +13,7 @@
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                              //Which AnimationCounter Animation is selected
-byte TotalAnimations = 12;
+byte TotalAnimations = 13;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -347,6 +347,36 @@ void ShowAnimation(bool Start) {       //This would be called to show an Animati
             LED_Fill(LEDtoPosition(_LEDPosU + _Counter)                           , 1, CRGB(255, 0, 0));  //Color the lips
             LED_Fill(LEDtoPosition(_LEDPosL + PacmanMouthOpenhalf - _Counter2 - 1), 1, CRGB(255, 0, 0));
           }
+          UpdateLEDs = true;
+        }
+      } break;
+    case 13: {                                                                //PHYSICS
+        static byte Counter = 0;
+        static CRGB LEDsStart[TotalLEDs];
+        if (Start) {
+          LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);               //Init with rainbow color, so we have something to work with
+
+          memcpy(LEDsStart, LEDs, TotalLEDs * 3); //Save the start position so we can refference it later, amount*3 since we use 3 colors: RGB
+          //Amount = sizeof(LEDs) / sizeof(LEDs[0]);
+
+          Counter = 0;                                              //Reset the counter
+        }
+        EVERY_N_MILLISECONDS(250) {
+          for (byte i = 0; i < TotalLEDs; i++) {
+
+            //https://www.desmos.com/calculator/g4ccytokl8
+            float _pos = cos((i + Counter) / 9.55) * 30 + 30;
+            LEDs[i] = LEDsStart[LEDtoPosition(_pos)];
+
+
+            //LEDs[i] = LEDsStart[LEDtoPosition(i + Counter)];
+          }
+          Counter++;
+          if (Counter >= TotalLEDs)
+            Counter = 0;
+
+          LEDs[Counter] = CRGB(0, 0, 255);      //Just add a rotating RED LED, so we know the code still works
+
           UpdateLEDs = true;
         }
       } break;

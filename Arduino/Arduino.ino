@@ -254,6 +254,8 @@ void loopLEDS() {
     case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2); break;
     case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
     case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
+    case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
+    
     default:
 #ifdef SerialEnabled
       Serial.println("mode with ID " + String(Mode) + " not found");
