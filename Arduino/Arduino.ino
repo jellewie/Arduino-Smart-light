@@ -32,13 +32,13 @@ const byte PAI_B = 34;                            //
 const byte PAI_Brightness = 35;                   //
 const byte PDI_Button = 26;                       //Pulled down with 10k to GND
 const byte PAI_LIGHT = 39;                        //Pulled down with a GL5528 to GND, and pulled up with 10k, This sensor is for AutoBrightness
-const byte PAI_DisablePOTs = 4;                  //Intern pulled up, when pulled down disableds reading of POTS
+const byte PAI_DisablePOTs = 4;                   //Intern pulled up, when pulled down disableds reading of POTS
 
 #include "functions.h"
 byte BootMode = OFF;                              //SOFT_SETTING In which mode to start in
 byte HourlyAnimationS = 10;                       //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;                   //SOFT_SETTING What mode to change to if the button is double pressed
-bool AutoBrightness = false;                      //SOFT_SETTING If the auto brightness is enabled
+bool AutoBrightness = true;                       //SOFT_SETTING If the auto brightness is enabled
 float AutoBrightnessP = 1.04;                     //SOFT_SETTING Brightness = Y=P*(X-N)+O [255/(255-AutoBrightnessN)]
 byte AutoBrightnessN = 10;                        //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
 byte AutoBrightnessO = 5;                         //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
@@ -101,8 +101,6 @@ void setup() {
   Serial.begin(115200);
   Serial.setTimeout(1);
 #endif //SerialEnabled
-  attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
-  pinMode(PAI_DisablePOTs, INPUT_PULLUP);
   //===========================================================================
   //Init LED and let them shortly blink
   //===========================================================================
@@ -114,6 +112,10 @@ void setup() {
     FastLED.delay(1);
   }
   //===========================================================================
+  //Set and attach pins
+  //===========================================================================
+  attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
+  pinMode(PAI_DisablePOTs, INPUT_PULLUP);             //Pull the pin up, so the pin is by default HIGH if not attached
   //Set up all server UrlRequest stuff
   //===========================================================================
   server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URL "/"
