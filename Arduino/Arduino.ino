@@ -47,8 +47,8 @@ byte ClockHourLines = 0;                          //SOFT_SETTING how bright each
 bool ClockHourAnalog = false;                     //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
 byte ClockOffset = 0;                             //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 bool ClockAnalog = false;                         //SOFT_SETTING Makes it so the LEDs dont step, but smootly transition
-long gmtOffset_sec = 3600;                        //SOFT_SETTING Set to you GMT offset (in seconds)
-int  daylightOffset_sec = 3600;                   //SOFT_SETTING Set to your daylight offset (in seconds)
+long gmtOffset_sec = 0;                           //SOFT_SETTING Set to you GMT offset (in seconds)
+int  daylightOffset_sec = 0;                      //SOFT_SETTING Set to your daylight offset (in seconds)
 byte PotMinChange = 2;                            //SOFT_SETTING How much the pot_value needs to change before we process it
 byte PotStick = PotMinChange + 1;                 //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                   //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
@@ -213,7 +213,6 @@ void loop() {
     loopLEDS();
   }
 }
-
 void loopLEDS() {
   if (AnimationCounter != 0)                          //Animation needs to be shown
     ShowAnimation(false);
@@ -254,7 +253,6 @@ void loopLEDS() {
         if (AnimationCounter == 0)                      //If no (hourly) animation is playing
           UpdateAndShowClock(true);
       } break;
-
     case BLINK:       if (LastMode != Mode) StartAnimation(0,  -2); break;
     case BPM:         if (LastMode != Mode) StartAnimation(1,  -2); break;
     case CONFETTI:    if (LastMode != Mode) StartAnimation(2,  -2); break;
