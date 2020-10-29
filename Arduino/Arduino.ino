@@ -32,6 +32,7 @@ const byte PAI_B = 34;                            //
 const byte PAI_Brightness = 35;                   //
 const byte PDI_Button = 26;                       //Pulled down with 10k to GND
 const byte PAI_LIGHT = 39;                        //Pulled down with a GL5528 to GND, and pulled up with 10k, This sensor is for AutoBrightness
+const byte PAI_DisablePOTs = 4;                  //Intern pulled up, when pulled down disableds reading of POTS
 
 #include "functions.h"
 byte BootMode = OFF;                              //SOFT_SETTING In which mode to start in
@@ -101,6 +102,7 @@ void setup() {
   Serial.setTimeout(1);
 #endif //SerialEnabled
   attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
+  pinMode(PAI_DisablePOTs, INPUT_PULLUP);
   //===========================================================================
   //Init LED and let them shortly blink
   //===========================================================================

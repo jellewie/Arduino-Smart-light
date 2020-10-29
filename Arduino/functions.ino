@@ -2,6 +2,7 @@
   This file declairs the function types but does require some other file-functions and variables to work
 */
 void UpdateColor(bool ForceUpdate) {
+  if (digitalRead(PAI_DisablePOTs) == LOW) return;    //If the POTs are disabled with hardware
   POT R = RED.ReadStable(PotMinChange, PotStick, AverageAmount);
   POT G = GREEN.ReadStable(PotMinChange, PotStick, AverageAmount);
   POT B = BLUE.ReadStable(PotMinChange, PotStick, AverageAmount);
@@ -44,6 +45,7 @@ void UpdateBrightness(bool ForceUpdate) {
     }
     ForceUpdate = false;
   }
+  if (digitalRead(PAI_DisablePOTs) == LOW) return; //If the POTs are disabled with hardware
   POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
     if (Brightness.Value == 0) Brightness.Value = 1;
