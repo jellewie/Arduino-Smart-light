@@ -25,7 +25,7 @@ void ClearAndSetupClock() {
 void UpdateAndShowClock(bool ShowClock, bool ForceClock = false);
 void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
   //ShowClock true = show the clock if needed
-  //&ForceClock true = force to show the clock
+  //& ForceClock true = force the clock to be shown
   //==============================
   //Update the internal time clock
   //==============================

@@ -116,6 +116,7 @@ void WiFiManagerUser_Status_Done() {                                    //Called
     fill_solid(&(LEDs[0]),           TotalLEDs,     CRGB(0, 255, 0));   //Turn all LEDs green
     FastLED.show();                                                     //Update leds to show wifi is done
   }
+  if (!TimeSet) UpdateTime();                                           //If no time set, try to get an time from the internet we have just connected to
 }
 void WiFiManagerUser_Status_Blink() {                                   //Used when trying to connect/not connected
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
