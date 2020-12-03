@@ -78,21 +78,24 @@ void ShowIP() {
   ShowIPnumber(MyIp[3]);
 }
 void ShowIPnumber(byte Number) {
+  //192 == ABC == A=1,C=9,C=2
 #ifdef SerialEnabled
   Serial.println("ShowIPnumber " + String(Number));
 #endif //SerialEnabled
   FastLED.clear();
   const static byte SectionLength = TotalLEDs / 10;
-  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);
+  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);  //Add section spacers
 
+  LED_Fill(LEDtoPosition(-1), 3, CRGB(255, 255, 255));  //Mark the start by painting in 3 LEDs around it
+  
   byte A = (Number / 100) * SectionLength + 1;
   Number = Number % 100;                              //Modulo (so what is over when we keep deviding by whole 100)
   byte B = (Number / 10) * SectionLength + 1;
   byte C = (Number % 10) * SectionLength + 1;
 
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(A + i)] += CRGB(255, 0, 0);
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(B + i)] += CRGB(0, 255, 0);
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255);
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(A + i)] += CRGB(255, 0, 0); //Make section A Red
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(B + i)] += CRGB(0, 255, 0); //Make section B Green
+  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255); //Make section C Blue
   UpdateLEDs = true;
 }
 void MyDelay(int DelayMS, int MinDelayMS, bool ReturnOnButtonPress) { //Just a non-blocking delay
