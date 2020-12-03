@@ -2,13 +2,13 @@
 #define Clock_ConnectionTimeOutMS 10000
 
 byte LEDtoPosition(signed int LEDID) {
-  //Takes ClockOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
-  //Basicly adding ClockOffset to the LED and wrapping LEDS around
+  //Takes LEDOffset into account, so you can say turn LED 0 on (top of the CLOCK) and it will convert it to be the top LED
+  //Basicly adding LEDOffset to the LED and wrapping LEDS around
 
   //x-30                  = Rotates 180 degrees
   //(TotalLEDs-Amount)-x  = Flip in Y-Y axes
 
-  LEDID += ClockOffset;
+  LEDID += LEDOffset;
   while (LEDID < 0)                                   //When a negative overflow
     LEDID += TotalLEDs;
   while (LEDID >= TotalLEDs)                          //When a positive overflow

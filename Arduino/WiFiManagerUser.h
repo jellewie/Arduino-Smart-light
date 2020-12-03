@@ -32,7 +32,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 6:   AutoBrightnessO    = ToByte(Value);             return true;  break;
     case 7:   ClockHourLines     = ToByte(Value);             return true;  break;
     case 8:   ClockHourAnalog    = IsTrue(Value);             return true;  break;
-    case 9:   ClockOffset        = ToByte(Value, TotalLEDs);  return true;  break;
+    case 9:   LEDOffset        = ToByte(Value, TotalLEDs);  return true;  break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
     case 11:  gmtOffset_sec      = Value.toInt();             return true;  break;
     case 12:  daylightOffset_sec = Value.toInt();             return true;  break;
@@ -76,7 +76,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 6:   return String(AutoBrightnessO);                                                   break;
     case 7:   return String(ClockHourLines);                                                    break;
     case 8:   return Convert ? IsTrueToString(ClockHourAnalog)      : String(ClockHourAnalog);  break;
-    case 9:   return String(ClockOffset);                                                       break;
+    case 9:   return String(LEDOffset);                                                       break;
     case 10:  return Convert ? IsTrueToString(ClockAnalog)          : String(ClockAnalog);      break;
     case 11:  return String(gmtOffset_sec);                                                     break;
     case 12:  return String(daylightOffset_sec);                                                break;

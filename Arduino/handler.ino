@@ -18,7 +18,7 @@
 #define PreFixSetDoublePressMode "dm"
 #define PreFixSetClockHourLines "hl"
 #define PreFixSetClockHourAnalog "a"
-#define PreFixSetClockOffset "o"
+#define PreFixSetLEDOffset "o"
 #define PreFixSetClockAnalog "c"
 
 //<ip>/time[?PreFix=Value][&....]                     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
@@ -79,8 +79,8 @@ void handle_Set() {
     } else if (ArguName == PreFixSetClockHourAnalog) {
       ClockHourAnalog = IsTrue(ArgValue);
       DoWriteToEEPROM = true;
-    } else if (ArguName == PreFixSetClockOffset) {
-      ClockOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
+    } else if (ArguName == PreFixSetLEDOffset) {
+      LEDOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockAnalog) {
       ClockAnalog = IsTrue(ArgValue);

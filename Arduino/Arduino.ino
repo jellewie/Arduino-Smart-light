@@ -45,7 +45,7 @@ byte AutoBrightnessN = 10;                        //SOFT_SETTING ^              
 byte AutoBrightnessO = 5;                         //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
 byte ClockHourLines = 0;                          //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool ClockHourAnalog = false;                     //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
-byte ClockOffset = 0;                             //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
+byte LEDOffset = 0;                             //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 bool ClockAnalog = false;                         //SOFT_SETTING Makes it so the LEDs dont step, but smootly transition
 long gmtOffset_sec = 0;                           //SOFT_SETTING Set to you GMT offset (in seconds)
 int  daylightOffset_sec = 0;                      //SOFT_SETTING Set to your daylight offset (in seconds)
@@ -73,7 +73,7 @@ extern void StartAnimation(byte ID, int Time);    //^ Required for Clock.h
 #define WiFiManagerUser_HandleAP_Defined          //^
 #define WiFiManagerUser_Name_Defined
 #define WiFiManagerUser_VariableNames_Defined
-const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "ClockOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
+const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "LEDOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
 const byte EEPROM_size = 255;
 #define WiFiManager_mDNS
 #define WiFiManager_OTA
