@@ -70,11 +70,11 @@ void ShowIP() {
 #endif //SerialEnabled
 
   ShowIPnumber(MyIp[0]);
-  MyDelay(30000, true);
+  MyDelay(30000, 500, true);
   ShowIPnumber(MyIp[1]);
-  MyDelay(30000, true);
+  MyDelay(30000, 500, true);
   ShowIPnumber(MyIp[2]);
-  MyDelay(30000, true);
+  MyDelay(30000, 500, true);
   ShowIPnumber(MyIp[3]);
 }
 void ShowIPnumber(byte Number) {
@@ -95,17 +95,21 @@ void ShowIPnumber(byte Number) {
   for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255);
   UpdateLEDs = true;
 }
-void MyDelay(int ms, bool ReturnOnButtonPress) {                    //Just a non-blocking delay
-  unsigned long StopAtTime = millis() + ms;
-  while (millis() < StopAtTime) {
-    WiFiManager.RunServer();                  //Do WIFI server stuff if needed
-    UpdateBrightness(false);                  //Check if manual input potmeters has changed, if so flag the update
-    UpdateColor(false);                       //Check if manual input potmeters has changed, if so flag the update
+void MyDelay(int DelayMS, int MinDelayMS, bool ReturnOnButtonPress) { //Just a non-blocking delay
+  //DelayMS, delay in ms like in the Arduino Delay() function
+  //(ReturnOnButtonPress=true) MinDelayMS, min delay in ms before returning on buttonpress
+  unsigned long _StartTime = millis();
+  while (millis() < _StartTime + DelayMS) {
+    WiFiManager.RunServer();                          //Do WIFI server stuff if needed
+    UpdateBrightness(false);                          //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);                               //Check if manual input potmeters has changed, if so flag the update
+    Button_Time Value = ButtonsA.CheckButton();       //Read and save buttonstate (only used if needed, else there just trashed)
     if (ReturnOnButtonPress) {
-      if (ButtonsA.CheckButton().StartPress)  //Read buttonstate and return early when the button is pressed
-        return;
-    } else
-      ButtonsA.CheckButton();                 //Read buttonstate  (Just trash all inputs)
+      if (millis() > _StartTime + MinDelayMS) {       //*When MinDelayMS=0 then the current time is always later than the StartTime, no need for another check for that
+        if (Value.StartPress)                         //Read buttonstate and return early when the button is pressed
+          return;
+      }
+    }
     UpdateLED();
     yield();
     FastLED.delay(1);

@@ -350,7 +350,7 @@ void handle_Info() {
 void handle_Reset() {
   if (WiFiManager.ClearEEPROM()) {
     server.send(200, "text/plain", "EEPROM cleared");
-    MyDelay(10, false);
+    MyDelay(10,0, false);
     ESP.restart();                                //Restart the ESP
   }
   server.send(400, "text/plain", "Error trying to clear EEPROM");
