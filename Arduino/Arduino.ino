@@ -189,8 +189,11 @@ void loop() {
     if (Value.StartRelease)     Serial.println("StartRelease");
 #endif //SerialEnabled
     if (Value.StartPress) {
-      if (Mode == OFF) {
-        Mode = ModeBeforeOff == OFF ? ON : ModeBeforeOff; //If (ModeBeforeOff is OFF) then {set mode to be ON} else {set to ModeBeforeOff}
+      if (Mode == OFF) {  
+        if (ModeBeforeOff == OFF)                     //If (ModeBeforeOff is OFF) then {set mode to be ON} else {set to ModeBeforeOff}
+          Mode = ON;
+        else
+          Mode = ModeBeforeOff;
       } else {
         ModeBeforeOff = Mode;
         Mode = OFF;
