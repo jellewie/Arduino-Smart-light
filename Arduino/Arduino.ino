@@ -35,7 +35,7 @@ const byte PAI_LIGHT = 39;                        //Pulled down with a GL5528 to
 const byte PAI_DisablePOTs = 4;                   //Intern pulled up, when pulled down disableds reading of POTS
 const byte PAI_OtherDefault  = 5;                 //Intern pulled up, when pulled down disableds reading of POTS
 
-#include "functions.h"
+#include "Structs.h"
 byte BootMode = OFF;                              //SOFT_SETTING In which mode to start in
 byte HourlyAnimationS = 10;                       //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;                   //SOFT_SETTING What mode to change to if the button is double pressed
@@ -85,14 +85,15 @@ const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/re
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
 #include "Button.h"
-#include "time.h"                                 //We need this for the clock function to get the time (Time library)
-#include "Task.h"
 Button ButtonsA = buttons({PDI_Button, PAO_LED});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
+#include "Functions.h"
+#include "time.h"                                 //We need this for the clock function to get the time (Time library)
+#include "Task.h"
 #include "WiFiManagerUser.h"                      //Define custon functions to hook into WiFiManager
 #include "Clock.h"
 #include "Animation.h"
@@ -276,15 +277,6 @@ void loopLEDS() {
   }
   LastMode = Mode;
   UpdateLED();
-}
-void UpdateLED() {
-  if (UpdateLEDs) {
-#ifdef UpdateLEDs_SerialEnabled
-    Serial.println("UL: Update LEDs");
-#endif //UpdateLEDs_SerialEnabled
-    UpdateLEDs = false;
-    FastLED.show();                                   //Update
-  }
 }
 //ISR must return nothing and take no arguments, so we need this sh*t
 void ISR_ButtonsA() {
