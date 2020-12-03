@@ -45,7 +45,7 @@ byte AutoBrightnessN = 10;                        //SOFT_SETTING ^              
 byte AutoBrightnessO = 5;                         //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
 byte ClockHourLines = 0;                          //SOFT_SETTING how bright each hour mark needs to be (0 for off)
 bool ClockHourAnalog = false;                     //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
-byte LEDOffset = 0;                             //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
+byte LEDOffset = 0;                               //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 bool ClockAnalog = false;                         //SOFT_SETTING Makes it so the LEDs dont step, but smootly transition
 long gmtOffset_sec = 0;                           //SOFT_SETTING Set to you GMT offset (in seconds)
 int  daylightOffset_sec = 0;                      //SOFT_SETTING Set to your daylight offset (in seconds)
@@ -58,6 +58,7 @@ bool TimeSet = false;                             //If the time has been set or 
 byte Mode;                                        //Holds in which mode the light is currently in
 byte LastMode = -1;                               //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 const byte TotalLEDs = 60;                        //The total amounts of LEDs in the strip
+const byte LEDSections = TotalLEDs / 60;          //Amount of sections of LEDs
 int AnimationCounter;                             //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                //Where we save the time to
 byte ModeBeforeOff = ON;

@@ -71,12 +71,12 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30;       //^
 
       for (int i = 0; i < TotalLEDs; i++) {
-        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255;        //https://www.desmos.com/calculator/zkl6idhjvx
-        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255;        //^
-        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255;        //^
-        LEDs[LEDtoPosition(i + TimeSSoffset)] += CRGB(0, 0, TimeSSbr);
-        LEDs[LEDtoPosition(i + TimeMMoffset)] += CRGB(0, TimeMMbr, 0);
-        LEDs[LEDtoPosition(i + TimeHHoffset)] += CRGB(TimeHHbr, 0, 0);
+        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255;       //https://www.desmos.com/calculator/zkl6idhjvx
+        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255;       //^
+        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255;       //^
+        LED_Add(LEDtoPosition((i + TimeSSoffset) * LEDSections), LEDSections, CRGB(0, 0, TimeSSbr));
+        LED_Add(LEDtoPosition((i + TimeMMoffset) * LEDSections), LEDSections, CRGB(0, TimeMMbr, 0));
+        LED_Add(LEDtoPosition((i + TimeHHoffset) * LEDSections), LEDSections, CRGB(TimeHHbr, 0, 0));
         UpdateLEDs = true;
       }
     } else {
@@ -84,12 +84,12 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       if (LastSec != TimeCurrent.SS or ForceClock) {
         LastSec = TimeCurrent.SS;
         ClearAndSetupClock();
-        LEDs[LEDtoPosition(TimeCurrent.SS)] += CRGB(0, 0, 255);
-        LEDs[LEDtoPosition(TimeCurrent.MM)] += CRGB(0, 255, 0);
+        LED_Add(LEDtoPosition(TimeCurrent.SS * LEDSections), LEDSections, CRGB(0, 0, 255));
+        LED_Add(LEDtoPosition(TimeCurrent.MM * LEDSections), LEDSections, CRGB(0, 255, 0));
         byte ClockHH = TimeCurrent.HH * 5;
         if (ClockHourAnalog)
           ClockHH += (TimeCurrent.MM / 15);
-        LEDs[LEDtoPosition(ClockHH)] += CRGB(255, 0, 0);
+        LED_Add(LEDtoPosition(ClockHH * LEDSections), LEDSections, CRGB(255, 0, 0));
         UpdateLEDs = true;
       }
     }

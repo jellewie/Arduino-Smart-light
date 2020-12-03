@@ -28,6 +28,19 @@ void LED_Fill(byte From, byte Amount, CRGB Color) {
   } else
     fill_solid(&(LEDs[From]), Amount, Color);
 }
+void LED_Add(byte From, byte Amount, CRGB Color) {
+  while (From >= TotalLEDs) From -= TotalLEDs;                      //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount >= TotalLEDs) Amount = TotalLEDs;                      //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount >= TotalLEDs) {                                 //Overflow protection
+    byte calc1 = TotalLEDs - From;                                  //Calculates the amount of LEDs which need to on on the end of the strip
+    for (int i = From; i < From + calc1; i++)
+      LEDs[i] += Color;
+    for (int i = 0; i < Amount - calc1; i++)
+      LEDs[i] += Color;
+  } else
+    for (int i = From; i < From + Amount; i++)
+      LEDs[i] += Color;
+}
 void LED_Move(byte From, byte Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true);
 void LED_Move(byte From, byte Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset) {
   //From = The first LED to do the animation on
@@ -211,7 +224,7 @@ void ShowIPnumber(byte Number) {
   for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);  //Add section spacers
 
   LED_Fill(LEDtoPosition(-1), 3, CRGB(255, 255, 255));  //Mark the start by painting in 3 LEDs around it
-  
+
   byte A = (Number / 100) * SectionLength + 1;
   Number = Number % 100;                              //Modulo (so what is over when we keep deviding by whole 100)
   byte B = (Number / 10) * SectionLength + 1;
