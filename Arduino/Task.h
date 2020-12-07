@@ -307,7 +307,7 @@ void ExecuteTask() {
           RemoveTask(i);                              //Remove the task, it has been executed
           DoTask(TempTask);                           //Execute the task entry
         }
-      } else if (TimeSet) {
+      } else if (TimeSet or TaskList[i].Type == SYNCTIME) {
         if (TaskList[i].ExectuteAt.HH != TimeCurrent.HH)      //If we not need to execute the task this hour
           TaskList[i].Executed = false;                       //flag this task as not executed
         else if (!TaskList[i].Executed)                       //If the task has not been executed yet, (and the hour must the the same)
