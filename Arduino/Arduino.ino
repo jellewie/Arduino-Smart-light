@@ -85,7 +85,7 @@ const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/re
 #include <FastLED.h>                              //Include the libary FastLED (If you get a error here, make sure it's installed!)
 CRGB LEDs[TotalLEDs];
 #include "StableAnalog.h"
-#include "Button.h"
+#include "Button/Button.h"
 Button ButtonsA = buttons({PDI_Button, PAO_LED});
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);

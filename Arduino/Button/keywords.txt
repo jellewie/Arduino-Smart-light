@@ -1,0 +1,15 @@
+buttons	KEYWORD1
+
+StartPress	KEYWORD2
+StartLongPress	KEYWORD2
+StartDoublePress	KEYWORD2
+StartRelease	KEYWORD2
+Pressed	KEYWORD2
+PressedLong	KEYWORD2
+DoublePress	KEYWORD2
+PressEnded	KEYWORD2
+PressedTime	KEYWORD2
+
+Button	KEYWORD2
+CheckButton	KEYWORD2
+Pinchange	KEYWORD2
