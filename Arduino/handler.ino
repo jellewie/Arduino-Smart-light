@@ -328,7 +328,7 @@ void handle_UpdateTime() {
 #endif //Server_SerialEnabled
 }
 void handle_Info() {
-  POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
+  POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   String Message = "https://github.com/jellewie/Arduino-Smart-light\n"
                    "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " + String(WiFi.macAddress()) + "\n"

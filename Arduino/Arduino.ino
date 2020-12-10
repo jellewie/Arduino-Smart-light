@@ -84,7 +84,7 @@ const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/re
 
 #include <FastLED.h>                              //Include the libary FastLED (If you get a error here, make sure it's installed!)
 CRGB LEDs[TotalLEDs];
-#include "StableAnalog.h"
+#include "StableAnalog/StableAnalog.h"
 #include "Button/Button.h"
 Button ButtonsA = buttons({PDI_Button, PAO_LED});
 StableAnalog RED   = StableAnalog(PAI_R);
@@ -141,10 +141,10 @@ void setup() {
   server.on("/reset",       handle_Reset);
   server.onNotFound(        handle_NotFound);         //When a client requests an unknown URI
   //===========================================================================
-  //Set AnalogResolution, and init the potmeters
+  //Set Analog Resolution, and init the potmeters
   //===========================================================================
-  analogReadResolution(AnalogResolution);
-  for (int i = 0; i < AverageAmount + 2; i++) {
+  analogReadResolution(StableAnalog_AnalogResolution);
+  for (int i = 0; i < StableAnalog_AverageAmount + 2; i++) {
     UpdateColor(false);                               //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
   }

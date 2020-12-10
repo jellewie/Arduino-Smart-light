@@ -158,9 +158,9 @@ void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Dir
 //==================================================
 void UpdateColor(bool ForceUpdate) {
   if (digitalRead(PAI_DisablePOTs) == LOW) return;    //If the POTs are disabled with hardware
-  POT R = RED.ReadStable(PotMinChange, PotStick, AverageAmount);
-  POT G = GREEN.ReadStable(PotMinChange, PotStick, AverageAmount);
-  POT B = BLUE.ReadStable(PotMinChange, PotStick, AverageAmount);
+  POT R = RED.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  POT G = GREEN.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  POT B = BLUE.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   //  if (R.Value == 0 and G.Value == 0 and B.Value == 0) { //If all LEDs are invisible
   //    R.Value = 1 + constrain(BN, 0, 254);
   //  }     //Tried to turn on LED strip soft red when all colors are invisble.
@@ -187,7 +187,7 @@ byte GetAutoBrightness(byte Value) {
   return 255 - constrain(Answer, 0, 254);
 }
 void UpdateBrightness(bool ForceUpdate) {
-  POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
+  POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   if (AutoBrightness) {
     if (L.Changed or ForceUpdate) {
       FastLED.setBrightness(GetAutoBrightness(L.Value));
@@ -201,7 +201,7 @@ void UpdateBrightness(bool ForceUpdate) {
     ForceUpdate = false;
   }
   if (digitalRead(PAI_DisablePOTs) == LOW) return; //If the POTs are disabled with hardware
-  POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, AverageAmount);
+  POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
     if (Brightness.Value == 0) Brightness.Value = 1;
     FastLED.setBrightness(Brightness.Value);
