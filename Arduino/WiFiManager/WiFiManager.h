@@ -42,16 +42,16 @@ class CWiFiManager {
     int EEPROM_USED = 0;                                //Howmany bytes we have used for data in the EEPROM
     //#define strip_ip, gateway_ip, subnet_mask to use static IP
 #ifndef WiFiManagerUser_password_Defined
-    char password[16] = "";                             //Also defines howmany characters can be in the SSID
+    char password[32] = "";                             //Also defines howmany characters can be in the SSID
 #endif //WiFiManagerUser_password_Defined
 #ifndef WiFiManagerUser_ssid_Defined
-    char ssid[16] = "";                                 //^
+    char ssid[32] = "";                                 //^
 #endif //WiFiManagerUser_ssid_Defined
 #ifndef WiFiManagerUser_Name_Defined
-    char Name[16] = "ESP32";                            //If you want to define the name somewhere else use 'char* Name = Name'
+    char Name[32] = "ESP32";                            //If you want to define the name somewhere else use 'char* Name = Name'
 #endif //WiFiManagerUser_Name_Defined
 #ifndef WiFiManagerUser_VariableNames_Defined
-    const byte EEPROM_size = 33;                        //Set EEPROM size to default: Max Amount of chars of 'SSID + PASSWORD' (+1)
+    const byte EEPROM_size = 65;                        //Set EEPROM size to default: Max Amount of chars of 'SSID + PASSWORD' (+1)
 #endif //WiFiManagerUser_VariableNames_Defined
     void Status_Start();                                //[UserHook]
     void Status_Done();                                 //[UserHook]

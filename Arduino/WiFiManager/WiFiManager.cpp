@@ -158,16 +158,15 @@ void WiFiManager_OTA_handle_update2() {
 //===========================================================================
 void CWiFiManager::StartServer() {
   static bool ServerStarted = false;
-  if (!ServerStarted) {                                 //If the server hasn't started yet
-    ServerStarted = true;
-    server.on("/",          WiFiManager_handle_Connect);
-    server.on("/setup",     WiFiManager_handle_Settings);
+  if (ServerStarted) return;                          //If the server is already started, stop here
+  ServerStarted = true;
+  server.on("/",          WiFiManager_handle_Connect);
+  server.on("/setup",     WiFiManager_handle_Settings);
 #ifdef WiFiManager_OTA
-    server.on("/ota",       WiFiManager_OTA_handle_uploadPage);
-    server.on("/update",  HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
+  server.on("/ota",       WiFiManager_OTA_handle_uploadPage);
+  server.on("/update",  HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
 #endif //WiFiManager_OTA
-    server.begin();                                     //Begin server
-  }
+  server.begin();                                     //Begin server
 }
 void CWiFiManager::EnableSetup(bool State) {
 #ifdef WiFiManager_SerialEnabled
@@ -378,6 +377,7 @@ bool CWiFiManager::ClearEEPROM() {
   return true;
 }
 void CWiFiManager::RunServer() {
+  StartServer();                                      //Start server if we havn't yet
   if (WiFi.status() == WL_CONNECTED) server.handleClient();
 }
 void CWiFiManager::handle_Connect() {
