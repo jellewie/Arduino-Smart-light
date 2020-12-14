@@ -1,7 +1,10 @@
+#====================
+#Don't include files
+#====================
+##Inventor 
 *OldVersions/
 *.lck
-_Local/
-Arduino/z_unused.h
+##Output files
 *.bin
-
-*.gcode linguist-vendored
+##Local files
+_Local/
