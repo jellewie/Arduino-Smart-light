@@ -3,3 +3,5 @@
 _Local/
 Arduino/z_unused.h
 *.bin
+
+*.stl linguist-vendored
