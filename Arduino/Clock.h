@@ -88,7 +88,7 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
         LED_Add(LEDtoPosition(TimeCurrent.MM * LEDSections), LEDSections, CRGB(0, 255, 0));
         byte ClockHH = TimeCurrent.HH * 5;
         if (ClockHourAnalog)
-          ClockHH += (TimeCurrent.MM / 15);
+          ClockHH += (TimeCurrent.MM / 12);
         LED_Add(LEDtoPosition(ClockHH * LEDSections), LEDSections, CRGB(255, 0, 0));
         UpdateLEDs = true;
       }
