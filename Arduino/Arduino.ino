@@ -131,7 +131,6 @@ void setup() {
   //Set up all server UrlRequest stuff
   //===========================================================================
   server.on("/",            handle_OnConnect);        //Call the 'handleRoot' function when a client requests URL "/"
-  server.on("/ip",          WiFiManager_handle_Connect);
   server.on("/get",         handle_Getcolors);
   server.on("/set",         handle_Set);
   server.on("/gettasks",    Tasks_handle_GetTasks);

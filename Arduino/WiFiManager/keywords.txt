@@ -30,3 +30,4 @@ RunServer	KEYWORD2
 handle_Connect	KEYWORD2
 handle_Settings	KEYWORD2
 CheckAndReconnectIfNeeded	KEYWORD2
+DoRequest	KEYWORD2

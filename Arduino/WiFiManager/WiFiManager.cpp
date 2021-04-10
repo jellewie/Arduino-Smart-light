@@ -156,15 +156,32 @@ void WiFiManager_OTA_handle_update2() {
 }
 #endif //WiFiManager_OTA
 //===========================================================================
+#ifdef WiFiManager_Restart
+void handle_Restart() {
+#ifdef WiFiManager_SerialEnabled
+  Serial.println("WM: handle_Restart");
+#endif //WiFiManager_SerialEnabled
+  server.send(200, "text/html", "OK, restarting...");
+  for (byte i = 50; i > 0; i--) {                       //Add some delay here to send feedback to the client, i is delay in MS
+    server.handleClient();
+    delay(1);
+  }
+  ESP.restart();
+}
+#endif //WiFiManager_Restart
 void CWiFiManager::StartServer() {
   static bool ServerStarted = false;
   if (ServerStarted) return;                          //If the server is already started, stop here
   ServerStarted = true;
   server.on("/",          WiFiManager_handle_Connect);
+  server.on("/ip",        WiFiManager_handle_Connect);//Just as backup, so the "/" can be overwritten by user
   server.on("/setup",     WiFiManager_handle_Settings);
+#ifdef WiFiManager_Restart
+  server.on("/restart",   handle_Restart);
+#endif //WiFiManager_Restart
 #ifdef WiFiManager_OTA
   server.on("/ota",       WiFiManager_OTA_handle_uploadPage);
-  server.on("/update",  HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
+  server.on("/update",    HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
 #endif //WiFiManager_OTA
   server.begin();                                     //Begin server
 }
@@ -192,9 +209,10 @@ bool CWiFiManager::TickEveryMS(int _Delay) {
 }
 byte CWiFiManager::APMode() {
   //IP of AP = 192.168.4.1
-  /* <Return> <meaning>
-    2 Soft-AP setup Failed
-    3 custom exit
+  /* Returns:
+    1= Done, Client submitted new data though AP portal
+    2= Soft-AP setup Failed
+    3= Manual leaving AP mode (User code has requested it)
   */
   WiFi.mode(WIFI_AP_STA);                               //https://github.com/espressif/arduino-esp32/blob/1287c529330d0c11853b9f23ddf254e4a0bc9aaf/libraries/WiFi/src/WiFiType.h#L33
   if (!WiFi.softAP(Name))                               //config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
@@ -203,14 +221,14 @@ byte CWiFiManager::APMode() {
   EnableSetup(true);                                    //Flag we need to responce to settings commands
   StartServer();                                        //Start server (if we havn't already)
 #ifdef WiFiManager_DNS
-#ifndef WiFiManager_SerialEnabled
+# ifndef WiFiManager_SerialEnabled
   dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));  //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
-#else
+# else
   if (dnsServer.start(53, "*", IPAddress(192, 168, 4, 1)))
     Serial.println("WM: DNS server started");
   else
     Serial.println("WM: DNS server failed to start");
-#endif //WiFiManager_SerialEnabled
+# endif //WiFiManager_SerialEnabled
 #endif //WiFiManager_DNS
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: APMode on; SSID=" + String(Name) + " ip=");
@@ -290,7 +308,7 @@ byte CWiFiManager::LoadData() {
       Value = Value.substring(j + 1);
     }
   }
-  return 0;
+  return 1;
 }
 bool CWiFiManager::Connect(int TimeOutMS) {
   if ((strlen(ssid) == 0 or strlen(password) == 0))     //If no SSID or password given
@@ -316,18 +334,19 @@ bool CWiFiManager::Connect(int TimeOutMS) {
   return true;
 }
 byte CWiFiManager::Start() {
-  //starts wifi stuff, only returns true when Connected. Will create AP when needed
-  /* <Return> <meaning>
-     2 Can't begin EEPROM
-     3 Can't write [all] data to EEPROM
+  //starts wifi stuff, only returns 1/TRUE when Connected. Will start AP setup if needed
+  /* Returns:
+     1= Done or already connected
+     2= EEPROM error (Can't begin EEPROM problably)
+     3= Apmode was unsuccessful
   */
-  if (WiFi.status() == WL_CONNECTED) return true;       //If WIFI already on, stop and return true
+  if (WiFi.status() == WL_CONNECTED) return 1;          //If WIFI already on, stop and return true
   Status_Start();
   if (ssid[0] == 0 and password[0] == 0)                //If the ssid and password are not yet in memory
-    if (byte temp = LoadData()) return temp;            //Load the EEPROM to get the ssid and password. Exit with code if failed
+    if (LoadData() != 1) return 2;                      //Load the EEPROM to get the ssid and password. Exit with code if failed
   while (WiFi.status() != WL_CONNECTED) {
     if (!Connect(ConnectionTimeOutMS))                  //Try to connected to ssid+password
-      APMode();                                         //If we could not connector for whatever reason, Entering APmode
+      if (APMode() != 1) return 3;                      //(If we could not connector for whatever reason), Entering APmode and if that fails return the error
   }
 #ifdef WiFiManager_mDNS                                 //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
   bool MDNSStatus = MDNS.begin(Name);                   //Start mDNS with the given domain name
@@ -344,7 +363,7 @@ byte CWiFiManager::Start() {
   Serial.println(WiFi.localIP());
 #endif //WiFiManager_SerialEnabled
   Status_Done();
-  return true;
+  return 1;
 }
 bool CWiFiManager::WriteEEPROM() {
   String Value;                                         //Save to mem:
@@ -444,12 +463,12 @@ void CWiFiManager::handle_uploadPage() {
   Serial.println("OTA_handle_UploadPage, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
 #endif //WiFiManager_SerialEnabled
   if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
-  String html = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script><a href=\"" + UpdateWebpage + "\">" + UpdateWebpage + "</a><br><br><form method='POST' action='#' enctype='multipart/form-data' id='upload_form'><input type='file' name='update'><input type='submit' value='Upload'></form><div id='prg'>progress: 0%</div><script>$('form').submit(function(c){c.preventDefault();var a=$('#upload_form')[0];var b=new FormData(a);$.ajax({url:'/update',type:'POST',data:b,contentType:false,processData:false,xhr:function(){var d=new window.XMLHttpRequest();d.upload.addEventListener('progress',function(e){if(e.lengthComputable){var f=e.loaded/e.total;$('#prg').html('progress: '+Math.round(f*100)+'%')}},false);return d},success:function(f,e){console.log('success!')},error:function(e,d,f){}})});</script>";
+  String html = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script><a href=\"" + UpdateWebpage + "\">" + UpdateWebpage + "</a><br>Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "<br><br><form method='POST' action='#' enctype='multipart/form-data' id='upload_form'><input type='file' name='update'><input type='submit' value='Upload'></form><div id='prg'>progress: 0%</div><script>$('form').submit(function(c){c.preventDefault();var a=$('#upload_form')[0];var b=new FormData(a);$.ajax({url:'/update',type:'POST',data:b,contentType:false,processData:false,xhr:function(){var d=new window.XMLHttpRequest();d.upload.addEventListener('progress',function(e){if(e.lengthComputable){var f=e.loaded/e.total;$('#prg').html('progress: '+Math.round(f*100)+'%')}},false);return d},success:function(f,e){console.log('success!')},error:function(e,d,f){}})});</script>";
   server.send(200, "text/html", html);
 }
 void CWiFiManager::handle_update() {
 #ifdef WiFiManager_SerialEnabled
-  Serial.printf("OTA: Update, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
+  Serial.printf("WM_OTA: Update, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
 #endif //WiFiManager_SerialEnabled
   if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
   server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
@@ -484,3 +503,60 @@ void CWiFiManager::handle_update2() {
 #endif //WiFiManager_SerialEnabled
 }
 #endif //WiFiManager_OTA
+#ifdef WiFiManager_DoRequest
+byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json, byte TimeOut) {
+  /* Returns:
+    0= Unknown error (responce out of range)  REQ_UNK
+    1= Done (responce code 200)               REQ_SUCCES
+    2= Cant connect to HUB                    REQ_HUB_CONCECT_ERROR
+    3= Timeout recieving responce code        REQ_TIMEOUT
+    4= Page not found (responce code 404)     REQ_PAGE_NOT_FOUND
+    5= Manual WiFi settup required            REQ_SETUP_REQUIRED
+    10-19= Unknown server error (first digit Responce=X-10, for example 4 means an 4## client error (like 403 Forbidden))
+  */
+#ifdef WiFiManager_SerialEnabled
+  Serial.println("WM_REQ: DO REQUEST: " + String(_IP) + ":" + _Port + _Path + " _Data=" + _Json);
+#endif //WiFiManager_SerialEnabled
+
+  if (!WiFiManager.CheckAndReconnectIfNeeded(false))
+    return REQ_SETUP_REQUIRED;                          //Exit here, no connection, and could not auto connect
+  WiFiClient client;
+  client.setTimeout(TimeOut);
+  if (!client.connect(_IP, _Port))
+    return REQ_HUB_CONNECT_ERROR;                       //Stop here, no reason to move on
+  client.println("PUT " + _Path + " HTTP/1.1");
+  client.println("Content-Length: " + String(_Json.length()));
+  client.println("Content-Type: application/json");
+  client.println();                                     //Terminate headers with a blank line
+  client.print(_Json);
+  //Try to look for a responce code 'HTTP/1.1 200 OK' = 200
+  int Responcecode  = 0;
+  unsigned long StopTime = millis() + 2500;             //After this amount of time stop waiting for a response, 500ms could be considered a normal response time
+  static unsigned long _Middle = -1;                    //We just need a really big number, if more than 0 and less than this amount of ms is passed, return true)
+  _Middle = _Middle / 2;                                //Somehow declairing middle on 1 line does not work
+  while (client.connected()) {
+    while (client.available()) {
+      byte recieved = client.read();
+      if (recieved == 0x20) {                           //If "HTTP/1.1" is paste and we now have a SPACE
+        recieved = client.read();                       //Purge space
+        while (recieved != 0x20) {                      //While we read numbers and not a SPACE
+          Responcecode = Responcecode * 10 + (recieved - 0x30); //Convert byte to number and put it in
+          recieved = client.read();                     //Read new byte
+        }
+        client.stop();                                  //Stop, we already have the Responce code
+      }
+    }
+    if (millis() - StopTime <= _Middle) {               //If we are in the timout windown, includes overflow (must be withing the _Middle window)
+      client.stop();                                    //Stop waiting on not responding client
+      return REQ_TIMEOUT;
+    }
+  }
+  if (Responcecode == 200)
+    return REQ_SUCCES;
+  if (Responcecode == 404)
+    return REQ_PAGE_NOT_FOUND;
+  if (Responcecode < 1000)
+    return 10 + floor(Responcecode / 100);
+  return REQ_UNK;
+}
+#endif //WiFiManager_DoRequest

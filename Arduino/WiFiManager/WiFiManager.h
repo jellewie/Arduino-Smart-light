@@ -27,6 +27,9 @@ WebServer server(80);
 const String WiFiManager_VariableNames[] = {"SSID", "Password"};
 #endif //WiFiManagerUser_VariableNames_Defined
 const byte WiFiManager_Settings = sizeof(WiFiManager_VariableNames) / sizeof(WiFiManager_VariableNames[0]); //Why filling this in if we can automate that? :)
+#ifdef WiFiManager_DoRequest
+enum {REQ_UNK, REQ_SUCCES, REQ_HUB_CONNECT_ERROR, REQ_TIMEOUT, REQ_PAGE_NOT_FOUND, REQ_SETUP_REQUIRED};
+#endif //WiFiManager_DoRequest
 
 class CWiFiManager {
   private:
@@ -72,13 +75,17 @@ class CWiFiManager {
     byte LoadData();                                    //Only load data from EEPROM to memory
 #ifdef WiFiManager_OTA
     bool OTA_Enabled = true;
-#ifndef WiFiManagerUser_UpdateWebpage_Defined
+# ifndef WiFiManagerUser_UpdateWebpage_Defined
     const String UpdateWebpage = "https://github.com/jellewie";
-#endif //WiFiManagerUser_UpdateWebpage_Defined
+# endif //WiFiManagerUser_UpdateWebpage_Defined
     void handle_uploadPage();
     void handle_update();
     void handle_update2();
 #endif //WiFiManager_OTA
+#ifdef WiFiManager_DoRequest
+    enum {REQ_UNK, REQ_SUCCES, REQ_HUB_CONNECT_ERROR, REQ_TIMEOUT, REQ_PAGE_NOT_FOUND, REQ_SETUP_REQUIRED};
+    byte DoRequest(char _IP[16], int _Port = 80, String _Path = "", String _Json = "", byte TimeOut = 0);
+#endif //WiFiManager_DoRequest
 };
 
 CWiFiManager WiFiManager;
