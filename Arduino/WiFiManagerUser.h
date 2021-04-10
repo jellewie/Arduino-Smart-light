@@ -34,8 +34,28 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 8:   ClockHourAnalog    = IsTrue(Value);             return true;  break;
     case 9:   LEDOffset        = ToByte(Value, TotalLEDs);  return true;  break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
-    case 11:  gmtOffset_sec      = Value.toInt();             return true;  break;
-    case 12:  daylightOffset_sec = Value.toInt();             return true;  break;
+    case 11:
+      if (gmtOffset_sec != Value.toInt()) {
+        gmtOffset_sec = Value.toInt();
+        TASK TempTask;                                  //Create a space to put a new Task in
+        TempTask.Type       = SYNCTIME;                 //Set the ID of the task to SYNCTIME
+        TempTask.ExectuteAt = TimeS{0, 0, 0, 1};        //Set the task to be executed in 1ms (basically ASAP)
+        AddTask(TempTask);                              //Add the Task command to the task list
+        return true;
+      }
+      return false;
+      break;
+    case 12:
+      if (daylightOffset_sec != Value.toInt()) {
+        daylightOffset_sec = Value.toInt();
+        TASK TempTask;                                  //Create a space to put a new Task in
+        TempTask.Type       = SYNCTIME;                 //Set the ID of the task to SYNCTIME
+        TempTask.ExectuteAt = TimeS{0, 0, 0, 1};        //Set the task to be executed in 1ms (basically ASAP)
+        AddTask(TempTask);                              //Add the Task command to the task list
+        return true;
+      }
+      return false;
+      break;
     case 13:  PotMinChange       = ToByte(Value);             return true;  break;
     case 14:  PotStick           = ToByte(Value);             return true;  break;
     case 15:  PotMin             = ToByte(Value);             return true;  break;
