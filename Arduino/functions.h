@@ -181,6 +181,7 @@ void UpdateColor(bool ForceUpdate) {
 }
 byte GetAutoBrightness(byte Value) {
   float Answer = AutoBrightnessP * (Value - AutoBrightnessN) - AutoBrightnessO;
+  Answer = round(Number);                               //Round to nearest instead of down
   return 255 - constrain(Answer, 0, 254);
 }
 void UpdateBrightness(bool ForceUpdate) {

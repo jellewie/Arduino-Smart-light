@@ -5,11 +5,11 @@
 #define StableAnalog_h
 
 #ifndef StableAnalog_AverageAmount
-#define StableAnalog_AverageAmount 16                         //On how much points to take the average from
+#define StableAnalog_AverageAmount 16                 	//On how much points to take the average from
 #endif //StableAnalog_AverageAmount
 
 #ifndef StableAnalog_AnalogResolution
-#define StableAnalog_AnalogResolution 8                       //Howmany bits an analog read is
+#define StableAnalog_AnalogResolution 8              	//Howmany bits an analog read is
 #endif //StableAnalog_AnalogResolution
 
 #ifndef StableAnalog_AnalogScaler

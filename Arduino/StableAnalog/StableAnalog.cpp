@@ -2,6 +2,7 @@
 StableAnalog::StableAnalog(byte _pin) {                 //Must be <class name> this is kinda the 'root' function
   this->pin = _pin;                                     //Make a pointer
   pinMode(pin, INPUT);                                  //Set the pin as input
+  analogReadResolution(StableAnalog_AnalogResolution);
 }
 byte StableAnalog::Read() {
   PointTotal -= Point[Counter];                         //Remove the old value from the total value
