@@ -242,10 +242,10 @@ Some examples of TaskType and Var:
 This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) and enables you to update firmware over WiFi.
 On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
 After which the 'Upload' button needs to be press for the update process to begin, the unit will automatically update and reboot afterwards.
-Note that [SoftSettings](#soft-settings) are reserved as long as the [FLASH is not wiped](#full-reset).
+Note that [SoftSettings](#soft-settings) are preserved.
 
 ### Full reset
-If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore it back. If the wipe was successful it will be reported back and will execute a restart.
+If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore them back. If the wipe was successful it will be reported back and will execute a restart.
 
 # Specifications 
 ## Input voltage
