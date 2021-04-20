@@ -170,6 +170,7 @@ void handle_Restart() {
 }
 #endif //WiFiManager_Restart
 void CWiFiManager::StartServer() {
+//Should not be called when it isn't connected or hosting
   static bool ServerStarted = false;
   if (ServerStarted) return;                          //If the server is already started, stop here
   ServerStarted = true;
@@ -396,8 +397,9 @@ bool CWiFiManager::ClearEEPROM() {
   return true;
 }
 void CWiFiManager::RunServer() {
+  if (WiFi.status() != WL_CONNECTED) return;
   StartServer();                                      //Start server if we havn't yet
-  if (WiFi.status() == WL_CONNECTED) server.handleClient();
+  server.handleClient();
 }
 void CWiFiManager::handle_Connect() {
   if (!SettingsEnabled) return;                         //If settingscommand is disabled: Stop right away, and do noting

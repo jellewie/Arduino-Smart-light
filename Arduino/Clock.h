@@ -123,7 +123,7 @@ bool UpdateTime() {
   timeinfoLocal = localtime(&Temptimeinfo);             //Convert UTC time to local time to exclude include DST offset automatically
 #ifdef Time_SerialEnabled
   Serial.println(&timeinfo, "TM: UTC: %A, %B %d %Y %H:%M:%S");
-  Serial.println(&timeinfoLocal, "TM: LOCAL: %A, %B %d %Y %H:%M:%S");
+  Serial.println("TM: LOCAL: " + String(timeinfoLocal->tm_hour) + ":" + String(timeinfoLocal->tm_min) + ":" + String(timeinfoLocal->tm_sec));
 #endif //Time_SerialEnabled
   TimeCurrent.Ticks = millis();
   TimeCurrent.HH = timeinfoLocal->tm_hour;

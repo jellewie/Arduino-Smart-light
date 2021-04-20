@@ -22,10 +22,6 @@
 #define Time_RejectStarts 80                            //Just some rejection
 #endif //Time_RejectStarts
 
-struct buttons {
-  byte PIN_Button;
-  byte PIN_LED;
-};
 struct Button_Time {
   bool StartPress;                                      //Triggered once on start press
   bool StartLongPress;                                  //Triggered once if timePressed > LongPress
@@ -39,14 +35,16 @@ struct Button_Time {
 };
 class Button {
   private:                                              //Private variables/functions
+	bool HighState = HIGH;
     bool StartLongFlagged;
     bool StartReleaseFlagged = true;
     unsigned long ButtonStartTime;                      //the button pressed time (to calculate long press)
     unsigned long LastButtonEndTime;                    //To detect double presses
     Button_Time State;
   public:                                               //public variables/functions (these can be acces from the normal sketch)
-    buttons Data;                                       //To store the pointer to the (group) of pins of this instance of buttons
-    Button(const buttons Input);                        //Called to initialize
+	byte PIN_Button;                                    //To store the pointer to pins of this instance of button
+	byte PIN_LED;										//^ but optional (0=unused)
+	Button(const byte _PIN_Button, const byte ButtonPinMode = INPUT, const byte _PIN_LED = 0); //Called to initialize
     Button_Time CheckButton();                          //Call to recieve button state
     void Pinchange();                                   //Called with interupt on pin change
 };

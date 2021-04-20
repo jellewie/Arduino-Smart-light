@@ -5,7 +5,6 @@
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
 #endif
 
-//#define WiFiManager_DNS                               //Is still causing some troubles with (some?) ESP32s
 //#define SerialEnabled
 #ifdef SerialEnabled
 #define     WiFiManager_SerialEnabled                 //WM:
@@ -64,37 +63,27 @@ byte ModeBeforeOff = ON;
 extern byte TotalAnimations;                            //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);          //^ Required for Clock.h
 
-#define WiFiManagerUser_Set_Value_Defined               //Define we want to hook into WiFiManager
-#define WiFiManagerUser_Get_Value_Defined               //^
-#define WiFiManagerUser_Status_Start_Defined            //^
-#define WiFiManagerUser_Status_Done_Defined             //^
-#define WiFiManagerUser_Status_Blink_Defined            //^
-#define WiFiManagerUser_Status_StartAP_Defined          //^
-#define WiFiManagerUser_HandleAP_Defined                //^
-#define WiFiManagerUser_Name_Defined
-#define WiFiManagerUser_VariableNames_Defined
-const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "LEDOffset", "ClockAnalog", "gmtOffset_sec", "daylightOffset_sec", "PotMinChange", "PotStick", "PotMin", "Name", "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7"};
-const byte EEPROM_size = 255;
-#define WiFiManager_mDNS
-#define WiFiManager_OTA
-#define WiFiManagerUser_UpdateWebpage_Defined
-const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/releases";
+#include "WiFiManagerBefore.h"                          //Define what options to use/include or to hook into WiFiManager
 #include "WiFiManager/WiFiManager.h"                    //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed      https://github.com/jellewie/Arduino-WiFiManager
 
 #include <FastLED.h>                                    //Include the libary FastLED (If you get a error here, make sure it's installed!)
 CRGB LEDs[TotalLEDs];
-#include "StableAnalog/StableAnalog.h"
+
 #include "Button/Button.h"
-Button ButtonsA = buttons({PDI_Button, PAO_LED});
+Button ButtonsA = {PDI_Button, INPUT, PAO_LED};
+
+#define StableAnalog_AnalogResolution 10                //ESP32 does not support 8bit (byte) analog readings, to set to 10 and scale down to 8
+#include "StableAnalog/StableAnalog.h"
 StableAnalog RED   = StableAnalog(PAI_R);
 StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
+
 #include "Functions.h"
 #include "time.h"                                       //We need this for the clock function to get the time (Time library)
 #include "Task.h"
-#include "WiFiManagerUser.h"                            //Define custon functions to hook into WiFiManager
+#include "WiFiManagerLater.h"                           //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest)
 #include "Clock.h"
 #include "Animation.h"
 
@@ -116,7 +105,7 @@ void setup() {
   //===========================================================================
   //Set and attach pins
   //===========================================================================
-  attachInterrupt(ButtonsA.Data.PIN_Button, ISR_ButtonsA, CHANGE);
+  attachInterrupt(ButtonsA.PIN_Button, ISR_ButtonsA, CHANGE);
   pinMode(PAI_DisablePOTs, INPUT_PULLUP);               //Pull the pin up, so the pin is by default HIGH if not attached
   //===========================================================================
   //Set default settings
@@ -141,6 +130,7 @@ void setup() {
   //===========================================================================
   //Init the potmeters (This trashed their first values)
   //===========================================================================
+  //analogReadResolution(StableAnalog_AnalogResolution);
   for (int i = 0; i < StableAnalog_AverageAmount + 2; i++) {
     UpdateColor(false);                                 //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
