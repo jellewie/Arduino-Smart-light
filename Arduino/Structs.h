@@ -19,10 +19,16 @@ const byte Modes_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why fi
 String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
-bool StringisDigit(String IN) {
+bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
+bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
+  //IgnoreChar can be used to ignore ',' or '.' or '-'
   for (byte i = 0; i < IN.length(); i++) {
-    if (not isDigit(IN.charAt(i)))
+    if (isDigit(IN.charAt(i))) {              //If it is a digit, do nothing
+    } else if (IN.charAt(i) == IgnoreCharA) { //If it is IgnoreCharA, do nothing
+    } else if (IN.charAt(i) == IgnoreCharB) { //If it is IgnoreCharB, do nothing
+    } else {
       return false;
+    }
   }
   return true;
 }
@@ -38,7 +44,7 @@ int ConvertModeToInt(String IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("CV: ConvertModeToInt '" + IN + "'");
 #endif //Convert_SerialEnabled
-  if (StringisDigit(IN)) {
+  if (StringIsDigit(IN)) {
     if (IN.toInt() < Modes_Amount)
       return IN.toInt();
     else

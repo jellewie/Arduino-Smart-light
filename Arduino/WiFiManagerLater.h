@@ -24,42 +24,75 @@ byte ToByte(String IN, byte MAX) {
 bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
   switch (ValueID) {                                    //Note the numbers are shifted from what is in memory, 0 is the first user value
     case 0:   BootMode           = ConvertModeToInt(Value);   return true;  break;
-    case 1:   HourlyAnimationS   = ToByte(Value);             return true;  break;
+    case 1: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        HourlyAnimationS         = ToByte(Value);             return true;
+      } break;
     case 2:   DoublePressMode    = ConvertModeToInt(Value);   return true;  break;
     case 3:   AutoBrightness     = IsTrue(Value);             return true;  break;
-    case 4:   AutoBrightnessN    = ToByte(Value);             return true;  break;
-    case 5:   AutoBrightnessP    = Value.toFloat();           return true;  break;
-    case 6:   AutoBrightnessO    = ToByte(Value);             return true;  break;
-    case 7:   ClockHourLines     = ToByte(Value);             return true;  break;
+    case 4: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        AutoBrightnessN          = ToByte(Value);             return true;
+      } break;
+    case 5: {
+        Value.replace(",", ".");                        //Replace EN to UN decimal seperator (thats what Arduino uses)
+        if (not StringIsDigit(Value, '.', '-'));              return false;  //No float number given
+        AutoBrightnessP          = Value.toFloat();           return true;
+      } break;
+    case 6: {
+        if (not StringIsDigit(Value));                        return false;  //No number given
+        AutoBrightnessO          = ToByte(Value);             return true;
+      } break;
+    case 7: {
+        if (not StringIsDigit(Value));                        return false;  //No number given
+        ClockHourLines           = ToByte(Value);             return true;
+      } break;
     case 8:   ClockHourAnalog    = IsTrue(Value);             return true;  break;
-    case 9:   LEDOffset          = ToByte(Value, TotalLEDs);  return true;  break;
+    case 9: {
+        if (not StringIsDigit(Value));                        return false;  //No number given
+        LEDOffset                = ToByte(Value, TotalLEDs);  return true;
+      } break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
-    case 11:
-      if (gmtOffset_sec != Value.toInt()) {
-        gmtOffset_sec = Value.toInt();
-        TASK TempTask;                                  //Create a space to put a new Task in
-        TempTask.Type       = SYNCTIME;                 //Set the ID of the task to SYNCTIME
-        TempTask.ExectuteAt = TimeS{0, 0, 0, 1};        //Set the task to be executed in 1ms (basically ASAP)
-        AddTask(TempTask);                              //Add the Task command to the task list
-        return true;
+    case 11: {
+        if (not StringIsDigit(Value), "-");                   return false;  //No number given
+        if (gmtOffset_sec != Value.toInt()) {
+          gmtOffset_sec = Value.toInt();
+          TASK TempTask;                                //Create a space to put a new Task in
+          TempTask.Type       = SYNCTIME;               //Set the ID of the task to SYNCTIME
+          TempTask.ExectuteAt = TimeS{0, 0, 0, 1};      //Set the task to be executed in 1ms (basically ASAP)
+          AddTask(TempTask);                            //Add the Task command to the task list
+          return true;
+        }
+        return false;
+      } break;
+    case 12: {
+        if (not StringIsDigit(Value), "-");                   return false;  //No number given
+        if (daylightOffset_sec != Value.toInt()) {
+          daylightOffset_sec = Value.toInt();
+          TASK TempTask;                                //Create a space to put a new Task in
+          TempTask.Type       = SYNCTIME;               //Set the ID of the task to SYNCTIME
+          TempTask.ExectuteAt = TimeS{0, 0, 0, 1};      //Set the task to be executed in 1ms (basically ASAP)
+          AddTask(TempTask);                            //Add the Task command to the task list
+          return true;
+        }
+        return false;
+      } break;
+    case 13: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        PotMinChange             = ToByte(Value);             return true;  break;
       }
-      return false;
-      break;
-    case 12:
-      if (daylightOffset_sec != Value.toInt()) {
-        daylightOffset_sec = Value.toInt();
-        TASK TempTask;                                  //Create a space to put a new Task in
-        TempTask.Type       = SYNCTIME;                 //Set the ID of the task to SYNCTIME
-        TempTask.ExectuteAt = TimeS{0, 0, 0, 1};        //Set the task to be executed in 1ms (basically ASAP)
-        AddTask(TempTask);                              //Add the Task command to the task list
-        return true;
-      }
-      return false;
-      break;
-    case 13:  PotMinChange       = ToByte(Value);             return true;  break;
-    case 14:  PotStick           = ToByte(Value);             return true;  break;
-    case 15:  PotMin             = ToByte(Value);             return true;  break;
-    case 16:  Value.toCharArray(Name, 16);                    return true;  break;
+    case 14: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        PotStick                 = ToByte(Value);             return true;
+      } break;
+    case 15: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        PotMin                   = ToByte(Value);             return true;
+      } break;
+    case 16: {
+        if (Value.length() > sizeof(Name))                    return false; //Length is to long, it would not fit so stop here
+        Value.toCharArray(Name, 16);                          return true;
+      } break;
     //==============================
     //Tasks
     //==============================
@@ -69,7 +102,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         String _Vars[5];                                //Create a space to but the cut string in
         CutVariable(Value, &_Vars[0], 5);               //Deconstruct the string, and put it into parts
         TASK TempTask;                                  //Create a space to put a new Task in
-        TempTask.Type                 = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
+        TempTask.Type               = constrain(_Vars[0].toInt(), 0, 255);  //Set the ID of the task
         if (TempTask.Type != 0 and TempTask.Type != SAVEEEPROM) { //If a task ID is given, and it was not SAVEEEPROM
           RemoveTask(i);                                //Clear the spot this should go into, NOTE: this might not be an outdated value, but should be fine since the call function loops thought the list
           TempTask.ExectuteAt.HH    = constrain(_Vars[1].toInt(), 0, 23);

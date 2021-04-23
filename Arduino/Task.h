@@ -209,7 +209,7 @@ int ConvertTaskIDToInt(String IN) {
 #ifdef Convert_SerialEnabled
   Serial.println("CV: ConvertTaskToInt '" + IN + "'");
 #endif //Convert_SerialEnabled
-  if (StringisDigit(IN)) {
+  if (StringIsDigit(IN)) {
     if (IN.toInt() <= Task_Amount)
       return IN.toInt();
     else
