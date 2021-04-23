@@ -11,7 +11,7 @@ enum Modes {OFF, ON, WIFI, RESET, CLOCK,
 String ModesString[] = {"OFF", "ON", "WIFI", "RESET", "CLOCK",
                         "BLINK", "BPM", "CONFETTI", "FLASH", "GLITTER", "JUGGLE", "MOVE", "RAINBOW", "SINELON", "SINELON2", "SMILEY", "FLASH2", "PACMAN"
                        }; //ALL CAPS!
-const byte Modes_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why filling this in if we can automate that? :)
+const byte Modes_Amount = sizeof(ModesString) / sizeof(ModesString[0]);//Why filling this in if we can automate that? :)
 
 //==============================
 //Convert stuff
@@ -23,9 +23,9 @@ bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
 bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
   //IgnoreChar can be used to ignore ',' or '.' or '-'
   for (byte i = 0; i < IN.length(); i++) {
-    if (isDigit(IN.charAt(i))) {              //If it is a digit, do nothing
-    } else if (IN.charAt(i) == IgnoreCharA) { //If it is IgnoreCharA, do nothing
-    } else if (IN.charAt(i) == IgnoreCharB) { //If it is IgnoreCharB, do nothing
+    if (isDigit(IN.charAt(i))) {                                //If it is a digit, do nothing
+    } else if (IN.charAt(i) == IgnoreCharA) {                   //If it is IgnoreCharA, do nothing
+    } else if (IN.charAt(i) == IgnoreCharB) {                   //If it is IgnoreCharB, do nothing
     } else {
       return false;
     }

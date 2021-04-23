@@ -4,7 +4,7 @@
 void ClearAndSetupClock() {
   FastLED.clear();
   if (ClockHourLines) {
-    for (int i = 0; i <= 55; i += 5)                    //Create the (12) hourly stripes
+    for (int i = 0; i <= 55; i += 5)                            //Create the (12) hourly stripes
       LEDs[LEDtoPosition(i)] += CRGB(ClockHourLines, ClockHourLines, ClockHourLines);
   }
 }
@@ -15,14 +15,14 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
   //==============================
   //Update the internal time clock
   //==============================
-  static bool FirstUpdate = true;                       //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
+  static bool FirstUpdate = true;                               //This is just to run the first time. Mostly needed if the boot time is lower than 1 second, since we would otherwise skip updating the time until 1s has passed
 #ifdef Time_SerialEnabled
   if (FirstUpdate) Serial.println("TM: UpdateAndShowClock due to FirstUpdate");
 #endif //Time_SerialEnabled
-  while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) {//While more than 1 second pased, or its the first update
+  while (TimeCurrent.Ticks + 1000 <= millis() or FirstUpdate) { //While more than 1 second pased, or its the first update
     if (FirstUpdate) {
       FirstUpdate = false;
-      UpdateTime();                                     //Get a new sync timestamp from the server
+      UpdateTime();                                             //Get a new sync timestamp from the server
     } else {
       TimeCurrent.Ticks += 1000;
     }
@@ -42,15 +42,15 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
         StartAnimation(random(0, TotalAnimations), HourlyAnimationS);//Start a random Animation
-        ShowClock = false;                              //Do not show the clock, an animation will be shown
+        ShowClock = false;                                      //Do not show the clock, an animation will be shown
       }
     }
     if (TimeCurrent.HH >= 24)
       TimeCurrent.HH = 0;
   }
-  if (WiFi.status() != WL_CONNECTED) {                  //If we are no longer connected to WIFI
+  if (WiFi.status() != WL_CONNECTED) {                          //If we are no longer connected to WIFI
     EVERY_N_MILLISECONDS(2000) {
-      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); //Blink every 2 second to show we have lost WIFI and can not sync
+      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));     //Blink every 2 second to show we have lost WIFI and can not sync
     }
   }
   //==============================
@@ -63,24 +63,24 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       float TimeSSfactor = (millis() - TimeCurrent.Ticks) / 1000.0 + TimeCurrent.SS;
       float TimeMMfactor = TimeCurrent.MM + TimeCurrent.SS / 60.0;
       float TimeHHfactor = TimeCurrent.HH * 5 + TimeCurrent.MM / 60.0;
-      if (TimeHHfactor > 60) TimeHHfactor -= 60;                  //If its above 12 hours, remove 12 since we can only show 0-12 hours
+      if (TimeHHfactor > 60) TimeHHfactor -= 60;                //If its above 12 hours, remove 12 since we can only show 0-12 hours
 
-      byte TimeSSoffset = 0, TimeMMoffset = 0, TimeHHoffset = 0;  //If time is over a half circle, lower it, and set the offset
-      if (TimeSSfactor > 30) TimeSSfactor -= TimeSSoffset = 30;   //^
-      if (TimeMMfactor > 30) TimeMMfactor -= TimeMMoffset = 30;   //^
-      if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30;   //^
+      byte TimeSSoffset = 0, TimeMMoffset = 0, TimeHHoffset = 0;//If time is over a half circle, lower it, and set the offset
+      if (TimeSSfactor > 30) TimeSSfactor -= TimeSSoffset = 30; //^
+      if (TimeMMfactor > 30) TimeMMfactor -= TimeMMoffset = 30; //^
+      if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30; //^
 
       for (int i = 0; i < TotalLEDs; i++) {
-        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255;   //https://www.desmos.com/calculator/zkl6idhjvx
-        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255;   //^
-        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255;   //^
+        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255; //https://www.desmos.com/calculator/zkl6idhjvx
+        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255; //^
+        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255; //^
         LED_Add(LEDtoPosition((i + TimeSSoffset) * LEDSections), LEDSections, CRGB(0, 0, TimeSSbr));
         LED_Add(LEDtoPosition((i + TimeMMoffset) * LEDSections), LEDSections, CRGB(0, TimeMMbr, 0));
         LED_Add(LEDtoPosition((i + TimeHHoffset) * LEDSections), LEDSections, CRGB(TimeHHbr, 0, 0));
         UpdateLEDs = true;
       }
     } else {
-      static byte LastSec = -1;                         //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
+      static byte LastSec = -1;                                 //Store 'second' as an 'update already done' state. so if the seconds counter changes we update and else we skip updating
       if (LastSec != TimeCurrent.SS or ForceClock) {
         LastSec = TimeCurrent.SS;
         ClearAndSetupClock();
@@ -110,17 +110,17 @@ bool UpdateTime() {
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  struct tm timeinfo;                                   //https://www.cplusplus.com/reference/ctime/tm/
+  struct tm timeinfo;                                           //https://www.cplusplus.com/reference/ctime/tm/
   if (!getLocalTime(&timeinfo, Clock_ConnectionTimeOutMS)) {
 #ifdef Time_SerialEnabled
     Serial.println("TM: Failed to obtain time");
 #endif //Time_SerialEnabled
-    LastMode = -1;                                      //Re-init the mode
+    LastMode = -1;                                              //Re-init the mode
     return false;
   }
   time_t Temptimeinfo = mktime(&timeinfo);
   struct tm *timeinfoLocal;
-  timeinfoLocal = localtime(&Temptimeinfo);             //Convert UTC time to local time to exclude include DST offset automatically
+  timeinfoLocal = localtime(&Temptimeinfo);                     //Convert UTC time to local time to exclude include DST offset automatically
 #ifdef Time_SerialEnabled
   Serial.println(&timeinfo, "TM: UTC: %A, %B %d %Y %H:%M:%S");
   Serial.println("TM: LOCAL: " + String(timeinfoLocal->tm_hour) + ":" + String(timeinfoLocal->tm_min) + ":" + String(timeinfoLocal->tm_sec));
@@ -130,7 +130,7 @@ bool UpdateTime() {
   TimeCurrent.MM = timeinfoLocal->tm_min;
   TimeCurrent.SS = timeinfoLocal->tm_sec;
   TimeSet = true;
-  if (Mode == CLOCK) UpdateAndShowClock(true, true);    //If we are curently in CLOCK mode, make sure to update the shown time
-  LastMode = -1;                                        //Re-init the mode
+  if (Mode == CLOCK) UpdateAndShowClock(true, true);            //If we are curently in CLOCK mode, make sure to update the shown time
+  LastMode = -1;                                                //Re-init the mode
   return true;
 }

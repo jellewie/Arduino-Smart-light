@@ -9,9 +9,9 @@ byte LEDtoPosition(signed int LEDID) {
   //(TotalLEDs-Amount)-x  = Flip in Y-Y axes
 
   LEDID += LEDOffset;
-  while (LEDID < 0)                                     //When a negative overflow
+  while (LEDID < 0)                                             //When a negative overflow
     LEDID += TotalLEDs;
-  while (LEDID >= TotalLEDs)                            //When a positive overflow
+  while (LEDID >= TotalLEDs)                                    //When a positive overflow
     LEDID -= TotalLEDs;
   return LEDID;
 }
@@ -19,20 +19,20 @@ byte LEDtoPosition(signed int LEDID) {
 //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
 //==================================================
 void LED_Fill(byte From, byte Amount, CRGB Color) {
-  while (From >= TotalLEDs) From -= TotalLEDs;          //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= TotalLEDs) Amount = TotalLEDs;          //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= TotalLEDs) {                     //Overflow protection
-    byte calc1 = TotalLEDs - From;                      //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= TotalLEDs) From -= TotalLEDs;                  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount >= TotalLEDs) Amount = TotalLEDs;                  //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount >= TotalLEDs) {                             //Overflow protection
+    byte calc1 = TotalLEDs - From;                              //Calculates the amount of LEDs which need to on on the end of the strip
     fill_solid(&(LEDs[From]), calc1, Color);
     fill_solid(&(LEDs[0]), Amount - calc1, Color);
   } else
     fill_solid(&(LEDs[From]), Amount, Color);
 }
 void LED_Add(byte From, byte Amount, CRGB Color) {
-  while (From >= TotalLEDs) From -= TotalLEDs;          //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= TotalLEDs) Amount = TotalLEDs;          //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= TotalLEDs) {                     //Overflow protection
-    byte calc1 = TotalLEDs - From;                      //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= TotalLEDs) From -= TotalLEDs;                  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount >= TotalLEDs) Amount = TotalLEDs;                  //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount >= TotalLEDs) {                             //Overflow protection
+    byte calc1 = TotalLEDs - From;                              //Calculates the amount of LEDs which need to on on the end of the strip
     for (int i = From; i < From + calc1; i++)
       LEDs[i] += Color;
     for (int i = 0; i < Amount - calc1; i++)
@@ -60,21 +60,21 @@ void LED_Move(byte From, byte Amount, CRGB Color, byte Sets, byte Length, byte *
     Count = Amount - Count - 1;
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0));
-  byte poss[Sets];                                      //Array for saving the positions of the sections
-  for (byte i = 0; i < Sets; i++) {                     //Beginning of the loop which will send each position and length
-    poss[i] = Count + Amount * i / Sets;                //This will calculate each position by adding the offset times the position number to the first position
-    byte posX;                                          //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
-    if (poss[i] >= Amount) {                            //To see if the position is to bigger than the total amount
-      posX = From + poss[i] - Amount;                   //Subtract the total amount of LEDs from the position number
-    } else {                                            //Otherwise it will just use the position data without modifying it
-      posX = From + poss[i];                            //Just use the position number
+  byte poss[Sets];                                              //Array for saving the positions of the sections
+  for (byte i = 0; i < Sets; i++) {                             //Beginning of the loop which will send each position and length
+    poss[i] = Count + Amount * i / Sets;                        //This will calculate each position by adding the offset times the position number to the first position
+    byte posX;                                                  //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
+    if (poss[i] >= Amount) {                                    //To see if the position is to bigger than the total amount
+      posX = From + poss[i] - Amount;                           //Subtract the total amount of LEDs from the position number
+    } else {                                                    //Otherwise it will just use the position data without modifying it
+      posX = From + poss[i];                                    //Just use the position number
     }
-    if (posX <= From + Amount - Length) {               //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
-      LED_Fill(posX, Length, Color);                    //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
+    if (posX <= From + Amount - Length) {                       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
+      LED_Fill(posX, Length, Color);                            //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
     } else {
-      byte calc1 = (From + Amount) - posX;              //Calculates the amount of LEDs which need to be set from the beginning
-      LED_Fill(posX, calc1, Color);                     //Fills the LEDs at the end of the strip
-      LED_Fill(From, Length - calc1, Color);            //Fills the LEDs at the beginning of the strip
+      byte calc1 = (From + Amount) - posX;                      //Calculates the amount of LEDs which need to be set from the beginning
+      LED_Fill(posX, calc1, Color);                             //Fills the LEDs at the end of the strip
+      LED_Fill(From, Length - calc1, Color);                    //Fills the LEDs at the beginning of the strip
     }
   }
   *Counter += 1;
@@ -94,10 +94,10 @@ void LED_Rainbow(byte From, byte Amount, byte DeltaHue) {
   //byte DeltaHue = Diffrence between each LED in hue
   static byte gHue;
   gHue++;
-  while (From >= TotalLEDs) From -= TotalLEDs;          //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= TotalLEDs) Amount = TotalLEDs;          //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= TotalLEDs) {                     //Overflow protection
-    byte calc1 = TotalLEDs - From;                      //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= TotalLEDs) From -= TotalLEDs;                  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount >= TotalLEDs) Amount = TotalLEDs;                  //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount >= TotalLEDs) {                             //Overflow protection
+    byte calc1 = TotalLEDs - From;                              //Calculates the amount of LEDs which need to on on the end of the strip
     fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
     fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
   } else
@@ -105,7 +105,7 @@ void LED_Rainbow(byte From, byte Amount, byte DeltaHue) {
 }
 void LED_Wobble(byte From, byte Amount, CRGB Color, byte Sets, byte Length) {
   //Sort of a move, but just back and forth between the start en end
-  static byte Counter;                                  //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
+  static byte Counter;                                          //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
   static bool Reverse = false;
   LED_Move(From, Amount, Color, Sets, Length, &Counter, Reverse);
   if (Reverse) {
@@ -122,17 +122,17 @@ void LED_Wobble(byte From, byte Amount, CRGB Color, byte Sets, byte Length) {
 }
 void LED_Blink(byte From, byte Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse = false);
 void LED_Blink(byte From, byte Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse) {
-  LED_Fill(From, Amount,       CRGB(0, 0, 0));          //Turn LEDs off
+  LED_Fill(From, Amount,       CRGB(0, 0, 0));                  //Turn LEDs off
   if (Reverse) {
-    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb);  //Set some LEDs to be always on
-    LED_Fill(From + Amount - *Counter, *Counter, rgb);  //Set the counter amount of LEDs on (this will increase)
+    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb);          //Set some LEDs to be always on
+    LED_Fill(From + Amount - *Counter, *Counter, rgb);          //Set the counter amount of LEDs on (this will increase)
   } else {
-    LED_Fill(From, AlwaysOn,     rgb);                  //Set some LEDs to be always on
-    LED_Fill(From, *Counter, rgb);                      //Set the counter amount of LEDs on (this will increase)
+    LED_Fill(From, AlwaysOn,     rgb);                          //Set some LEDs to be always on
+    LED_Fill(From, *Counter, rgb);                              //Set the counter amount of LEDs on (this will increase)
   }
-  *Counter += 1;                                        //This will make the blink 1 longer each time
-  if (*Counter > Amount)                                //If we are at max length
-    *Counter = 0;                                       //Reset counter
+  *Counter += 1;                                                //This will make the blink 1 longer each time
+  if (*Counter > Amount)                                        //If we are at max length
+    *Counter = 0;                                               //Reset counter
 }
 void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true);
 void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Direcion, bool Reverse, bool Reset) {
@@ -141,24 +141,24 @@ void LED_BackAndForth(byte From, byte Amount, CRGB rgb, byte *Counter, bool *Dir
     LED_Fill(From, Amount, CRGB(0, 0, 0));
 
   if (Reverse)
-    LED_Fill(From + Amount - *Counter, *Counter, rgb);  //Set the counter amount of LEDs on
+    LED_Fill(From + Amount - *Counter, *Counter, rgb);          //Set the counter amount of LEDs on
   else
-    LED_Fill(From, *Counter, rgb);                      //Set the counter amount of LEDs on
+    LED_Fill(From, *Counter, rgb);                              //Set the counter amount of LEDs on
 
   if (*Direcion)
-    *Counter -= 1;                                      //This will make the animation_on 1 shorter each time
+    *Counter -= 1;                                              //This will make the animation_on 1 shorter each time
   else
-    *Counter += 1;                                      //This will make the animation_on 1 longer each time
-  if (*Counter >= Amount or * Counter == 0)             //If we are at max length or at the start
-    *Direcion = !*Direcion;                             //Flip direction
+    *Counter += 1;                                              //This will make the animation_on 1 longer each time
+  if (*Counter >= Amount or * Counter == 0)                     //If we are at max length or at the start
+    *Direcion = !*Direcion;                                     //Flip direction
 }
 //==================================================
 void UpdateColor(bool ForceUpdate) {
-  if (digitalRead(PAI_DisablePOTs) == LOW) return;      //If the POTs are disabled with hardware
+  if (digitalRead(PAI_DisablePOTs) == LOW) return;              //If the POTs are disabled with hardware
   POT R = RED.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   POT G = GREEN.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   POT B = BLUE.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
-  //  if (R.Value == 0 and G.Value == 0 and B.Value == 0) { //If all LEDs are invisible
+  //  if (R.Value == 0 and G.Value == 0 and B.Value == 0) {     //If all LEDs are invisible
   //    R.Value = 1 + constrain(BN, 0, 254);
   //  }     //Tried to turn on LED strip soft red when all colors are invisble.
   if (R.Changed or G.Changed or B.Changed or ForceUpdate) {
@@ -181,7 +181,7 @@ void UpdateColor(bool ForceUpdate) {
 }
 byte GetAutoBrightness(byte Value) {
   float Answer = AutoBrightnessP * (Value - AutoBrightnessN) - AutoBrightnessO;
-  Answer = round(Answer);                               //Round to nearest instead of down
+  Answer = round(Answer);                                       //Round to nearest instead of down
   return 255 - constrain(Answer, 0, 254);
 }
 void UpdateBrightness(bool ForceUpdate) {
@@ -198,7 +198,7 @@ void UpdateBrightness(bool ForceUpdate) {
     }
     ForceUpdate = false;
   }
-  if (digitalRead(PAI_DisablePOTs) == LOW) return;      //If the POTs are disabled with hardware
+  if (digitalRead(PAI_DisablePOTs) == LOW) return;              //If the POTs are disabled with hardware
   POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
     if (Brightness.Value == 0) Brightness.Value = 1;
@@ -221,10 +221,10 @@ void ShowIPnumber(byte Number) {
   const static byte SectionLength = TotalLEDs / 10;
   for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);//Add section spacers
 
-  LED_Fill(LEDtoPosition(-1), 3, CRGB(255, 255, 255));  //Mark the start by painting in 3 LEDs around it
+  LED_Fill(LEDtoPosition(-1), 3, CRGB(255, 255, 255));          //Mark the start by painting in 3 LEDs around it
 
   byte A = (Number / 100) * SectionLength + 1;
-  Number = Number % 100;                                //Modulo (so what is over when we keep deviding by whole 100)
+  Number = Number % 100;                                        //Modulo (so what is over when we keep deviding by whole 100)
   byte B = (Number / 10) * SectionLength + 1;
   byte C = (Number % 10) * SectionLength + 1;
 
@@ -239,7 +239,7 @@ void UpdateLED() {
     Serial.println("UL: Update LEDs");
 #endif //UpdateLEDs_SerialEnabled
     UpdateLEDs = false;
-    FastLED.show();                                     //Update
+    FastLED.show();                                             //Update
   }
 }
 void MyDelay(int DelayMS, int MinDelayMS, bool ReturnOnButtonPress) { //Just a non-blocking delay
@@ -247,13 +247,13 @@ void MyDelay(int DelayMS, int MinDelayMS, bool ReturnOnButtonPress) { //Just a n
   //(ReturnOnButtonPress=true) MinDelayMS, min delay in ms before returning on buttonpress
   unsigned long _StartTime = millis();
   while (millis() < _StartTime + DelayMS) {
-    WiFiManager.RunServer();                            //Do WIFI server stuff if needed
-    UpdateBrightness(false);                            //Check if manual input potmeters has changed, if so flag the update
-    UpdateColor(false);                                 //Check if manual input potmeters has changed, if so flag the update
-    Button_Time Value = ButtonsA.CheckButton();         //Read and save buttonstate (only used if needed, else there just trashed)
+    WiFiManager.RunServer();                                    //Do WIFI server stuff if needed
+    UpdateBrightness(false);                                    //Check if manual input potmeters has changed, if so flag the update
+    UpdateColor(false);                                         //Check if manual input potmeters has changed, if so flag the update
+    Button_Time Value = ButtonsA.CheckButton();                 //Read and save buttonstate (only used if needed, else there just trashed)
     if (ReturnOnButtonPress) {
-      if (millis() > _StartTime + MinDelayMS) {         //*When MinDelayMS=0 then the current time is always later than the StartTime, no need for another check for that
-        if (Value.StartPress)                           //Read buttonstate and return early when the button is pressed
+      if (millis() > _StartTime + MinDelayMS) {                 //*When MinDelayMS=0 then the current time is always later than the StartTime, no need for another check for that
+        if (Value.StartPress)                                   //Read buttonstate and return early when the button is pressed
           return;
       }
     }
@@ -269,7 +269,7 @@ void ShowIP() {
   IPAddress MyIp = WiFi.localIP();
 #ifdef SerialEnabled
   Serial.print("My ip = ");
-  Serial.println(WiFi.localIP());                       //Just send it's IP on boot to let you know
+  Serial.println(WiFi.localIP());                               //Just send it's IP on boot to let you know
 #endif //SerialEnabled
 
   ShowIPnumber(MyIp[0]);

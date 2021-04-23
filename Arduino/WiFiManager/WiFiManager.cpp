@@ -33,19 +33,19 @@ bool CWiFiManager::Set_Value(byte ValueID, String Value) {
 #endif //WiFiManager_SerialEnabled
   switch (ValueID) {
     case 0:
-      return false;                                     //Invalid ValueID
+      return false;                                             //Invalid ValueID
       break;
     case 1:
       Value.toCharArray(ssid, Value.length() + 1);
       break;
     case 2:
       for (byte i = 0; i < String(Value).length(); i++) {
-        if (Value.charAt(i) != '*') {                   //if the password is set (and not just the '*****' we have given the client)
+        if (Value.charAt(i) != '*') {                           //if the password is set (and not just the '*****' we have given the client)
           Value.toCharArray(password, Value.length() + 1);
-          return true;                                  //Stop for loop
+          return true;                                          //Stop for loop
         }
       }
-      return false;                                     //Not set, the password was just '*****'
+      return false;                                             //Not set, the password was just '*****'
       break;
 #ifdef WiFiManagerUser_Set_Value_Defined
     default:
@@ -61,16 +61,16 @@ String CWiFiManager::Get_Value(byte ValueID, bool Safe, bool Convert) {
 #ifdef WiFiManager_SerialEnabled
   Serial.print("WM: Get current value of: " + String(ValueID) + " safe=" + String(Safe) + " conv=" + String(Convert));
 #endif //WiFiManager_SerialEnabled
-  String Return_Value = "";                             //Make sure to return something, if we return bad data of NULL, the HTML page will break
+  String Return_Value = "";                                     //Make sure to return something, if we return bad data of NULL, the HTML page will break
   switch (ValueID) {
     case 0:
-      return "";                                        //Invalid ValueID
+      return "";                                                //Invalid ValueID
       break;
     case 1:
       Return_Value += String(ssid);
       break;
     case 2:
-      if (Safe)                                         //If's it's safe to return password.
+      if (Safe)                                                 //If's it's safe to return password.
         Return_Value += String(password);
       else {
         for (byte i = 0; i < String(password).length(); i++)
@@ -86,8 +86,8 @@ String CWiFiManager::Get_Value(byte ValueID, bool Safe, bool Convert) {
 #ifdef WiFiManager_SerialEnabled
   Serial.println(" = " + Return_Value);
 #endif //WiFiManager_SerialEnabled
-  Return_Value.replace("\"", "'");                      //Make sure to change char("), since we can't use that, change to char(')
-  Return_Value.replace(String(EEPROM_Seperator), " ");  //Make sure to change the EEPROM seperator, since we can't use that
+  Return_Value.replace("\"", "'");                              //Make sure to change char("), since we can't use that, change to char(')
+  Return_Value.replace(String(EEPROM_Seperator), " ");          //Make sure to change the EEPROM seperator, since we can't use that
   return String(Return_Value);
 }
 void CWiFiManager::Status_Start() {
@@ -162,7 +162,7 @@ void handle_Restart() {
   Serial.println("WM: handle_Restart");
 #endif //WiFiManager_SerialEnabled
   server.send(200, "text/html", "OK, restarting...");
-  for (byte i = 50; i > 0; i--) {                       //Add some delay here to send feedback to the client, i is delay in MS
+  for (byte i = 50; i > 0; i--) {                               //Add some delay here to send feedback to the client, i is delay in MS
     server.handleClient();
     delay(1);
   }
@@ -170,12 +170,12 @@ void handle_Restart() {
 }
 #endif //WiFiManager_Restart
 void CWiFiManager::StartServer() {
-//Should not be called when it isn't connected or hosting
+  //Should not be called when it isn't connected or hosting
   static bool ServerStarted = false;
-  if (ServerStarted) return;                          //If the server is already started, stop here
+  if (ServerStarted) return;                                    //If the server is already started, stop here
   ServerStarted = true;
   server.on("/",          WiFiManager_handle_Connect);
-  server.on("/ip",        WiFiManager_handle_Connect);//Just as backup, so the "/" can be overwritten by user
+  server.on("/ip",        WiFiManager_handle_Connect);          //Just as backup, so the "/" can be overwritten by user
   server.on("/setup",     WiFiManager_handle_Settings);
 #ifdef WiFiManager_Restart
   server.on("/restart",   handle_Restart);
@@ -184,7 +184,7 @@ void CWiFiManager::StartServer() {
   server.on("/ota",       WiFiManager_OTA_handle_uploadPage);
   server.on("/update",    HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
 #endif //WiFiManager_OTA
-  server.begin();                                     //Begin server
+  server.begin();                                               //Begin server
 }
 void CWiFiManager::EnableSetup(bool State) {
 #ifdef WiFiManager_SerialEnabled
@@ -201,7 +201,7 @@ void CWiFiManager::EnableSetup(bool State) {
   SettingsEnabled = State;
 }
 bool CWiFiManager::TickEveryMS(int _Delay) {
-  static unsigned long _LastTime = 0;                   //Make it so it returns 1 if called for the FIST time
+  static unsigned long _LastTime = 0;                           //Make it so it returns 1 if called for the FIST time
   if (millis() > _LastTime + _Delay) {
     _LastTime = millis();
     return true;
@@ -216,14 +216,14 @@ byte CWiFiManager::APMode() {
     3= Manual leaving AP mode (User code has requested it)
   */
   WiFi.mode(WIFI_AP_STA);                               //https://github.com/espressif/arduino-esp32/blob/1287c529330d0c11853b9f23ddf254e4a0bc9aaf/libraries/WiFi/src/WiFiType.h#L33
-  if (!WiFi.softAP(Name))                               //config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
+  if (!WiFi.softAP(Name))                                       //config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
     return 2;
   Status_StartAP();
-  EnableSetup(true);                                    //Flag we need to responce to settings commands
-  StartServer();                                        //Start server (if we havn't already)
+  EnableSetup(true);                                            //Flag we need to responce to settings commands
+  StartServer();                                                //Start server (if we havn't already)
 #ifdef WiFiManager_DNS
 # ifndef WiFiManager_SerialEnabled
-  dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));  //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
+  dnsServer.start(53, "*", IPAddress(192, 168, 4, 1));          //Start a DNS server at the default DNS port, and send ALL trafic to it OWN IP (DNS_port, DNS_domainName, DNS_resolvedIP)
 # else
   if (dnsServer.start(53, "*", IPAddress(192, 168, 4, 1)))
     Serial.println("WM: DNS server started");
@@ -236,7 +236,7 @@ byte CWiFiManager::APMode() {
   Serial.println(WiFi.softAPIP());
 #endif //WiFiManager_SerialEnabled
   while (WaitOnAPMode) {
-    if (TickEveryMS(100)) Status_Blink();               //Let the LED blink to show we are not connected
+    if (TickEveryMS(100)) Status_Blink();                       //Let the LED blink to show we are not connected
     server.handleClient();
 #ifdef WiFiManager_DNS
     dnsServer.processNextRequest();
@@ -245,7 +245,7 @@ byte CWiFiManager::APMode() {
 #ifdef SerialEnabled
       Serial.println("WM: Manual leaving APMode");
 #endif //SerialEnabled
-      EnableSetup(false);                               //Flag to stop responce to settings commands
+      EnableSetup(false);                                       //Flag to stop responce to settings commands
 #ifdef WiFiManager_DNS
       dnsServer.stop();
 #endif //WiFiManager_DNS
@@ -258,8 +258,8 @@ byte CWiFiManager::APMode() {
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: Leaving APmode");
 #endif //WiFiManager_SerialEnabled
-  WaitOnAPMode = true;                                  //reset flag for next time
-  EnableSetup(false);                                   //Flag to stop responce to settings commands
+  WaitOnAPMode = true;                                          //reset flag for next time
+  EnableSetup(false);                                           //Flag to stop responce to settings commands
   return 1;
 }
 String CWiFiManager::LoadEEPROM() {
@@ -269,14 +269,14 @@ String CWiFiManager::LoadEEPROM() {
 #endif //WiFiManager_SerialEnabled
   for (int i = 0; i < EEPROM_size; i++) {
     byte Input = EEPROM.read(i);
-    if (Input == 255) {                                 //If at the end of data
+    if (Input == 255) {                                         //If at the end of data
 #ifdef WiFiManager_SerialEnabled
       Serial.println();
 #endif //WiFiManager_SerialEnabled
       EEPROM_USED = Value.length();
-      return Value;                                     //Stop and return all data stored
+      return Value;                                             //Stop and return all data stored
     }
-    if (Input == 0) {                                   //If no data found (NULL)
+    if (Input == 0) {                                           //If no data found (NULL)
       EEPROM_USED = Value.length();
       return String(EEPROM_Seperator);
     }
@@ -289,7 +289,7 @@ String CWiFiManager::LoadEEPROM() {
   Serial.println();
 #endif //WiFiManager_SerialEnabled
   EEPROM_USED = Value.length();
-  return String(EEPROM_Seperator);                      //ERROR; [maybe] not enough space
+  return String(EEPROM_Seperator);                              //ERROR; [maybe] not enough space
 }
 byte CWiFiManager::LoadData() {
   if (!EEPROM.begin(EEPROM_size))
@@ -298,21 +298,21 @@ byte CWiFiManager::LoadData() {
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: EEPROM data=" + Value);
 #endif //WiFiManager_SerialEnabled
-  if (Value != String(EEPROM_Seperator)) {              //If there is data in EEPROM
+  if (Value != String(EEPROM_Seperator)) {                      //If there is data in EEPROM
     for (byte i = 1; i < WiFiManager_Settings + 1; i++) {
       byte j = Value.indexOf(char(EEPROM_Seperator));
       if (j == 255)
         j = Value.length();
       String _Value = Value.substring(0, j);
-      if (_Value != "")                                 //If there is a value
-        Set_Value(i, _Value);                           //set the value in memory (and thus overwrite the Hardcoded stuff)
+      if (_Value != "")                                         //If there is a value
+        Set_Value(i, _Value);                                   //set the value in memory (and thus overwrite the Hardcoded stuff)
       Value = Value.substring(j + 1);
     }
   }
   return 1;
 }
 bool CWiFiManager::Connect(int TimeOutMS) {
-  if ((strlen(ssid) == 0 or strlen(password) == 0))     //If no SSID or password given
+  if ((strlen(ssid) == 0 or strlen(password) == 0))             //If no SSID or password given
     return false;
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: Connecting to ssid='" + String(ssid) + "' password='" + String(password) + "'");
@@ -324,13 +324,13 @@ bool CWiFiManager::Connect(int TimeOutMS) {
 #endif
   unsigned long StopTime = millis() + TimeOutMS;
   while (WiFi.status() != WL_CONNECTED) {
-    if (millis() > StopTime) {                          //If we are in overtime
+    if (millis() > StopTime) {                                  //If we are in overtime
 #ifdef WiFiManager_SerialEnabled
       Serial.println("WM: Could not connect within " + String(TimeOutMS) + "ms to given SSID, aborting with code " + ConvertWifistatus(WiFi.status()));
 #endif //WiFiManager_SerialEnabled
       return false;
     }
-    if (TickEveryMS(500)) Status_Blink();               //Let the LED blink to show we are trying to connect
+    if (TickEveryMS(500)) Status_Blink();                       //Let the LED blink to show we are trying to connect
   }
   return true;
 }
@@ -341,17 +341,17 @@ byte CWiFiManager::Start() {
      2= EEPROM error (Can't begin EEPROM problably)
      3= Apmode was unsuccessful
   */
-  if (WiFi.status() == WL_CONNECTED) return 1;          //If WIFI already on, stop and return true
+  if (WiFi.status() == WL_CONNECTED) return 1;                  //If WIFI already on, stop and return true
   Status_Start();
-  if (ssid[0] == 0 and password[0] == 0)                //If the ssid and password are not yet in memory
-    if (LoadData() != 1) return 2;                      //Load the EEPROM to get the ssid and password. Exit with code if failed
+  if (ssid[0] == 0 and password[0] == 0)                        //If the ssid and password are not yet in memory
+    if (LoadData() != 1) return 2;                              //Load the EEPROM to get the ssid and password. Exit with code if failed
   while (WiFi.status() != WL_CONNECTED) {
-    if (!Connect(ConnectionTimeOutMS))                  //Try to connected to ssid+password
-      if (APMode() != 1) return 3;                      //(If we could not connector for whatever reason), Entering APmode and if that fails return the error
+    if (!Connect(ConnectionTimeOutMS))                          //Try to connected to ssid+password
+      if (APMode() != 1) return 3;                              //(If we could not connector for whatever reason), Entering APmode and if that fails return the error
   }
-#ifdef WiFiManager_mDNS                                 //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
-  bool MDNSStatus = MDNS.begin(Name);                   //Start mDNS with the given domain name
-  if (MDNSStatus) MDNS.addService("http", "tcp", 80);   //Add service to MDNS-SD
+#ifdef WiFiManager_mDNS                                         //https://github.com/espressif/arduino-esp32/blob/master/libraries/ESPmDNS/src/ESPmDNS.cpp
+  bool MDNSStatus = MDNS.begin(Name);                           //Start mDNS with the given domain name
+  if (MDNSStatus) MDNS.addService("http", "tcp", 80);           //Add service to MDNS-SD
 #ifdef WiFiManager_SerialEnabled
   if (MDNSStatus)
     Serial.println("WM: mDNS responder started with name '" + String(Name) + "'");
@@ -367,20 +367,20 @@ byte CWiFiManager::Start() {
   return 1;
 }
 bool CWiFiManager::WriteEEPROM() {
-  String Value;                                         //Save to mem:
+  String Value;                                                 //Save to mem:
   for (byte i = 0; i < WiFiManager_Settings; i++) {
-    Value += Get_Value(i + 1, true, false);             //^     <Seperator>
+    Value += Get_Value(i + 1, true, false);                     //^     <Seperator>
     if (WiFiManager_Settings - i > 1)
-      Value += EEPROM_Seperator;                        //^            <Value>  (only if there more values)
+      Value += EEPROM_Seperator;                                //^            <Value>  (only if there more values)
   }
-  Value += char(255);                                   //^            <emthy bit> (we use a emthy bit to mark the end)
+  Value += char(255);                                           //^            <emthy bit> (we use a emthy bit to mark the end)
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: EEPROM WRITE; '" + Value + "'");
-#endif //WiFiManager_SerialEnabled
-  if (Value.length() > EEPROM_size)                     //If not enough room in the EEPROM
-    return false;                                       //Return false; not all data is stored
-  for (int i = 0; i < Value.length(); i++)              //For each character to save
-    EEPROM.write(i, (int)Value.charAt(i));              //Write it to the EEPROM
+#endif //WiFiManager_SerialEnabled                              
+  if (Value.length() > EEPROM_size)                             //If not enough room in the EEPROM
+    return false;                                               //Return false; not all data is stored
+  for (int i = 0; i < Value.length(); i++)                      //For each character to save
+    EEPROM.write(i, (int)Value.charAt(i));                      //Write it to the EEPROM
   EEPROM.commit();
   EEPROM_USED = Value.length();
   return true;
@@ -388,21 +388,21 @@ bool CWiFiManager::WriteEEPROM() {
 bool CWiFiManager::ClearEEPROM() {
 #ifdef WiFiManager_SerialEnabled
   Serial.println("WM: EEPROM CLEAR");
-#endif //WiFiManager_SerialEnabled
+#endif //WiFiManager_SerialEnabled                              
   if (!EEPROM.begin(EEPROM_size))
     return false;
-  for (int i = 0; i < EEPROM_size; i++)                 //For each character to save
-    EEPROM.write(i, 0);                                 //Clear the EEPROM bit
+  for (int i = 0; i < EEPROM_size; i++)                         //For each character to save
+    EEPROM.write(i, 0);                                         //Clear the EEPROM bit
   EEPROM.commit();
   return true;
 }
 void CWiFiManager::RunServer() {
   if (WiFi.status() != WL_CONNECTED) return;
-  StartServer();                                      //Start server if we havn't yet
+  StartServer();                                                //Start server if we havn't yet
   server.handleClient();
 }
 void CWiFiManager::handle_Connect() {
-  if (!SettingsEnabled) return;                         //If settingscommand is disabled: Stop right away, and do noting
+  if (!SettingsEnabled) return;                                 //If settingscommand is disabled: Stop right away, and do noting
   String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>" + String(Name) + " settings</strong><br><br><form action=\"/setup?\" method=\"get\">";
   for (byte i = 1; i < WiFiManager_Settings + 1; i++)
     HTML += "<div><label>" + WiFiManager_VariableNames[i - 1] + " </label><input type=\"text\" name=\"" + i + "\" value=\"" + Get_Value(i, false, true) + "\"></div>";
@@ -412,7 +412,7 @@ void CWiFiManager::handle_Connect() {
   server.send(200, "text/html", HTML);
 }
 void CWiFiManager::handle_Settings() {
-  if (!SettingsEnabled) return;                         //If settingscommand is disabled: Stop right away, and do noting
+  if (!SettingsEnabled) return;                                 //If settingscommand is disabled: Stop right away, and do noting
   String HTML = "";
   int    Code = 200;
   for (int i = 0; i < server.args(); i++) {
@@ -429,11 +429,11 @@ void CWiFiManager::handle_Settings() {
       HTML += "ERROR ID; '" + server.argName(i) + "'='" + ArgValue + "'\n";
     }
   }
-  WaitOnAPMode = false;                                 //Flag we have input data, and we can stop waiting in APmode on data
+  WaitOnAPMode = false;                                         //Flag we have input data, and we can stop waiting in APmode on data
   WriteEEPROM();
   HTML += String(EEPROM_USED) + "/" + String(EEPROM_size) + " Bytes used";
   server.send(Code, "text/plain", HTML);
-  for (byte i = 50; i > 0; i--) {                       //Add some delay here, to send feedback to the client, i is delay in MS to still wait
+  for (byte i = 50; i > 0; i--) {                               //Add some delay here, to send feedback to the client, i is delay in MS to still wait
     server.handleClient();
     delay(1);
   }
@@ -445,7 +445,7 @@ void CWiFiManager::handle_Settings() {
 #endif //WiFiManager_SerialEnabled
     OldSSID = String(ssid);
     Oldpassword = String(password);
-    WiFi.disconnect();                                  //we need to reconnect (user requested to switch WIFI)
+    WiFi.disconnect();                                          //we need to reconnect (user requested to switch WIFI)
   }
 }
 bool CWiFiManager::CheckAndReconnectIfNeeded(bool AllowAPmode) {
@@ -454,7 +454,7 @@ bool CWiFiManager::CheckAndReconnectIfNeeded(bool AllowAPmode) {
       Start();
     else
       Connect(ConnectionTimeOutMS);
-    if (WiFi.status() != WL_CONNECTED)                  //If still not connected
+    if (WiFi.status() != WL_CONNECTED)                          //If still not connected
       return false;
   }
   return true;
@@ -464,7 +464,7 @@ void CWiFiManager::handle_uploadPage() {
 #ifdef WiFiManager_SerialEnabled
   Serial.println("OTA_handle_UploadPage, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
 #endif //WiFiManager_SerialEnabled
-  if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
+  if (!OTA_Enabled) return;                                     //If OTA is disabled, stop here and do not respond
   String html = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script><a href=\"" + UpdateWebpage + "\">" + UpdateWebpage + "</a><br>Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "<br><br><form method='POST' action='#' enctype='multipart/form-data' id='upload_form'><input type='file' name='update'><input type='submit' value='Upload'></form><div id='prg'>progress: 0%</div><script>$('form').submit(function(c){c.preventDefault();var a=$('#upload_form')[0];var b=new FormData(a);$.ajax({url:'/update',type:'POST',data:b,contentType:false,processData:false,xhr:function(){var d=new window.XMLHttpRequest();d.upload.addEventListener('progress',function(e){if(e.lengthComputable){var f=e.loaded/e.total;$('#prg').html('progress: '+Math.round(f*100)+'%')}},false);return d},success:function(f,e){console.log('success!')},error:function(e,d,f){}})});</script>";
   server.send(200, "text/html", html);
 }
@@ -472,33 +472,33 @@ void CWiFiManager::handle_update() {
 #ifdef WiFiManager_SerialEnabled
   Serial.printf("WM_OTA: Update, enabled=" + OTA_Enabled ? "TRUE" : "FALSE");
 #endif //WiFiManager_SerialEnabled
-  if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
+  if (!OTA_Enabled) return;                                     //If OTA is disabled, stop here and do not respond
   server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
   ESP.restart();
 }
 void CWiFiManager::handle_update2() {
-  if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
+  if (!OTA_Enabled) return;                                     //If OTA is disabled, stop here and do not respond
   HTTPUpload& upload = server.upload();
 #ifdef WiFiManager_SerialEnabled
-  if (!OTA_Enabled) return;                             //If OTA is disabled, stop here and do not respond
+  if (!OTA_Enabled) return;                                     //If OTA is disabled, stop here and do not respond
   if (upload.status == UPLOAD_FILE_START) {
     Serial.printf("Update: %s\n", upload.filename.c_str());
-    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {           //start with max available size
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {                   //start with max available size
       Update.printError(Serial);
     }
-  } else if (upload.status == UPLOAD_FILE_WRITE) {      //flashing firmware to ESP
+  } else if (upload.status == UPLOAD_FILE_WRITE) {              //flashing firmware to ESP
     if (Update.write(upload.buf, upload.currentSize) != upload.currentSize)
       Update.printError(Serial);
   } else if (upload.status == UPLOAD_FILE_END) {
-    if (Update.end(true))                               //true to set the size to the current progress
+    if (Update.end(true))                                       //true to set the size to the current progress
       Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
     else
       Update.printError(Serial);
   }
 #else
   if (upload.status == UPLOAD_FILE_START)
-    Update.begin(UPDATE_SIZE_UNKNOWN);                  //start with max available size
-  else if (upload.status == UPLOAD_FILE_WRITE)          //flashing firmware to ESP
+    Update.begin(UPDATE_SIZE_UNKNOWN);                          //start with max available size
+  else if (upload.status == UPLOAD_FILE_WRITE)                  //flashing firmware to ESP
     Update.write(upload.buf, upload.currentSize);
   else if (upload.status == UPLOAD_FILE_END)
     Update.end(true);
@@ -521,35 +521,35 @@ byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json
 #endif //WiFiManager_SerialEnabled
 
   if (!WiFiManager.CheckAndReconnectIfNeeded(false))
-    return REQ_SETUP_REQUIRED;                          //Exit here, no connection, and could not auto connect
+    return REQ_SETUP_REQUIRED;                                  //Exit here, no connection, and could not auto connect
   WiFiClient client;
   client.setTimeout(TimeOut);
   if (!client.connect(_IP, _Port))
-    return REQ_HUB_CONNECT_ERROR;                       //Stop here, no reason to move on
+    return REQ_HUB_CONNECT_ERROR;                               //Stop here, no reason to move on
   client.println("PUT " + _Path + " HTTP/1.1");
   client.println("Content-Length: " + String(_Json.length()));
   client.println("Content-Type: application/json");
-  client.println();                                     //Terminate headers with a blank line
+  client.println();                                             //Terminate headers with a blank line
   client.print(_Json);
   //Try to look for a responce code 'HTTP/1.1 200 OK' = 200
   int Responcecode  = 0;
-  unsigned long StopTime = millis() + 2500;             //After this amount of time stop waiting for a response, 500ms could be considered a normal response time
-  static unsigned long _Middle = -1;                    //We just need a really big number, if more than 0 and less than this amount of ms is passed, return true)
-  _Middle = _Middle / 2;                                //Somehow declairing middle on 1 line does not work
+  unsigned long StopTime = millis() + 2500;                     //After this amount of time stop waiting for a response, 500ms could be considered a normal response time
+  static unsigned long _Middle = -1;                            //We just need a really big number, if more than 0 and less than this amount of ms is passed, return true)
+  _Middle = _Middle / 2;                                        //Somehow declairing middle on 1 line does not work
   while (client.connected()) {
     while (client.available()) {
       byte recieved = client.read();
-      if (recieved == 0x20) {                           //If "HTTP/1.1" is paste and we now have a SPACE
-        recieved = client.read();                       //Purge space
-        while (recieved != 0x20) {                      //While we read numbers and not a SPACE
+      if (recieved == 0x20) {                                   //If "HTTP/1.1" is paste and we now have a SPACE
+        recieved = client.read();                               //Purge space
+        while (recieved != 0x20) {                              //While we read numbers and not a SPACE
           Responcecode = Responcecode * 10 + (recieved - 0x30); //Convert byte to number and put it in
-          recieved = client.read();                     //Read new byte
+          recieved = client.read();                             //Read new byte
         }
-        client.stop();                                  //Stop, we already have the Responce code
+        client.stop();                                          //Stop, we already have the Responce code
       }
     }
-    if (millis() - StopTime <= _Middle) {               //If we are in the timout windown, includes overflow (must be withing the _Middle window)
-      client.stop();                                    //Stop waiting on not responding client
+    if (millis() - StopTime <= _Middle) {                       //If we are in the timout windown, includes overflow (must be withing the _Middle window)
+      client.stop();                                            //Stop waiting on not responding client
       return REQ_TIMEOUT;
     }
   }
