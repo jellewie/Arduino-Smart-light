@@ -183,9 +183,9 @@ An example of the settings page is shown in the figure on the right.
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
-The most up-to-date values can be found in the top of the [WifiManager.h](Arduino/WifiManager.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
+The most up-to-date values can be found in the top of the [WiFiManagerBefore.h](Arduino/WiFiManagerBefore.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
-Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively
+Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively. Leave black to skip updating these, use spaces ' ' to clear the values
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
