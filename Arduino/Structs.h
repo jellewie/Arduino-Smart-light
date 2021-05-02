@@ -60,7 +60,7 @@ int ConvertModeToInt(String IN) {
 }
 bool IsTrue(String input) {
   input.toLowerCase();
-  if (input.toInt() == 1 or input == "true" or input == "yes" or input == "high")
+  if (input == "1" or input == "true" or input == "yes" or input == "high")
     return true;
   return false;
 }
