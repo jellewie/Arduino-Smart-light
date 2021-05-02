@@ -239,8 +239,8 @@ Some examples of TaskType and Var:
 9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
 
 ### OTA (Over The Air update)
-This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) and enables you to update firmware over WiFi.
-On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
+This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) (or 'IP/ota') and enables you to update firmware over WiFi.
+On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
 After which the 'Upload' button needs to be press for the update process to begin, the unit will automatically update and reboot afterwards.
 Note that [SoftSettings](#soft-settings) are preserved.
 
