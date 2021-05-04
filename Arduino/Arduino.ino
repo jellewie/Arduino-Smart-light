@@ -59,6 +59,7 @@ byte Mode;                                                      //Holds in which
 byte LastMode = -1;                                             //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 const byte TotalLEDs = 60;                                      //The total amounts of LEDs in the strip
 const byte LEDSections = TotalLEDs / 60;                        //Amount of sections of LEDs
+const byte TotalLEDsClock = LEDSections * 60;
 int AnimationCounter;                                           //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                              //Where we save the time to
 byte ModeBeforeOff = ON;

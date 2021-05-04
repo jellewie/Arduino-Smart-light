@@ -10,9 +10,9 @@ byte LEDtoPosition(signed int LEDID) {
 
   LEDID += LEDOffset;
   while (LEDID < 0)                                             //When a negative overflow
-    LEDID += TotalLEDs;
-  while (LEDID >= TotalLEDs)                                    //When a positive overflow
-    LEDID -= TotalLEDs;
+    LEDID += TotalLEDsClock;
+  while (LEDID >= TotalLEDsClock)                             //When a positive overflow
+    LEDID -= TotalLEDsClock;
   return LEDID;
 }
 //==================================================
