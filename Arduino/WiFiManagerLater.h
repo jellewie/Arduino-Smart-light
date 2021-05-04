@@ -37,25 +37,25 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
       } break;
     case 5: {
         Value.replace(",", ".");                                //Replace EN to UN decimal seperator (thats what Arduino uses)
-        if (not StringIsDigit(Value, '.', '-'));              return false;  //No float number given
+        if (not StringIsDigit(Value, '.', '-'))               return false;  //No float number given
         AutoBrightnessP          = Value.toFloat();           return true;
       } break;
     case 6: {
-        if (not StringIsDigit(Value));                        return false;  //No number given
+        if (not StringIsDigit(Value))                         return false;  //No number given
         AutoBrightnessO          = ToByte(Value);             return true;
       } break;
     case 7: {
-        if (not StringIsDigit(Value));                        return false;  //No number given
+        if (not StringIsDigit(Value))                         return false;  //No number given
         ClockHourLines           = ToByte(Value);             return true;
       } break;
     case 8:   ClockHourAnalog    = IsTrue(Value);             return true;  break;
     case 9: {
-        if (not StringIsDigit(Value));                        return false;  //No number given
+        if (not StringIsDigit(Value))                         return false;  //No number given
         LEDOffset                = ToByte(Value, TotalLEDs);  return true;
       } break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
     case 11: {
-        if (not StringIsDigit(Value), "-");                   return false;  //No number given
+        if (not StringIsDigit(Value), "-")                    return false;  //No number given
         if (gmtOffset_sec != Value.toInt()) {
           gmtOffset_sec = Value.toInt();
           TASK TempTask;                                        //Create a space to put a new Task in
@@ -67,7 +67,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         return false;
       } break;
     case 12: {
-        if (not StringIsDigit(Value), "-");                   return false;  //No number given
+        if (not StringIsDigit(Value), "-")                    return false;  //No number given
         if (daylightOffset_sec != Value.toInt()) {
           daylightOffset_sec = Value.toInt();
           TASK TempTask;                                        //Create a space to put a new Task in
