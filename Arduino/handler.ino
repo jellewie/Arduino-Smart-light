@@ -336,6 +336,7 @@ void handle_Info() {
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =255-(P*(raw-N)-O)\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
+                   "TotalLEDs=" + String(TotalLEDs) + " Sections=" + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
