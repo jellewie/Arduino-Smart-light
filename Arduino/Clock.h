@@ -65,11 +65,31 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       float LED_HH = TimeCurrent.HH * 5.0 + TimeCurrent.MM / 60.0;
       if (LED_HH >= 60) LED_HH -= 60;                           //If its above 12 hours, remove 12 since we can only show 0-12 hours
 
+      //When there are more sections, raise the resolution (but sadly I could not figure out a formula so this is only limited to a few hand checked samples)
+#if (LEDSections >= 4 and LEDSections % 4 == 0)                 //If its 4 or a multiplication of it (% =modulo)
+      const float Multiplier = -0.16875;
+      LED_SS = LED_SS * 4;
+      LED_MM = LED_MM * 4;
+      LED_HH = LED_HH * 4;
+#elif (LEDSections >= 3 and LEDSections % 3 == 0)               //If its 3 or a multiplication of it (% =modulo)
+      const float Multiplier = -0.3;
+      LED_SS = LED_SS * 3;
+      LED_MM = LED_MM * 3;
+      LED_HH = LED_HH * 3;
+#elif (LEDSections == 2)
+      const float Multiplier = -0.675;
+      LED_SS = LED_SS * LEDSections;
+      LED_MM = LED_MM * LEDSections;
+      LED_HH = LED_HH * LEDSections;
+#else
+      const float Multiplier = -2.7;
+#endif //LEDSections
+
       for (int i = 0; i < TotalLEDsClock; i++) {
-        byte Bri_SS = exp(-2.7 * sq(i - LED_SS)) * 255;         //https://www.desmos.com/calculator/zkl6idhjvx
-        byte Bri_MM = exp(-2.7 * sq(i - LED_MM)) * 255;         //^
-        byte Bri_HH = exp(-2.7 * sq(i - LED_HH)) * 255;         //^
-        LED_Add(LEDtoPosition(i*LEDSections), LEDSections, CRGB(Bri_HH, Bri_MM, Bri_SS), TotalLEDsClock);
+        byte Bri_SS = exp(Multiplier * sq(i - LED_SS)) * 255;         //https://www.desmos.com/calculator/zkl6idhjvx
+        byte Bri_MM = exp(Multiplier * sq(i - LED_MM)) * 255;         //^
+        byte Bri_HH = exp(Multiplier * sq(i - LED_HH)) * 255;         //^
+        LED_Add(LEDtoPosition(i), 1, CRGB(Bri_HH, Bri_MM, Bri_SS), TotalLEDsClock);
         UpdateLEDs = true;
       }
     } else {
