@@ -5,7 +5,7 @@ void ClearAndSetupClock() {
   FastLED.clear();
   if (ClockHourLines) {
     for (int i = 0; i <= 55; i += 5)                            //Create the (12) hourly stripes
-      LEDs[LEDtoPosition(i)] += CRGB(ClockHourLines, ClockHourLines, ClockHourLines);
+      LED_Add(LEDtoPosition(i * LEDSections), LEDSections, CRGB(ClockHourLines, ClockHourLines, ClockHourLines));
   }
 }
 void UpdateAndShowClock(bool ShowClock, bool ForceClock = false);

@@ -70,7 +70,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Direction = random8(0, 2);
         }
         EVERY_N_MILLISECONDS((10000 / TotalLEDsClock) - 1) {
-          LED_Blink(0, (TotalLEDsClock), AnimationRGB, 1, &_Counter, _Direction);
+          LED_Blink(0, TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
           UpdateLEDs = true;
         }
       } break;
@@ -148,12 +148,12 @@ void ShowAnimation(bool Start) {                                //This would be 
           BlinkLeft = random8(0, 2);
           BlinkCounter = 0;
           BlinkEachxLoops = random8(20, 50);
-          LED_Fill(LEDtoPosition(5 * LEDSections),   4 * LEDSections, AnimationRGB);    //Right eye
-          LED_Fill(LEDtoPosition(50 * LEDSections),  4 * LEDSections, AnimationRGB);    //Left eye
+          LED_Fill(LEDtoPosition(5 * LEDSections),   4 * LEDSections, AnimationRGB, TotalLEDsClock);  //Right eye
+          LED_Fill(LEDtoPosition(50 * LEDSections),  4 * LEDSections, AnimationRGB, TotalLEDsClock);  //Left eye
           UpdateLEDs = true;
         }
         EVERY_N_MILLISECONDS(200) {
-          LED_Wobble(LEDtoPosition(15 * LEDSections), 30 * LEDSections, CRGB(255, 0, 0), 1, 20 * LEDSections);
+          LED_Wobble(LEDtoPosition(15 * LEDSections), 30 * LEDSections, CRGB(255, 0, 0), 1, 20 * LEDSections, TotalLEDsClock);
           UpdateLEDs = true;
         }
         EVERY_N_MILLISECONDS(100) {
@@ -161,9 +161,9 @@ void ShowAnimation(bool Start) {                                //This would be 
           if (BlinkCounter >= BlinkEachxLoops) {
             if (BlinkCounter > BlinkEachxLoops) BlinkCounter = 0;
             if (BlinkLeft)
-              LED_Flash(LEDtoPosition(5 * LEDSections), 4 * LEDSections, AnimationRGB); //Right eye
+              LED_Flash(LEDtoPosition(5 * LEDSections), 4 * LEDSections, AnimationRGB, CRGB(0, 0, 0), TotalLEDsClock); //Right eye
             else
-              LED_Flash(LEDtoPosition(50 * LEDSections), 4 * LEDSections, AnimationRGB); //Left eye
+              LED_Flash(LEDtoPosition(50 * LEDSections), 4 * LEDSections, AnimationRGB, CRGB(0, 0, 0), TotalLEDsClock); //Left eye
           }
           UpdateLEDs = true;
         }
@@ -175,25 +175,24 @@ void ShowAnimation(bool Start) {                                //This would be 
             SetNewColor();
             _NextNewColor = false;
           }
-          if (!LED_Flash(0, TotalLEDsClock, AnimationRGB))
+          if (!LED_Flash(0, TotalLEDsClock, AnimationRGB, CRGB(0, 0, 0), TotalLEDsClock))
             _NextNewColor = true;
           UpdateLEDs = true;
         }
       } break;
     case 12: {                                                  //PACMAN
-#define PacmanMouthOpen 16
-#define PacmanMouthOpenhalf PacmanMouthOpen / 2
-#define PacmanMouthMiddle 15
-#define PacmanStartU PacmanMouthMiddle - PacmanMouthOpenhalf
-#define PacmanEyeLength 4
-#define PacmanEyeOffset 2
-#define PacmanBowTieLength 6
-#define PacmanBowTieOffset 8
+#define PacmanMouthOpen 16 * LEDSections                        //1/4 of a circle         Amounth the mpouth opens (up+down)
+#define PacmanMouthOpenhalf (PacmanMouthOpen / 2)               //                        Length the mouth opens (up or down)
+#define PacmanMouthMiddle 15 * LEDSections                      //Right (90degrees)       Center of the mouth
+#define PacmanEyeLength 6 * LEDSections
+#define PacmanEyeOffset 0 * LEDSections                         //Howmuch to move the Eye to the right
+#define PacmanBowTieLength 6 * LEDSections
+#define PacmanBowTieOffset 4 * LEDSections                      //Howmuch to move the BowTie to the left
         static byte _Counter, _Counter2, _LEDPosU, _LEDPosL;
         static bool _Direcion, _Direcion2, _Left, _Miss;
         if (Start) {
           _Left = random8(0, 2);
-          if (random8(0, 4) == 0)                               //Make miss apearing rarely
+          if (random8(0, 4) == 0)                               //Make Miss apearing rarely
             _Miss = random8(0, 2);
           else
             _Miss = false;
@@ -201,26 +200,26 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Counter2 = 0;
           _Direcion = false;
           _Direcion2 = false;
-          LED_Fill(0, TotalLEDsClock, CRGB(255, 255, 0));       //Fill the whol stip with yellow, we will but stuff out/overwrite it if we need so
+          LED_Fill(0, TotalLEDsClock, CRGB(255, 255, 0), TotalLEDsClock); //Fill the whole stip with yellow, we will but stuff out/overwrite it if we need so
           if (_Left) {
-            _LEDPosU = PacmanStartU + TotalLEDsClock / 2;
+            _LEDPosU = (PacmanMouthMiddle - PacmanMouthOpenhalf) + TotalLEDsClock / 2;  //Upperlip position + half a clock
             _LEDPosL = PacmanMouthMiddle + TotalLEDsClock / 2;
-            LED_Fill(           LEDtoPosition(TotalLEDsClock - PacmanEyeLength    - (PacmanStartU - PacmanEyeLength    - PacmanEyeOffset)   ), PacmanEyeLength   , CRGB(0, 0, 0));                          //Cut out the eye
-            if (_Miss) LED_Fill(LEDtoPosition(TotalLEDsClock - PacmanBowTieLength - (PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset)), PacmanBowTieLength, CRGB(255, 0, 0)); //Set here bow tie
+            LED_Fill(LEDtoPosition(TotalLEDsClock - PacmanEyeOffset - PacmanEyeLength), PacmanEyeLength, CRGB(0, 0, 0), TotalLEDsClock);                        //Cut out the eye
+            if (_Miss) LED_Fill(LEDtoPosition(PacmanBowTieOffset), PacmanBowTieLength, CRGB(255, 0, 0));                                                        //Set here bow tie
           } else {
-            _LEDPosU = PacmanStartU;
+            _LEDPosU = PacmanMouthMiddle - PacmanMouthOpenhalf;
             _LEDPosL = PacmanMouthMiddle;
-            LED_Fill(           LEDtoPosition(PacmanStartU - PacmanEyeLength    - PacmanEyeOffset   ), PacmanEyeLength   , CRGB(0, 0, 0));    //Cut out the eye
-            if (_Miss) LED_Fill(LEDtoPosition(PacmanStartU - PacmanBowTieLength - PacmanBowTieOffset), PacmanBowTieLength, CRGB(255, 0, 0));  //Set here bow tie
+            LED_Fill(LEDtoPosition(PacmanEyeOffset), PacmanEyeLength, CRGB(0, 0, 0), TotalLEDsClock);                                                           //Cut out the eye
+            if (_Miss) LED_Fill(LEDtoPosition(TotalLEDsClock - PacmanBowTieOffset - PacmanBowTieLength), PacmanBowTieLength, CRGB(255, 0, 0), TotalLEDsClock);  //Set here bow tie
           }
           UpdateLEDs = true;
         }
-        EVERY_N_MILLISECONDS(25) {
-          LED_BackAndForth(LEDtoPosition(_LEDPosU), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  & _Direcion, false);  //Upper lip (or lower if direction is reversed)
-          LED_BackAndForth(LEDtoPosition(_LEDPosL), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true);  //Lower lip
+        EVERY_N_MILLISECONDS(4 / (PacmanMouthOpen * 10)) {      //Execute animatio in such way every WAKA is 0.4seconds as original (~10bites in 101frames at 25FPS=0.4S per WAKA)
+          LED_BackAndForth(LEDtoPosition(_LEDPosU), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  &_Direcion,  false, true, TotalLEDsClock);              //Upper lip (or lower if direction is reversed)
+          LED_BackAndForth(LEDtoPosition(_LEDPosL), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true, true, TotalLEDsClock);              //Lower lip
           if (_Miss) {
-            LED_Fill(LEDtoPosition(_LEDPosU + _Counter)                           , 1, CRGB(255, 0, 0));  //Color the lips
-            LED_Fill(LEDtoPosition(_LEDPosL + PacmanMouthOpenhalf - _Counter2 - 1), 1, CRGB(255, 0, 0));
+            LED_Fill(LEDtoPosition(_LEDPosU + _Counter)                                     , LEDSections , CRGB(255, 0, 0), TotalLEDsClock);                   //Color the lips
+            LED_Fill(LEDtoPosition(_LEDPosL + PacmanMouthOpenhalf - _Counter2 - LEDSections), LEDSections , CRGB(255, 0, 0), TotalLEDsClock);
           }
           UpdateLEDs = true;
         }

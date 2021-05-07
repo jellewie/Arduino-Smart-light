@@ -15,8 +15,8 @@
    -"Set_Value"       Set the action on what to do on startup with this value
    -"Get_Value"       [optional] Set the action on what to fill in in the boxes in the 'AP settings portal'
 */
-byte ToByte(String IN, byte MAX = 255);
-byte ToByte(String IN, byte MAX) {
+int ToByte(String IN, int MAX = 255);
+int ToByte(String IN, int MAX) {
   //Converts a String to a byte, taking into account the upper limit.
   //Used for WiFiManagerUser_Set_Value
   return IN.toInt() > MAX ? MAX : IN.toInt();
