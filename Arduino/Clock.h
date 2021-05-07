@@ -60,23 +60,16 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
     if (ClockAnalog) {
       ClearAndSetupClock();
 
-      float TimeSSfactor = (millis() - TimeCurrent.Ticks) / 1000.0 + TimeCurrent.SS;
-      float TimeMMfactor = TimeCurrent.MM + TimeCurrent.SS / 60.0;
-      float TimeHHfactor = TimeCurrent.HH * 5 + TimeCurrent.MM / 60.0;
-      if (TimeHHfactor > 60) TimeHHfactor -= 60;                //If its above 12 hours, remove 12 since we can only show 0-12 hours
+      float LED_SS = TimeCurrent.SS + (millis() - TimeCurrent.Ticks) / 1000.0;
+      float LED_MM = TimeCurrent.MM + TimeCurrent.SS / 60.0;
+      float LED_HH = TimeCurrent.HH * 5.0 + TimeCurrent.MM / 60.0;
+      if (LED_HH >= 60) LED_HH -= 60;                           //If its above 12 hours, remove 12 since we can only show 0-12 hours
 
-      byte TimeSSoffset = 0, TimeMMoffset = 0, TimeHHoffset = 0;//If time is over a half circle, lower it, and set the offset
-      if (TimeSSfactor > 30) TimeSSfactor -= TimeSSoffset = 30; //^
-      if (TimeMMfactor > 30) TimeMMfactor -= TimeMMoffset = 30; //^
-      if (TimeHHfactor > 30) TimeHHfactor -= TimeHHoffset = 30; //^
-
-      for (int i = 0; i < TotalLEDs; i++) {
-        byte TimeSSbr = exp(-2.7 * sq(i - TimeSSfactor)) * 255; //https://www.desmos.com/calculator/zkl6idhjvx
-        byte TimeMMbr = exp(-2.7 * sq(i - TimeMMfactor)) * 255; //^
-        byte TimeHHbr = exp(-2.7 * sq(i - TimeHHfactor)) * 255; //^
-        LED_Add(LEDtoPosition((i + TimeSSoffset) * LEDSections), LEDSections, CRGB(0, 0, TimeSSbr));
-        LED_Add(LEDtoPosition((i + TimeMMoffset) * LEDSections), LEDSections, CRGB(0, TimeMMbr, 0));
-        LED_Add(LEDtoPosition((i + TimeHHoffset) * LEDSections), LEDSections, CRGB(TimeHHbr, 0, 0));
+      for (int i = 0; i < TotalLEDsClock; i++) {
+        byte Bri_SS = exp(-2.7 * sq(i - LED_SS)) * 255;         //https://www.desmos.com/calculator/zkl6idhjvx
+        byte Bri_MM = exp(-2.7 * sq(i - LED_MM)) * 255;         //^
+        byte Bri_HH = exp(-2.7 * sq(i - LED_HH)) * 255;         //^
+        LED_Add(LEDtoPosition(i*LEDSections), LEDSections, CRGB(Bri_HH, Bri_MM, Bri_SS), TotalLEDsClock);
         UpdateLEDs = true;
       }
     } else {
