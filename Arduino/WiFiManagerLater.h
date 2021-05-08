@@ -55,7 +55,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
       } break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
     case 11: {
-        if (not StringIsDigit(Value), "-")                    return false;  //No number given
+        if (not StringIsDigit(Value))                         return false;  //No number given
         if (gmtOffset_sec != Value.toInt()) {
           gmtOffset_sec = Value.toInt();
           TASK TempTask;                                        //Create a space to put a new Task in
@@ -67,7 +67,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         return false;
       } break;
     case 12: {
-        if (not StringIsDigit(Value), "-")                    return false;  //No number given
+        if (not StringIsDigit(Value))                         return false;  //No number given
         if (daylightOffset_sec != Value.toInt()) {
           daylightOffset_sec = Value.toInt();
           TASK TempTask;                                        //Create a space to put a new Task in
