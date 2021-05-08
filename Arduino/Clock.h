@@ -85,11 +85,17 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
       const float Multiplier = -2.7;
 #endif //LEDSections
 
+      byte Offset_SS = 0, Offset_MM = 0, Offset_HH = 0;       //If time is over a half circle, lower it, and set the offset. This make it so the EXP forulla loops around
+      if (LED_SS > TotalLEDsClock / 2) LED_SS -= Offset_SS = TotalLEDsClock / 2;          //^
+      if (LED_MM > TotalLEDsClock / 2) LED_MM -= Offset_MM = TotalLEDsClock / 2;          //^
+      if (LED_HH > TotalLEDsClock / 2) LED_HH -= Offset_HH = TotalLEDsClock / 2;          //^
       for (int i = 0; i < TotalLEDsClock; i++) {
         byte Bri_SS = exp(Multiplier * sq(i - LED_SS)) * 255;         //https://www.desmos.com/calculator/zkl6idhjvx
         byte Bri_MM = exp(Multiplier * sq(i - LED_MM)) * 255;         //^
         byte Bri_HH = exp(Multiplier * sq(i - LED_HH)) * 255;         //^
-        LED_Add(LEDtoPosition(i), 1, CRGB(Bri_HH, Bri_MM, Bri_SS), TotalLEDsClock);
+        LED_Add(LEDtoPosition(i + Offset_SS), 1, CRGB(0, 0, Bri_SS), TotalLEDsClock);
+        LED_Add(LEDtoPosition(i + Offset_MM), 1, CRGB(0, Bri_MM, 0), TotalLEDsClock);
+        LED_Add(LEDtoPosition(i + Offset_HH), 1, CRGB(Bri_HH, 0, 0), TotalLEDsClock);
         UpdateLEDs = true;
       }
     } else {
