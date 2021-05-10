@@ -217,24 +217,25 @@ void UpdateBrightness(bool ForceUpdate) {
   }
 }
 void ShowIPnumber(byte Number) {
-  //192 == ABC == A=1,C=9,C=2
+  //192 == ABC == A=1,C=9,C=2* (the real value of A is the start position of that section, the section is going to represent the digit)
 #ifdef SerialEnabled
   Serial.println("ShowIPnumber " + String(Number));
 #endif //SerialEnabled
   FastLED.clear();
-  const static byte SectionLength = TotalLEDs / 10;
-  for (int i = 0; i < TotalLEDs; i += SectionLength) LEDs[LEDtoPosition(i)] = CRGB(128, 128, 128);//Add section spacers
+  const static byte SectionLength = TotalLEDsClock / 10;
+  for (int i = 0; i < TotalLEDsClock; i += SectionLength)
+    LED_Fill(LEDtoPosition(i), LEDSections, CRGB(128, 128, 128), TotalLEDsClock); //Add section spacers
+  LED_Fill (LEDtoPosition(0 - LEDSections), LEDSections + 2, CRGB(255, 255, 255), TotalLEDsClock); //Mark the start by painting in 3 LEDs around it
 
-  LED_Fill(LEDtoPosition(-1), 3, CRGB(255, 255, 255));          //Mark the start by painting in 3 LEDs around it
-
-  byte A = (Number / 100) * SectionLength + 1;
+  byte A = (Number / 100) * SectionLength + LEDSections;        //Set start position of the first digit
   Number = Number % 100;                                        //Modulo (so what is over when we keep deviding by whole 100)
-  byte B = (Number / 10) * SectionLength + 1;
-  byte C = (Number % 10) * SectionLength + 1;
+  byte B = (Number / 10) * SectionLength + LEDSections;
+  byte C = (Number % 10) * SectionLength + LEDSections;
 
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(A + i)] += CRGB(255, 0, 0); //Make section A Red
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(B + i)] += CRGB(0, 255, 0); //Make section B Green
-  for (byte i = 0; i < SectionLength - 1; i++) LEDs[LEDtoPosition(C + i)] += CRGB(0, 0, 255); //Make section C Blue
+  LED_Add(LEDtoPosition(A), SectionLength - LEDSections - 1, CRGB(255, 0, 0), TotalLEDsClock); //Make section A Red
+  LED_Add(LEDtoPosition(B), SectionLength - LEDSections - 1, CRGB(0, 255, 0), TotalLEDsClock); //Make section B Green
+  LED_Add(LEDtoPosition(C), SectionLength - LEDSections - 1, CRGB(0, 0, 255), TotalLEDsClock); //Make section C Blue
+
   UpdateLEDs = true;
 }
 void UpdateLED() {
