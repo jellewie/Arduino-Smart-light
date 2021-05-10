@@ -2,7 +2,7 @@
 #define Clock_ConnectionTimeOutMS 10000
 
 void ClearAndSetupClock() {
-  FastLED.clear();
+  ClockClear();
   if (ClockHourLines) {
     for (int i = 0; i <= 55; i += 5)                            //Create the (12) hourly stripes
       LED_Add(LEDtoPosition(i * LEDSections), LEDSections, CRGB(ClockHourLines, ClockHourLines, ClockHourLines));
@@ -116,11 +116,11 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
 }
 bool UpdateTime() {
   if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false;      //If WIFI is not connected, stop right away
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs Purple  0202
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 1th quater green 1202
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0, 255, 0  )); //Turn 2rd quater green 1212
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock,     CRGB(255, 0, 255), TotalLEDsClock); //Turn all LEDs purple  2222
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 1th quater green 1222
+  LED_Fill(LEDtoPosition(TotalLEDsClock / 2), TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 2rd quater green 1212
   FastLED.show();                                                       //Update leds to show updating time
-  FastLED.clear();
+  ClockClear();
   UpdateLEDs = true;
 #ifdef LEDstatus_SerialEnabled
   Serial.println("LS: Setting LEDs to 'updating time'");

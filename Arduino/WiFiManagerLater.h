@@ -152,9 +152,9 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
   return "";
 }
 void WiFiManagerUser_Status_Start() {                                   //Called before start of WiFi
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 1th quater blue 1222
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(0,   0, 255)); //Turn 2rd quater blue 1212
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock,     CRGB(255, 0, 255), TotalLEDsClock); //Turn all LEDs purple 2222
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock / 4, CRGB(0  , 0, 255), TotalLEDsClock); //Turn 1th quater blue 1222
+  LED_Fill(LEDtoPosition(TotalLEDsClock / 2), TotalLEDsClock / 4, CRGB(0  , 0, 255), TotalLEDsClock); //Turn 2rd quater blue 1212
   FastLED.show();                                                       //Update leds to show wifi is starting
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -164,10 +164,10 @@ void WiFiManagerUser_Status_Done() {                            //Called after s
   WiFiManager.EnableSetup(true);                                //Enable the setup page, disable for more security
   digitalWrite(LED_BUILTIN, LOW);
   if (BootMode != OFF) {
-    FastLED.clear();
+    ClockClear();
     Mode = BootMode;                                            //Go into the right mode
   } else {
-    fill_solid(&(LEDs[0]), TotalLEDs, CRGB(0, 255, 0));         //Turn all LEDs green
+    LED_Fill(LEDtoPosition(0), TotalLEDsClock, CRGB(0, 255, 0), TotalLEDsClock); //Turn all Clock LEDs green
     FastLED.show();                                             //Update leds to show wifi is done
   }
   if (!TimeSet) UpdateTime();                                   //If no time set, try to get an time from the internet we have just connected to
@@ -176,9 +176,9 @@ void WiFiManagerUser_Status_Blink() {                           //Used when tryi
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 }
 void WiFiManagerUser_Status_StartAP() {                                 //Called before start of APmode
-  fill_solid(&(LEDs[0]),             TotalLEDs,     CRGB(255, 0, 255)); //Turn all LEDs purple 2222
-  fill_solid(&(LEDs[0]),             TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 1th quater red  1222
-  fill_solid(&(LEDs[TotalLEDs / 2]), TotalLEDs / 4, CRGB(255, 0, 0  )); //Turn 2rd quater red  1212
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock,     CRGB(255, 0, 255), TotalLEDsClock); //Turn all LEDs purple 2222
+  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock / 4, CRGB(255, 0, 0  ), TotalLEDsClock); //Turn 1th quater red  1222
+  LED_Fill(LEDtoPosition(TotalLEDsClock / 2), TotalLEDsClock / 4, CRGB(255, 0, 0  ), TotalLEDsClock); //Turn 2rd quater red  1212
   FastLED.show();                                                       //Update leds to show we are entering APmode
   FastLED.delay(1);
 #ifdef LEDstatus_SerialEnabled

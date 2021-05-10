@@ -157,6 +157,9 @@ void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Dir
     LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
 }
 //==================================================
+void ClockClear(){
+  fill_solid(&(LEDs[0]), TotalLEDsClock, CRGB(0, 0, 0));        //Clear all the Clock LEDs
+}
 void UpdateColor(bool ForceUpdate) {
   if (digitalRead(PAI_DisablePOTs) == LOW) return;              //If the POTs are disabled with hardware
   POT R = RED.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
@@ -232,9 +235,9 @@ void ShowIPnumber(byte Number) {
   byte B = (Number / 10) * SectionLength + LEDSections;
   byte C = (Number % 10) * SectionLength + LEDSections;
 
-  LED_Add(LEDtoPosition(A), SectionLength - LEDSections - 1, CRGB(255, 0, 0), TotalLEDsClock); //Make section A Red
-  LED_Add(LEDtoPosition(B), SectionLength - LEDSections - 1, CRGB(0, 255, 0), TotalLEDsClock); //Make section B Green
-  LED_Add(LEDtoPosition(C), SectionLength - LEDSections - 1, CRGB(0, 0, 255), TotalLEDsClock); //Make section C Blue
+  LED_Add(LEDtoPosition(A), SectionLength - LEDSections, CRGB(255, 0, 0), TotalLEDsClock); //Make section A Red
+  LED_Add(LEDtoPosition(B), SectionLength - LEDSections, CRGB(0, 255, 0), TotalLEDsClock); //Make section B Green
+  LED_Add(LEDtoPosition(C), SectionLength - LEDSections, CRGB(0, 0, 255), TotalLEDsClock); //Make section C Blue
 
   UpdateLEDs = true;
 }
