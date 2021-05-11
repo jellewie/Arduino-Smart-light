@@ -115,16 +115,18 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
   }
 }
 bool UpdateTime() {
-  if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false;      //If WIFI is not connected, stop right away
-  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock,     CRGB(255, 0, 255), TotalLEDsClock); //Turn all LEDs purple  2222
-  LED_Fill(LEDtoPosition(0),                  TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 1th quater green 1222
-  LED_Fill(LEDtoPosition(TotalLEDsClock / 2), TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 2rd quater green 1212
-  FastLED.show();                                                       //Update leds to show updating time
-  ClockClear();
-  UpdateLEDs = true;
+  if (!WiFiManager.CheckAndReconnectIfNeeded(false)) return false; //If WIFI is not connected, stop right away
+  if (Mode != OFF) {
 #ifdef LEDstatus_SerialEnabled
-  Serial.println("LS: Setting LEDs to 'updating time'");
+    Serial.println("LS: Setting LEDs to 'updating time'");
 #endif //LEDstatus_SerialEnabled
+    LED_Fill(LEDtoPosition(0),                  TotalLEDsClock,     CRGB(255, 0, 255), TotalLEDsClock); //Turn all LEDs purple  2222
+    LED_Fill(LEDtoPosition(0),                  TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 1th quater green 1222
+    LED_Fill(LEDtoPosition(TotalLEDsClock / 2), TotalLEDsClock / 4, CRGB(0  , 255, 0), TotalLEDsClock); //Turn 2rd quater green 1212
+    FastLED.show();                                             //Update leds to show updating time
+    ClockClear();                                               //Clear and mark that when done update the LEDs again
+    UpdateLEDs = true;
+  }
 #ifdef Time_SerialEnabled
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled
