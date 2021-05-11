@@ -69,7 +69,8 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Counter = 0;
           _Direction = random8(0, 2);
         }
-        EVERY_N_MILLISECONDS((10000 / TotalLEDsClock) - 1) {
+#define _DelayBlink (10000 / TotalLEDsClock) - 1
+        EVERY_N_MILLISECONDS(_DelayBlink) {
           LED_Blink(0, TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
           UpdateLEDs = true;
         }
@@ -119,8 +120,8 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Length = random8(2, TotalLEDsClock / (_Sets + 1));
           _Direction = random8(0, 2);
         }
-#define _Delay (10000 + 500) / (TotalLEDsClock * 4)             //define the speed so it goes around 4 times in 10seconds
-        EVERY_N_MILLISECONDS(_Delay) {
+#define _DelayMove (10000 + 500) / (TotalLEDsClock * 4)         //define the speed so it goes around 4 times in 10seconds
+        EVERY_N_MILLISECONDS(_DelayMove) {
           LED_Move(0, TotalLEDsClock, AnimationRGB, _Sets, _Length, &_Counter, _Direction);
           UpdateLEDs = true;
         }
@@ -214,7 +215,8 @@ void ShowAnimation(bool Start) {                                //This would be 
           }
           UpdateLEDs = true;
         }
-        EVERY_N_MILLISECONDS(4 / (PacmanMouthOpen * 10)) {      //Execute animatio in such way every WAKA is 0.4seconds as original (~10bites in 101frames at 25FPS=0.4S per WAKA)
+#define _DelayWAKA 4 / (PacmanMouthOpen * 10)
+        EVERY_N_MILLISECONDS(_DelayWAKA) {                      //Execute animation in such way every WAKA is 0.4seconds as original (~10bites in 101frames at 25FPS=0.4S per WAKA)
           LED_BackAndForth(LEDtoPosition(_LEDPosU), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  &_Direcion,  false, true, TotalLEDsClock);              //Upper lip (or lower if direction is reversed)
           LED_BackAndForth(LEDtoPosition(_LEDPosL), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true, true, TotalLEDsClock);              //Lower lip
           if (_Miss) {
