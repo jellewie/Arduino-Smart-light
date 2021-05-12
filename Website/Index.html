@@ -330,6 +330,7 @@
                     this.textEl.classList.add('sliderText');
                     this.containerEl.appendChild(this.textEl);
                     this.rangeEl = document.createElement('input');
+                    this.rangeEl.autocomplete = 'off';
                     this.rangeEl.type = 'range';
                     this.rangeEl.min = '0';
                     this.rangeEl.max = '255';
