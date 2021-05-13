@@ -157,7 +157,7 @@ void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Dir
     LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
 }
 //==================================================
-void ClockClear(){
+void ClockClear() {
   fill_solid(&(LEDs[0]), TotalLEDsClock, CRGB(0, 0, 0));        //Clear all the Clock LEDs
 }
 void UpdateColor(bool ForceUpdate) {

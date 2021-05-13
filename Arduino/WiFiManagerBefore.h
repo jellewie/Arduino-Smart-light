@@ -9,7 +9,7 @@
    DO NOT USE char(") in any of input stings on the webpage, use char(') if you need it. char(") will be replaced
    These are the declaired triggered and function names: you can declare over these to overwrite them but be carefull
       server.on("/",        WiFiManager_handle_Connect);
-      server.on("/ip",      WiFiManager_handle_Connect);     //Just as backup, so the "/" can be overwritten by user 
+      server.on("/ip",      WiFiManager_handle_Connect);     //Just as backup, so the "/" can be overwritten by user
       server.on("/setup",   WiFiManager_handle_Settings);
       server.on("/ota",     WiFiManager_OTA_handle_uploadPage);
       server.on("/update",  HTTP_POST, WiFiManager_OTA_handle_update, WiFiManager_OTA_handle_update2);
@@ -53,5 +53,5 @@ const String UpdateWebpage = "https://github.com/jellewie/Arduino-Smart-light/re
 
 //  WiFiManager.EnableSetup(true);                              //(runtime) Enable the settings, only enabled in APmode by default
 //  WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
-                                      
+
 //#define WiFiManager_DNS                                       //Was causing some troubles with stableness, note sure why yet

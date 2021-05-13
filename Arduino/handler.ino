@@ -91,7 +91,6 @@ void handle_Set() {
 #ifdef Server_SerialEnabled
   Serial.println();
 #endif //Server_SerialEnabled
-
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown
     if (NewR != -1) AnimationRGB[0] = NewR;                     //Set animation color
@@ -143,16 +142,13 @@ void handle_Getcolors() {
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
-
   byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
     r = AnimationRGB[0];
     g = AnimationRGB[1];
     b = AnimationRGB[2];
   }
-
   ans += "\"RGBL\":[{\"R\":" + String(r) + ",\"G\":" + String(g) + ",\"B\":" + String(b) + ",\"L\":" + String(FastLED.getBrightness()) + "}]}";
-
   server.send(200, "application/json", ans);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Getcolors " + ans);
