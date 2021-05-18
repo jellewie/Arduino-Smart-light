@@ -62,7 +62,7 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
 
       float LED_SS = TimeCurrent.SS + (millis() - TimeCurrent.Ticks) / 1000.0;
       float LED_MM = TimeCurrent.MM + TimeCurrent.SS / 60.0;
-      float LED_HH = TimeCurrent.HH * 5.0 + TimeCurrent.MM / 60.0;
+      float LED_HH = TimeCurrent.HH * 5 + TimeCurrent.MM / 12.0;
       if (LED_HH >= 60) LED_HH -= 60;                           //If its above 12 hours, remove 12 since we can only show 0-12 hours
 
       //When there are more sections, raise the resolution (but sadly I could not figure out a formula so this is only limited to a few hand checked samples)
