@@ -20,6 +20,7 @@
 #define PreFixSetClockHourAnalog "a"
 #define PreFixSetLEDOffset "o"
 #define PreFixSetClockAnalog "c"
+#define PreFixSection "s"           //''or'0'=All, 1=TotalLEDsClock, 2=!(TotalLEDsClock)
 
 //<ip>/time[?PreFix=Value][&....]                               //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
@@ -29,6 +30,7 @@
 void handle_Set() {
   String ERRORMSG;                                              //emthy=dont change
   bool DoWriteToEEPROM = false;
+  byte Section = 0;
   int NewR = -1, NewG = -1, NewB = -1;
 #ifdef Server_SerialEnabled
   Serial.print("SV: /SET?");
@@ -85,36 +87,51 @@ void handle_Set() {
     } else if (ArguName == PreFixSetClockAnalog) {
       ClockAnalog = IsTrue(ArgValue);
       DoWriteToEEPROM = true;
+    } else if (ArguName == PreFixSection) {
+      Section = ArgValue.toInt();
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
   }
 #ifdef Server_SerialEnabled
   Serial.println();
 #endif //Server_SerialEnabled
+  if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
+    FastLED.clear();
+  bool ColorUpdated = false;
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown
     if (NewR != -1) AnimationRGB[0] = NewR;                     //Set animation color
-    if (NewG != -1) AnimationRGB[1] = NewG;
-    if (NewB != -1) AnimationRGB[2] = NewB;
+    if (NewG != -1) AnimationRGB[1] = NewG;                     //^
+    if (NewB != -1) AnimationRGB[2] = NewB;                     //^
   } else {
     if (NewR != -1) {
-      Mode = WIFI;
-      LEDs[0].r = NewR;
+      LEDs[TotalLEDs - 1].r = NewR;                             //Set animation color
+      ColorUpdated = true;
     }
     if (NewG != -1) {
-      Mode = WIFI;
-      LEDs[0].g = NewG;
+      LEDs[TotalLEDs - 1].g = NewG;                             //^
+      ColorUpdated = true;
     }
     if (NewB != -1) {
-      Mode = WIFI;
-      LEDs[0].b = NewB;
+      LEDs[TotalLEDs - 1].b = NewB;                             //^
+      ColorUpdated = true;
     }
   }
   if (DoWriteToEEPROM)
     ScheduleWriteToEEPROM();                                    //If we need to write to EEPROM
-  if (Mode == WIFI)
-    fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);                 //Change the whole LED strip to have the color of the first set LED
-  else if (Mode == RESET) {
+  if (ColorUpdated) {
+    int FromLED = 0, AmountLED = TotalLEDs;
+    if (Section == 0) {                                         //If we are talking about all LEDs
+      Mode = WIFI;
+    } else if (Section == 1) {                                  //If clock only
+      AmountLED = TotalLEDsClock;
+    } else if (Section == 2) {                                  //If every section except the clock
+      if (Mode != CLOCK) Mode = WIFI;
+      FromLED   = TotalLEDsClock + 1;
+      AmountLED = TotalLEDs - FromLED;
+    }
+    fill_solid(&(LEDs[FromLED]), AmountLED, LEDs[TotalLEDs - 1]); //Change the whole LED strip to have the color of the last set LED
+  } else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
     for (int i = 0; i < 100; i++) {                             //Just wait for a few ms to make sure the "reset command recieved" has been send
       server.handleClient();
@@ -142,8 +159,8 @@ void handle_Getcolors() {
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
-  byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
-  if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show animation color, instead of mostly black)
+  byte r = LEDs[TotalLEDs - 1].r, g = LEDs[TotalLEDs - 1].g, b = LEDs[TotalLEDs - 1].b; //Set RGB to be the color of the last LED
+  if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show the set animation color)
     r = AnimationRGB[0];
     g = AnimationRGB[1];
     b = AnimationRGB[2];
