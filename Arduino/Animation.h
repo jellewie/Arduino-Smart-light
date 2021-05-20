@@ -248,37 +248,43 @@ void ShowAnimation(bool Start) {                                //This would be 
           UpdateLEDs = true;
         }
       } break;
-    case 13: {                                                                //PHYSICS
-        static byte Counter = 0;
-        static CRGB LEDsStart[TotalLEDs];
+
+    case 13: {                                                  //PHYSICS
+#define Speed -0.02
+#define Drag 0.981
+        CRGB Saved_Color[TotalLEDsClock];
+        float Position[TotalLEDsClock];
+        float Velocity[TotalLEDsClock];
         if (Start) {
-          LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);               //Init with rainbow color, so we have something to work with
 
-          memcpy(LEDsStart, LEDs, TotalLEDs * 3); //Save the start position so we can refference it later, amount*3 since we use 3 colors: RGB
-          //Amount = sizeof(LEDs) / sizeof(LEDs[0]);
+          LED_Rainbow(0, TotalLEDsClock, 255 / TotalLEDsClock);
 
-          Counter = 0;                                              //Reset the counter
-        }
-        EVERY_N_MILLISECONDS(250) {
-          for (byte i = 0; i < TotalLEDs; i++) {
-
-            //https://www.desmos.com/calculator/g4ccytokl8
-            float _pos = cos((i + Counter) / 9.55) * 30 + 30;
-            LEDs[i] = LEDsStart[LEDtoPosition(_pos)];
-
-
-            //LEDs[i] = LEDsStart[LEDtoPosition(i + Counter)];
+          for (int i = 0; i < TotalLEDsClock; i++) {
+            Position[i] = i;
+            Saved_Color[i].r = LEDs[i].r;
+            Saved_Color[i].g = LEDs[i].g;
+            Saved_Color[i].b = LEDs[i].b;
           }
-          Counter++;
-          if (Counter >= TotalLEDs)
-            Counter = 0;
+          //memcpy(Saved_Color, LEDs, sizeof(Saved_Color));            //Destination, Source, Size http://www.cplusplus.com/reference/cstring/memcpy/
+        }
+#define ANIMATION_TIME_PHYSICS 1000/30
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_PHYSICS) {
+          LED_Fill(1, TotalLEDsClock - 1, CRGB(0, 0, 0), TotalLEDsClock); //Clear All LEDs so we start from a blank slate
 
-          LEDs[Counter] = CRGB(0, 0, 255);      //Just add a rotating RED LED, so we know the code still works
+          LED_Flash(0, 1, CRGB(255, 0, 0), CRGB(0, 0, 255), TotalLEDsClock);
 
+          for (int i = 0; i < TotalLEDsClock; i++) {
+            float Acceleration = Speed * (Position[i] - TotalLEDsClock / 2);//Calculate howmuch we wish to move (just linear)  https://www.desmos.com/calculator/ljo4mllyzq   y=-\frac{1}{2}\left(x-b\right)
+            Velocity[i] = Velocity[i] * Drag + Acceleration;    //Set the Velocity to be (the speed we shere add) * (Drag) + (howmuch we wish to move)
+            Position[i] = Position[i] + Velocity[i];            //Calculate new position
+            //LED_Add(LEDtoPosition(round(Position[i])), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
+
+            int _LedPos = round(Position[i]);
+            LED_Fill(LEDtoPosition(_LedPos), 1, CRGB(0, 0, 255));
+          }
           UpdateLEDs = true;
         }
       } break;
-
     default:
       AnimationCounter = 0;                                     //Stop animation
 #ifdef SerialEnabled
