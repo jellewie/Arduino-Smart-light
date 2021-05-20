@@ -111,7 +111,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           fadeToBlackBy(LEDs, TotalLEDsClock, 10);
           byte dothue = 0;
           for (byte i = 0; i < 8; i++) {
-            LEDs[beatsin8( i + 7, 0, TotalLEDsClock - 1 )] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
+            LEDs[beatsin8(i + 7, 0, TotalLEDsClock)] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
             dothue += 32;
           }
           UpdateLEDs = true;

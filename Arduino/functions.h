@@ -21,8 +21,8 @@ int LEDtoPosition(signed int LEDID) {
 void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
 void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
   while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= MaxBound) Amount = MaxBound;                    //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= MaxBound) {                              //Overflow protection
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
     byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
     fill_solid(&(LEDs[From]), calc1, Color);
     fill_solid(&(LEDs[0]), Amount - calc1, Color);
@@ -32,8 +32,8 @@ void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
 void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
 void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
   while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= MaxBound) Amount = MaxBound;                    //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= MaxBound) {                              //Overflow protection
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
     byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
     for (int i = From; i < From + calc1; i++)
       LEDs[i] += Color;
@@ -98,8 +98,8 @@ void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
   static byte gHue;
   gHue++;
   while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount >= MaxBound) Amount = MaxBound;                    //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount >= MaxBound) {                              //Overflow protection
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
     byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
     fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
     fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
