@@ -11,7 +11,7 @@ int LEDtoPosition(signed int LEDID) {
   LEDID += LEDOffset;
   while (LEDID < 0)                                             //When a negative overflow
     LEDID += TotalLEDsClock;
-  while (LEDID >= TotalLEDsClock)                             //When a positive overflow
+  while (LEDID >= TotalLEDsClock)                               //When a positive overflow
     LEDID -= TotalLEDsClock;
   return LEDID;
 }

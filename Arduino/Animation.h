@@ -92,7 +92,7 @@ void ShowAnimation(bool Start) {                                //This would be 
       } break;
     case 2: {                                                   //CONFETTI
 #define ANIMATION_TIME_CONFETTI 1000 / 60
-        EVERY_N_MILLISECONDS(ANIMATION_TIME_CONFETTI) {         //Limit to 60FPS
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_CONFETTI) {         //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           EVERY_N_MILLISECONDS(50) {
             LEDs[random8(TotalLEDsClock)] += AnimationRGB;
@@ -109,7 +109,7 @@ void ShowAnimation(bool Start) {                                //This would be 
       } break;
     case 4: {                                                   //GLITTER
 #define ANIMATION_TIME_GLITTER 1000 / 60
-        EVERY_N_MILLISECONDS(ANIMATION_TIME_GLITTER) {          //Limit to 60FPS
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_GLITTER) {          //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           if (random8() < 40)                                   //x/255 change to exectue:
             LEDs[random8(TotalLEDsClock)] += AnimationRGB;
@@ -117,7 +117,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 5: {                                                   //JUGGLE
-#define ANIMATION_TIME_JUGGLE 1000 / 30
+#define ANIMATION_TIME_JUGGLE 1000 / 120
         EVERY_N_MILLISECONDS(ANIMATION_TIME_JUGGLE) {           //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 10);
           byte dothue = 0;
@@ -137,7 +137,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Direction = random8(0, 2);
         }
 #define ANIMATION_TIME_MOVE (10000 + 500) / (TotalLEDsClock * 3)
-        EVERY_N_MILLISECONDS(ANIMATION_TIME_MOVE) {             //define the speed so it goes around 3 times in 10seconds
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_MOVE) {             //Define the speed so it goes around 3 times in 10seconds
           LED_Move(0, TotalLEDsClock, AnimationRGB, _Sets, _Length, &_Counter, _Direction);
           UpdateLEDs = true;
         }
@@ -149,14 +149,14 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 8: {                                                   //SINELON
-#define ANIMATION_TIME_SINELON 1000 / 30
+#define ANIMATION_TIME_SINELON 1000 / 120
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON) {          //Limit to x FPS
           AnimationSinelon(AnimationRGB, 5, Start, 13);
           UpdateLEDs = true;
         }
       } break;
     case 9: {                                                   //SINELON2
-#define ANIMATION_TIME_SINELON2 1000 / 30
+#define ANIMATION_TIME_SINELON2 1000 / 120
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON2) {         //Limit to x FPS
           if (AnimationSinelon(AnimationRGB, 1, Start, 13))
             SetNewColor();
