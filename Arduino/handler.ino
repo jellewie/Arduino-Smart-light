@@ -85,6 +85,7 @@ void handle_Set() {
       LEDOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockAnalog) {
+      ClockHourAnalog = true;
       ClockAnalog = IsTrue(ArgValue);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSection) {
