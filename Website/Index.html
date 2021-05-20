@@ -200,7 +200,7 @@
 
             .taskCloseBtn::before,.taskCloseBtn::after {
                 content: '';
-                background: black;
+                background: var(--ui-color);
                 width: 2px;
                 height: 25px;
                 display: block;
@@ -283,6 +283,13 @@
                 <select id="addTaskType">
                     <option>SWITCHMODE</option>
                     <option>DIMMING</option>
+                    <option>BRIGHTEN</option>
+                    <option>RESETESP</option>
+                    <option>CHANGERGB</option>
+                    <option>SAVEEEPROM</option>
+                    <option>SYNCTIME</option>
+                    <option>AUTOBRIGHTNESS</option>
+                    <option>HOURLYANIMATIONS</option>
                 </select>
                 <input id="addTaskVar" type="text" placeholder="var">
             </div>
@@ -323,6 +330,7 @@
                     this.textEl.classList.add('sliderText');
                     this.containerEl.appendChild(this.textEl);
                     this.rangeEl = document.createElement('input');
+                    this.rangeEl.autocomplete = 'off';
                     this.rangeEl.type = 'range';
                     this.rangeEl.min = '0';
                     this.rangeEl.max = '255';
@@ -450,7 +458,7 @@
             let Dm = new DropDown({
                 name: 'Mode',
                 setParamName: 'm',
-                possibleValues: ['OFF', 'ON', 'WIFI', 'CLOCK', 'BLINK', 'BPM', 'CONFETTI', 'FLASH', 'GLITTER', 'JUGGLE', 'MOVE', 'RAINBOW', 'SINELON', 'SINELON2'],
+                possibleValues: ['OFF', 'ON', 'WIFI', 'CLOCK', 'BLINK', 'BPM', 'CONFETTI', 'FLASH', 'FLASH2', 'GLITTER', 'JUGGLE', 'MOVE', 'PACMAN', 'RAINBOW', 'SINELON', 'SINELON2', 'SMILEY'],
                 modifySendParams: (oldParams)=>{
                     if (Dm.value == 'WIFI') {
                         let extraData = this.getServerStateMessageData();
@@ -470,7 +478,7 @@
             let Ddm = new DropDown({
                 name: 'Doublepress mode',
                 setParamName: 'dm',
-                possibleValues: ['WIFI', 'CLOCK', 'BLINK', 'BPM', 'CONFETTI', 'FLASH', 'GLITTER', 'JUGGLE', 'MOVE', 'RAINBOW', 'SINELON', 'SINELON2']
+                possibleValues: ['WIFI', 'CLOCK', 'BLINK', 'RAINBOW']
             });
             settingsContainer.appendChild(document.createElement('br'));
             let Di = new DropDown({
@@ -506,7 +514,7 @@
             }
             );
             let Bt = new RequestButton('Sync time','/time','Time updated');
-            let Br = new RequestButton('Reset','/set?m=RESET','ESP restarting');
+            let Br = new RequestButton('Restart','/set?m=RESET','ESP restarting');
             settingsContainer.appendChild(document.createElement('br'));
             new LinkButton('OTA','/ota');
             new LinkButton('Info','/info');
@@ -654,10 +662,9 @@
                     const closeBtn = document.createElement('div');
                     closeBtn.classList.add('taskCloseBtn');
                     liEl.appendChild(closeBtn);
-                        const response = await fetch('/settask?o=2&i='+task.id);
                     closeBtn.addEventListener('click', async _=>{
-                        if (!response.ok)
-                            doToastMessage(await response.text(), true);
+                        const response = await fetch('/settask?o=2&i=' + task.id);
+                        doToastMessage(await response.text(), !response.ok);
                         await updateTaskList();
                     }
                     );

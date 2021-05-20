@@ -2,9 +2,9 @@
    HTML written by JesperTheEnd https://github.com/jespertheend
 */
 
-//#define Server_SerialEnabled                        //define this to enable serial feedback
+//#define Server_SerialEnabled                                  //Define this to enable serial feedback
 
-//<ip>/set?PreFix=Value[&....]                        //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
+//<ip>/set?PreFix=Value[&....]                                  //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixSetColorValueRed "r"
 #define PreFixSetColorValueGreen "g"
 #define PreFixSetColorValueBlue "b"
@@ -18,17 +18,19 @@
 #define PreFixSetDoublePressMode "dm"
 #define PreFixSetClockHourLines "hl"
 #define PreFixSetClockHourAnalog "a"
-#define PreFixSetClockOffset "o"
+#define PreFixSetLEDOffset "o"
 #define PreFixSetClockAnalog "c"
+#define PreFixSection "s"           //''or'0'=All, 1=TotalLEDsClock, 2=!(TotalLEDsClock)
 
-//<ip>/time[?PreFix=Value][&....]                     //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
+//<ip>/time[?PreFix=Value][&....]                               //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
 #define PreFixTimeMin  "m"
 #define PreFixTimeSec  "s"
 
 void handle_Set() {
-  String ERRORMSG;                                    //emthy=dont change
+  String ERRORMSG;                                              //emthy=dont change
   bool DoWriteToEEPROM = false;
+  byte Section = 0;
   int NewR = -1, NewG = -1, NewB = -1;
 #ifdef Server_SerialEnabled
   Serial.print("SV: /SET?");
@@ -48,10 +50,10 @@ void handle_Set() {
     } else if (ArguName == PreFixSetColorValueBlue) {
       NewB = constrain((ArgValue.toInt()), 0, 255);
     } else if (ArguName == PreFixSetModeTo) {
-      LastMode = -1;                                  //Make sure we init the new mode
+      LastMode = -1;                                            //Make sure we init the new mode
       Mode = ConvertModeToInt(ArgValue);
     } else if (ArguName == PreFixSetBrightness) {
-      if (Mode == ON) Mode = WIFI;                    //If we are on manual, switch to WIFI
+      if (Mode == ON) Mode = WIFI;                              //If we are on manual, switch to WIFI
       AutoBrightness = false;
       FastLED.setBrightness(constrain((ArgValue.toInt()), 1, 255));
     } else if (ArguName == PreFixSetAutoBrightness) {
@@ -79,49 +81,64 @@ void handle_Set() {
     } else if (ArguName == PreFixSetClockHourAnalog) {
       ClockHourAnalog = IsTrue(ArgValue);
       DoWriteToEEPROM = true;
-    } else if (ArguName == PreFixSetClockOffset) {
-      ClockOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
+    } else if (ArguName == PreFixSetLEDOffset) {
+      LEDOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockAnalog) {
+      ClockHourAnalog = true;
       ClockAnalog = IsTrue(ArgValue);
       DoWriteToEEPROM = true;
+    } else if (ArguName == PreFixSection) {
+      Section = ArgValue.toInt();
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
   }
 #ifdef Server_SerialEnabled
   Serial.println();
 #endif //Server_SerialEnabled
-
+  if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
+    FastLED.clear();
+  bool ColorUpdated = false;
   if (Mode == WIFI) AnimationCounter = 0;
-  if (AnimationCounter != 0) {                        //Animation needs to be shown
-    if (NewR != -1) AnimationRGB[0] = NewR;               //Set animation color
-    if (NewG != -1) AnimationRGB[1] = NewG;
-    if (NewB != -1) AnimationRGB[2] = NewB;
+  if (AnimationCounter != 0) {                                  //Animation needs to be shown
+    if (NewR != -1) AnimationRGB[0] = NewR;                     //Set animation color
+    if (NewG != -1) AnimationRGB[1] = NewG;                     //^
+    if (NewB != -1) AnimationRGB[2] = NewB;                     //^
   } else {
     if (NewR != -1) {
-      Mode = WIFI;
-      LEDs[0].r = NewR;
+      LEDs[TotalLEDs - 1].r = NewR;                             //Set animation color
+      ColorUpdated = true;
     }
     if (NewG != -1) {
-      Mode = WIFI;
-      LEDs[0].g = NewG;
+      LEDs[TotalLEDs - 1].g = NewG;                             //^
+      ColorUpdated = true;
     }
     if (NewB != -1) {
-      Mode = WIFI;
-      LEDs[0].b = NewB;
+      LEDs[TotalLEDs - 1].b = NewB;                             //^
+      ColorUpdated = true;
     }
   }
   if (DoWriteToEEPROM)
-    ScheduleWriteToEEPROM();                          //If we need to write to EEPROM
-  if (Mode == WIFI)
-    fill_solid(&(LEDs[0]), TotalLEDs, LEDs[0]);       //Change the whole LED strip to have the color of the first set LED
-  else if (Mode == RESET) {
+    ScheduleWriteToEEPROM();                                    //If we need to write to EEPROM
+  if (ColorUpdated) {
+    int FromLED = 0, AmountLED = TotalLEDs;
+    if (Section == 0) {                                         //If we are talking about all LEDs
+      Mode = WIFI;
+    } else if (Section == 1) {                                  //If clock only
+      AmountLED = TotalLEDsClock;
+    } else if (Section == 2) {                                  //If every section except the clock
+      if (Mode != CLOCK) Mode = WIFI;
+      FromLED   = TotalLEDsClock + 1;
+      AmountLED = TotalLEDs - FromLED;
+    }
+    fill_solid(&(LEDs[FromLED]), AmountLED, LEDs[TotalLEDs - 1]); //Change the whole LED strip to have the color of the last set LED
+  } else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
-    for (int i = 0; i < 100; i++) {                   //Just wait for a few ms to make sure the "reset command recieved" has been send
+    for (int i = 0; i < 100; i++) {                             //Just wait for a few ms to make sure the "reset command recieved" has been send
       server.handleClient();
       delay(1);
     }
-    ESP.restart();                                    //Restart the ESP
+    ESP.restart();                                              //Restart the ESP
   }
   if (ERRORMSG == "") {
     UpdateLEDs = true;
@@ -143,16 +160,13 @@ void handle_Getcolors() {
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
-
-  byte r = LEDs[0].r, g = LEDs[0].g, b = LEDs[0].b;
-  if (AnimationCounter != 0) {                        //Animation needs to be shown (this is used to show animation color, instead of mostly black)
+  byte r = LEDs[TotalLEDs - 1].r, g = LEDs[TotalLEDs - 1].g, b = LEDs[TotalLEDs - 1].b; //Set RGB to be the color of the last LED
+  if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show the set animation color)
     r = AnimationRGB[0];
     g = AnimationRGB[1];
     b = AnimationRGB[2];
   }
-
   ans += "\"RGBL\":[{\"R\":" + String(r) + ",\"G\":" + String(g) + ",\"B\":" + String(b) + ",\"L\":" + String(FastLED.getBrightness()) + "}]}";
-
   server.send(200, "application/json", ans);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Getcolors " + ans);
@@ -160,7 +174,7 @@ void handle_Getcolors() {
 }
 void handle_OnConnect() {
   if (WiFi.status() != WL_CONNECTED) {
-    WiFiManager_handle_Connect();                     //Since we have no internet/WIFI connection, handle request as an APmode request
+    WiFiManager_handle_Connect();                               //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
   /*HTML USEFULL STEPS:
@@ -169,7 +183,7 @@ void handle_OnConnect() {
     static String html = "<code>";
   */
   const String html = "<html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover\"><link rel=\"manifest\" href=\"manifest.json\"><style>"
-                      "body,html{font-family:Helvetica,Arial,sans-serif;margin:0;background:var(--selected-color);color:var(--ui-color)}#sliders{width:80%;max-width:400px;top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)}.sliderContainer{margin:30px 0;text-align:center}.slideIn{position:absolute;border-radius:5px;box-shadow:2px 2px var(--ui-color-trans2);transition:opacity .2s,transform .2s;background:var(--selected-color);border:1px solid var(--ui-color)}.toast{z-index:160;right:0;top:0;font-size:14pt;margin:30px;padding:10px}.toast.error{background:#ff5026}.toast.hidden{transform:translateY(-30%);opacity:0}input[type=\"range\"]{display:block;width:100%;margin:0;-webkit-appearance:none;background:transparent}input[type=\"range\"]:focus{outline:0}input[type=\"range\"]::-webkit-slider-runnable-track{background:var(--ui-color-trans2);height:5px;margin:30px 0;border-radius:5px}@media(max-height:540px){input[type=\"range\"]::-webkit-slider-runnable-track{margin:10px 0}}input[type=\"range\"]:hover::-webkit-slider-runnable-track{background:var(--ui-color-trans1)}input[type=\"range\"]::-webkit-slider-thumb{-webkit-appearance:none;background:var(--ui-color);width:10px;height:10px;border-radius:30px;margin-top:-3px;transition:width .2s,height .2s,margin-top .2s}input[type=\"range\"]:hover::-webkit-slider-thumb{width:30px;height:30px;margin-top:-12.5px}input[type=\"text\"],input[type=\"time\"]{background:#00000021;color:var(--ui-color);border:solid 1px var(--ui-color);border-radius:5px}input[type=\"time\"]::-webkit-calendar-picker-indicator{background-color:var(--ui-color-trans2)}input[type=\"text\"]::placeholder{color:var(--ui-color-trans2)}#curtain{position:absolute;left:0;right:0;top:0;bottom:0;z-index:100;background:#00000082;opacity:1;transition:opacity .2s}#curtain.hidden{opacity:0;pointer-events:none}.popup{position:absolute;width:90%;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:150}.popup.hidden{transform:translate(-50%,calc( - 50% - 10px));opacity:0;pointer-events:none}#settingsBtn{bottom:0;right:0;position:absolute;width:30px;height:30px;margin:10px;cursor:pointer}#taskList{padding:0}.taskItem{list-style:none;display:flex;align-items:center;padding:10px;flex-wrap:nowrap;white-space:nowrap}.taskItem>*{margin:0 8px}.taskTime{width:80px;position:relative}.taskTime::after{content:' ';background:black;width:1px;height:23px;display:inline-block;right:0;top:50%;position:absolute;transform:translateY(-50%)}.taskCloseBtn{width:27px;height:27px;cursor:pointer;opacity:.6;margin-left:auto}.taskCloseBtn:hover{opacity:1}.taskCloseBtn::before,.taskCloseBtn::after{content:'';background:black;width:2px;height:25px;display:block;position:absolute}.taskCloseBtn::before{transform:translateX(12px) rotate(45deg)}.taskCloseBtn::after{transform:translateX(12px) rotate(-45deg)}.selectLabel{margin:5px;display:block}.selectContainer{display:inline-block;position:relative}select{-webkit-appearance:none;background:0;color:var(--ui-color);border:solid 1px var(--ui-color);border-radius:5px;margin:3px;padding:2px}select:focus{outline:0}select,.dropdownFakeValue{font-size:11px}.dropdownFakeValue{display:inline-block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}option{color:initial}button{-webkit-appearance:none;background:var(--ui-color);border:0;padding:3px 5px;margin:3px;border-radius:5px;color:var(--selected-color)}"
+                      "body,html{font-family:Helvetica,Arial,sans-serif;margin:0;background:var(--selected-color);color:var(--ui-color)}#sliders{width:80%;max-width:400px;top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)}.sliderContainer{margin:30px 0;text-align:center}.slideIn{position:absolute;border-radius:5px;box-shadow:2px 2px var(--ui-color-trans2);transition:opacity .2s,transform .2s;background:var(--selected-color);border:1px solid var(--ui-color)}.toast{z-index:160;right:0;top:0;font-size:14pt;margin:30px;padding:10px}.toast.error{background:#ff5026}.toast.hidden{transform:translateY(-30%);opacity:0}input[type=\"range\"]{display:block;width:100%;margin:0;-webkit-appearance:none;background:transparent}input[type=\"range\"]:focus{outline:0}input[type=\"range\"]::-webkit-slider-runnable-track{background:var(--ui-color-trans2);height:5px;margin:30px 0;border-radius:5px}@media(max-height:540px){input[type=\"range\"]::-webkit-slider-runnable-track{margin:10px 0}}input[type=\"range\"]:hover::-webkit-slider-runnable-track{background:var(--ui-color-trans1)}input[type=\"range\"]::-webkit-slider-thumb{-webkit-appearance:none;background:var(--ui-color);width:10px;height:10px;border-radius:30px;margin-top:-3px;transition:width .2s,height .2s,margin-top .2s}input[type=\"range\"]:hover::-webkit-slider-thumb{width:30px;height:30px;margin-top:-12.5px}input[type=\"text\"],input[type=\"time\"]{background:#00000021;color:var(--ui-color);border:solid 1px var(--ui-color);border-radius:5px}input[type=\"time\"]::-webkit-calendar-picker-indicator{background-color:var(--ui-color-trans2)}input[type=\"text\"]::placeholder{color:var(--ui-color-trans2)}#curtain{position:absolute;left:0;right:0;top:0;bottom:0;z-index:100;background:#00000082;opacity:1;transition:opacity .2s}#curtain.hidden{opacity:0;pointer-events:none}.popup{position:absolute;width:90%;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:150}.popup.hidden{transform:translate(-50%,calc( - 50% - 10px));opacity:0;pointer-events:none}#settingsBtn{bottom:0;right:0;position:absolute;width:30px;height:30px;margin:10px;cursor:pointer}#taskList{padding:0}.taskItem{list-style:none;display:flex;align-items:center;padding:10px;flex-wrap:nowrap;white-space:nowrap}.taskItem>*{margin:0 8px}.taskTime{width:80px;position:relative}.taskTime::after{content:' ';background:black;width:1px;height:23px;display:inline-block;right:0;top:50%;position:absolute;transform:translateY(-50%)}.taskCloseBtn{width:27px;height:27px;cursor:pointer;opacity:.6;margin-left:auto}.taskCloseBtn:hover{opacity:1}.taskCloseBtn::before,.taskCloseBtn::after{content:'';background:var(--ui-color);width:2px;height:25px;display:block;position:absolute}.taskCloseBtn::before{transform:translateX(12px) rotate(45deg)}.taskCloseBtn::after{transform:translateX(12px) rotate(-45deg)}.selectLabel{margin:5px;display:block}.selectContainer{display:inline-block;position:relative}select{-webkit-appearance:none;background:0;color:var(--ui-color);border:solid 1px var(--ui-color);border-radius:5px;margin:3px;padding:2px}select:focus{outline:0}select,.dropdownFakeValue{font-size:11px}.dropdownFakeValue{display:inline-block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}option{color:initial}button{-webkit-appearance:none;background:var(--ui-color);border:0;padding:3px 5px;margin:3px;border-radius:5px;color:var(--selected-color)}"
                       "</style><style id=\"colorVars\"></style></head><body>"
                       "<div id=\"sliders\"></div>"
                       "<div id=\"curtain\" class=\"hidden\"></div>"
@@ -205,7 +219,7 @@ void handle_OnConnect() {
                       "let addTaskTypeEl = document.getElementById('addTaskType');"
                       "let addTaskVarEl = document.getElementById('addTaskVar');"
 
-                      "class Slider{constructor(name,isBrightness=false){this.name=name;this.containerEl=document.createElement('div');this.containerEl.classList.add('sliderContainer');slidersEl.appendChild(this.containerEl);this.textEl=document.createElement('div');this.textEl.classList.add('sliderText');this.containerEl.appendChild(this.textEl);this.rangeEl=document.createElement('input');this.rangeEl.type='range';this.rangeEl.min='0';this.rangeEl.max='255';this.containerEl.appendChild(this.rangeEl);this.rangeEl.addEventListener('input',(_)=>{this.update();});this.rangeEl.addEventListener('change',(_)=>{setServerState(isBrightness);});this.updateText();}get value(){return this.rangeEl.value;}set value(v){this.rangeEl.value=v;this.update();}get value01(){return this.value/255;}update(){this.updateText();updateCssColor();}updateText(){this.textEl.textContent=this.name+': '+this.value;}}"
+                      "class Slider{constructor(name,isBrightness=false){this.name=name;this.containerEl=document.createElement('div');this.containerEl.classList.add('sliderContainer');slidersEl.appendChild(this.containerEl);this.textEl=document.createElement('div');this.textEl.classList.add('sliderText');this.containerEl.appendChild(this.textEl);this.rangeEl=document.createElement('input');this.rangeEl.autocomplete='off';this.rangeEl.type='range';this.rangeEl.min='0';this.rangeEl.max='255';this.containerEl.appendChild(this.rangeEl);this.rangeEl.addEventListener('input',(_)=>{this.update();});this.rangeEl.addEventListener('change',(_)=>{setServerState(isBrightness);});this.updateText();}get value(){return this.rangeEl.value;}set value(v){this.rangeEl.value=v;this.update();}get value01(){return this.value/255;}update(){this.updateText();updateCssColor();}updateText(){this.textEl.textContent=this.name+': '+this.value;}}"
                       "class DropDown{constructor({name='',setParamName='',possibleValues=[],modifySendParams=null}={}){let labelEl=document.createElement('label');labelEl.classList.add('selectLabel');labelEl.textContent=name+':';settingsContainerEl.appendChild(labelEl);this.name=name;this._value='';this.setParamName=setParamName;this.modifySendParams=modifySendParams;let selectContainer=document.createElement('div');selectContainer.classList.add('selectContainer');labelEl.appendChild(selectContainer);this.el=document.createElement('select');selectContainer.appendChild(this.el);this.el.addEventListener('change',(_)=>{this.onChange();});for(const val of possibleValues){let optionEl=document.createElement('option');optionEl.value=optionEl.textContent=val;this.el.appendChild(optionEl);}this.el.value='';this.fakeValueEl=document.createElement('div');this.fakeValueEl.classList.add('dropdownFakeValue');selectContainer.appendChild(this.fakeValueEl);}async onChange(){this.value=this.el.value;this.el.value='';let sendParams={};sendParams[this.setParamName]=this.value;if(this.modifySendParams){let newSendParams=this.modifySendParams(sendParams);if(newSendParams)sendParams=newSendParams;}let success=await sendServerState(sendParams);if(success){doToastMessage(this.name+' Updated');}}get value(){return this._value;}set value(v){this._value=v;this.fakeValueEl.textContent=v;}}"
                       "class Button{constructor(label,cb){this.el=document.createElement('button');this.el.textContent=label;settingsContainer.appendChild(this.el);this.el.addEventListener('click',(_)=>{cb();});}}"
                       "class RequestButton extends Button{constructor(label,endpoint,successMessage){super(label,async(_)=>{try{let response=await fetch(endpoint);if(response.ok){doToastMessage(successMessage);}else{doToastMessage(await response.text(),true);}}catch(_){doToastMessage('Failed to connect',true);}});}}"
@@ -274,7 +288,7 @@ void handle_OnConnect() {
                       "Dc.value=json.c;"
                       "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sl.value=col.L;}"
 
-                      "async function updateTaskList(){let response=await fetch('/gettasks');if(response.ok){await updateTaskListFromResponse(response);}else{doToastMessage(await response.text(),true);}}let currentTaskListTimeItems=[];async function updateTaskListFromResponse(response){if(!response.ok)return;const json=await response.json();taskListEl.innerHTML='';currentTaskListTimeItems=[];for(const task of json.tasks){const liEl=document.createElement('li');liEl.classList.add('taskItem');taskListEl.appendChild(liEl);const timeEl=document.createElement('div');timeEl.classList.add('taskTime');timeEl.innerText=task.time;liEl.appendChild(timeEl);if(task.timeFromNow){currentTaskListTimeItems.push({el:timeEl,fireTime:performance.now()+task.timeFromNow,});}const typeEl=document.createElement('div');typeEl.classList.add('taskType');typeEl.innerText=task.type;liEl.appendChild(typeEl);const varEl=document.createElement('div');varEl.classList.add('taskVar');if(task.var){varEl.innerText='Var: '+task.var;}liEl.appendChild(varEl);const closeBtn=document.createElement('div');closeBtn.classList.add('taskCloseBtn');liEl.appendChild(closeBtn);closeBtn.addEventListener('click',async _=>{const response=await fetch('/settask?o=2&i='+task.id);if(!response.ok)doToastMessage(await response.text(),true);await updateTaskList();});}}function updateTaskTimes(){for(const timeItem of currentTaskListTimeItems){const dt=timeItem.fireTime-performance.now();let str='';if(dt<0){str='now';}else{const dtSeconds=dt/1000;const dtMinutes=dtSeconds/60;const dtHours=dtMinutes/60;const hours=Math.floor(dtHours);const minutes=Math.floor(dtMinutes-hours*60);const seconds=Math.floor(dtSeconds-hours*60*60-minutes*60);str=(''+seconds).padStart(2,'0');if(hours>0){str=(''+minutes).padStart(2,'0')+':'+str;str=hours+':'+str;}else{str=minutes+':'+str;}}timeItem.el.textContent=str;}}setInterval(updateTaskTimes,100);const addTaskBtn=new Button('add',async _=>{const params={i:addTaskTypeEl.value,a:addTaskVarEl.value,};if(addTaskTimeTypeEl.value==\"ABSOLUTE\"){params.h=addTaskTimeEl.valueAsDate.getUTCHours();params.m=addTaskTimeEl.valueAsDate.getUTCMinutes();params.s=addTaskTimeEl.valueAsDate.getUTCSeconds();}else{const ticks=addTaskTimeEl.valueAsNumber;params.t=ticks;}let searchParams=new URLSearchParams(params);try{let response=await fetch('/settask?o=1&'+searchParams);doToastMessage(await response.text(),!response.ok);}catch(e){doToastMessage('Failed to add task',true);}updateTaskList();});addTaskVarEl.parentElement.appendChild(addTaskBtn.el);"
+                      "async function updateTaskList(){let response=await fetch('/gettasks');if(response.ok){await updateTaskListFromResponse(response);}else{doToastMessage(await response.text(),true);}}let currentTaskListTimeItems=[];async function updateTaskListFromResponse(response){if(!response.ok)return;const json=await response.json();taskListEl.innerHTML='';currentTaskListTimeItems=[];for(const task of json.tasks){const liEl=document.createElement('li');liEl.classList.add('taskItem');taskListEl.appendChild(liEl);const timeEl=document.createElement('div');timeEl.classList.add('taskTime');timeEl.innerText=task.time;liEl.appendChild(timeEl);if(task.timeFromNow){currentTaskListTimeItems.push({el:timeEl,fireTime:performance.now()+task.timeFromNow,});}const typeEl=document.createElement('div');typeEl.classList.add('taskType');typeEl.innerText=task.type;liEl.appendChild(typeEl);const varEl=document.createElement('div');varEl.classList.add('taskVar');if(task.var){varEl.innerText='Var: '+task.var;}liEl.appendChild(varEl);const closeBtn=document.createElement('div');closeBtn.classList.add('taskCloseBtn');liEl.appendChild(closeBtn);closeBtn.addEventListener('click',async _=>{const response=await fetch('/settask?o=2&i='+task.id);doToastMessage(await response.text(), !response.ok);await updateTaskList();});}}function updateTaskTimes(){for(const timeItem of currentTaskListTimeItems){const dt=timeItem.fireTime-performance.now();let str='';if(dt<0){str='now';}else{const dtSeconds=dt/1000;const dtMinutes=dtSeconds/60;const dtHours=dtMinutes/60;const hours=Math.floor(dtHours);const minutes=Math.floor(dtMinutes-hours*60);const seconds=Math.floor(dtSeconds-hours*60*60-minutes*60);str=(''+seconds).padStart(2,'0');if(hours>0){str=(''+minutes).padStart(2,'0')+':'+str;str=hours+':'+str;}else{str=minutes+':'+str;}}timeItem.el.textContent=str;}}setInterval(updateTaskTimes,100);const addTaskBtn=new Button('add',async _=>{const params={i:addTaskTypeEl.value,a:addTaskVarEl.value,};if(addTaskTimeTypeEl.value==\"ABSOLUTE\"){params.h=addTaskTimeEl.valueAsDate.getUTCHours();params.m=addTaskTimeEl.valueAsDate.getUTCMinutes();params.s=addTaskTimeEl.valueAsDate.getUTCSeconds();}else{const ticks=addTaskTimeEl.valueAsNumber;params.t=ticks;}let searchParams=new URLSearchParams(params);try{let response=await fetch('/settask?o=1&'+searchParams);doToastMessage(await response.text(),!response.ok);}catch(e){doToastMessage('Failed to add task',true);}updateTaskList();});addTaskVarEl.parentElement.appendChild(addTaskBtn.el);"
                       "async function timeout(ms){await new Promise((r)=>setTimeout(r,ms));}"
                       "function recalculateStyle(elem){window.getComputedStyle(elem).getPropertyValue('top');}"
                       "async function doToastMessage(message,error=false){let el=document.createElement('div');el.classList.add('toast','slideIn','hidden');el.classList.toggle('error',error);el.textContent=message;document.body.appendChild(el);recalculateStyle(el);el.classList.remove('hidden');await timeout(5000);el.classList.add('hidden');await timeout(200);el.parentElement.removeChild(el);}"
@@ -289,7 +303,7 @@ void handle_UpdateTime() {
   String ERRORMSG;
   String message = String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   bool TimeUpdated = false;
-  if (server.args() > 0) {                      //If manual time given
+  if (server.args() > 0) {                                      //If manual time given
     for (int i = 0; i < server.args(); i++) {
       String ArguName = server.argName(i);
       ArguName.toLowerCase();
@@ -306,13 +320,13 @@ void handle_UpdateTime() {
       } else
         ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
     }
-  } else {                                            //If no manual time given, just get it from a time server
-    if (UpdateTime())                                 //Update the time, and if not posible..
+  } else {                                                      //If no manual time given, just get it from a time server
+    if (UpdateTime())                                           //Update the time, and if not posible..
       TimeUpdated = true;
     else
       ERRORMSG += "Could not get updated time from the server\n";
   }
-  if (TimeUpdated) {                                  //If time has updated
+  if (TimeUpdated) {                                            //If time has updated
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   } else {
     if (ERRORMSG == "")
@@ -328,14 +342,15 @@ void handle_UpdateTime() {
 #endif //Server_SerialEnabled
 }
 void handle_Info() {
-  POT L = LIGHT.ReadStable(PotMinChange, PotStick, AverageAmount);
+  POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   String Message = "https://github.com/jellewie/Arduino-Smart-light\n"
                    "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " + String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
-                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " =(raw-N)*P+O\n"
+                   "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " = 255-(P*(raw-N)-O)\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
+                   "TotalLEDs = " + String(TotalLEDs) + " Sections = " + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
@@ -350,8 +365,8 @@ void handle_Info() {
 void handle_Reset() {
   if (WiFiManager.ClearEEPROM()) {
     server.send(200, "text/plain", "EEPROM cleared");
-    MyDelay(10, false);
-    ESP.restart();                                //Restart the ESP
+    MyDelay(10, 0, false);
+    ESP.restart();                                              //Restart the ESP
   }
   server.send(400, "text/plain", "Error trying to clear EEPROM");
 }

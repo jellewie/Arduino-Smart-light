@@ -41,9 +41,6 @@ You can skip to [OTA updater](#ota-over-the-air-update) if you just want to upda
  - [Appendix](#appendix)
 </p></details>
 
-<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
-<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
-
 # Quick start guide
 Follow the following steps to setup the lamp, stop after the first step if you do not want to set up Wi-Fi.
 1.	Connect a proper power supply. The LEDs will blink shortly a soft white for a split second to show that bootup was successful.
@@ -55,6 +52,9 @@ Follow the following steps to setup the lamp, stop after the first step if you d
 3.	When connected go to [192.168.4.1](http://192.168.4.1/) this will show a page where the WIFI name (SSID) and password (Password) can be set, do not forget to submit to apply. Other settings on this page are explained in [soft settings](#soft-settings), for example 'Clockoffset' is the rotation of the LEDs (there are 60 LEDs so filling in 30 will rotate the clock by 50%). 
 ~~The light will also try to make a captive portal to prompt you to login and setup these settings. Sadly, this only works with HTTP, use the mentioned IP if the device does not prompt the login page ([Not working as of now, Known issue](https://github.com/jellewie/Arduino-Smart-light/issues/28))~~ 
 4.	When the device is connected to WIFI it can be accessed by its IP address, but on devices who support mDNS, like Windows and Apple, [smart-clock.local/](http://smart-clock.local/) can also be used.
+
+<img align="right" src="Images/Desk%20clock.jpeg" alt="Desk clock image" width=50%>
+<img align="right" src="Images/Desk%20lamp.jpeg" alt="Desk lamp image" width=50%>
 
 # Creating a unit
 ## Hardware
@@ -183,9 +183,9 @@ An example of the settings page is shown in the figure on the right.
 
 ### Soft settings
 There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
-The most up-to-date values can be found in the top of the [WifiManager.h](Arduino/WifiManager.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
+The most up-to-date values can be found in the top of the [WiFiManagerBefore.h](Arduino/WiFiManagerBefore.h) source file, and can only be set in [smart-clock.local/ip](http://smart-clock.local/ip).
 These settings are saved EEPROMSaveDelayMS (Default 30000ms) after the last change of SoftSettings, or directly after APmode and in the [smart-clock.local/ip](http://smart-clock.local/ip) page.
-Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively
+Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively. Leave black to skip updating these, use spaces ' ' to clear the values
 - **Bootmode** In which mode to start in after start-up
 - **HourlyAnimationS** If it needs to show hourly animations when in CLOCK mode, defined in time in seconds where 0=off.
 - **DoublePressMode** In what mode to go into when the button is double pressed.
@@ -239,13 +239,13 @@ Some examples of TaskType and Var:
 9. HOURLYANIMATIONS - Time in seconds for the animation "x" 
 
 ### OTA (Over The Air update)
-This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) and enables you to update firmware over WiFi.
-On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [github.com/jellewie/Arduino-Smart-light/releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
+This page can be accesed on [smart-clock.local/ota](http://smart-clock.local/ota) (or 'IP/ota') and enables you to update firmware over WiFi.
+On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Smart_clock.bin"). This can be downloaded from [releases](https://github.com/jellewie/Arduino-Smart-light/releases). 
 After which the 'Upload' button needs to be press for the update process to begin, the unit will automatically update and reboot afterwards.
-Note that [SoftSettings](#soft-settings) are reserved as long as the [FLASH is not wiped](#full-reset).
+Note that [SoftSettings](#soft-settings) are preserved.
 
 ### Full reset
-If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore it back. If the wipe was successful it will be reported back and will execute a restart.
+If a full reset is desired it can be achieved by going to 'smart-clock.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore them back. If the wipe was successful it will be reported back and will execute a restart.
 
 # Specifications 
 ## Input voltage

@@ -1,0 +1,6 @@
+POT	KEYWORD1
+
+
+StableAnalog	KEYWORD2
+Read	KEYWORD2
+ReadStable	KEYWORD2
