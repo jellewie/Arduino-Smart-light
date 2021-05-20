@@ -248,7 +248,6 @@ void ShowAnimation(bool Start) {                                //This would be 
           UpdateLEDs = true;
         }
       } break;
-
     case 13: {                                                  //PHYSICS
 #define Speed -0.02
 #define Drag 0.981
@@ -267,7 +266,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           }
           //memcpy(Saved_Color, LEDs, sizeof(Saved_Color));            //Destination, Source, Size http://www.cplusplus.com/reference/cstring/memcpy/
         }
-#define ANIMATION_TIME_PHYSICS 1000/30
+#define ANIMATION_TIME_PHYSICS 1000/10
         EVERY_N_MILLISECONDS(ANIMATION_TIME_PHYSICS) {
           LED_Fill(1, TotalLEDsClock - 1, CRGB(0, 0, 0), TotalLEDsClock); //Clear All LEDs so we start from a blank slate
 
@@ -277,14 +276,12 @@ void ShowAnimation(bool Start) {                                //This would be 
             float Acceleration = Speed * (Position[i] - TotalLEDsClock / 2);//Calculate howmuch we wish to move (just linear)  https://www.desmos.com/calculator/ljo4mllyzq   y=-\frac{1}{2}\left(x-b\right)
             Velocity[i] = Velocity[i] * Drag + Acceleration;    //Set the Velocity to be (the speed we shere add) * (Drag) + (howmuch we wish to move)
             Position[i] = Position[i] + Velocity[i];            //Calculate new position
-            //LED_Add(LEDtoPosition(round(Position[i])), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
-
-            int _LedPos = round(Position[i]);
-            LED_Fill(LEDtoPosition(_LedPos), 1, CRGB(0, 0, 255));
+            LED_Add(LEDtoPosition(round(Position[i])), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
           }
           UpdateLEDs = true;
         }
       } break;
+
     default:
       AnimationCounter = 0;                                     //Stop animation
 #ifdef SerialEnabled
