@@ -124,9 +124,10 @@ void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int Ma
     }
   }
 }
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, int MaxBound = TotalLEDs);
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, int MaxBound) {
-  LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);              //Turn LEDs off
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);            //Turn LEDs off
   if (Reverse) {
     LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb, MaxBound); //Set some LEDs to be always on
     LED_Fill(From + Amount - *Counter, *Counter, rgb, MaxBound); //Set the counter amount of LEDs on (this will increase)

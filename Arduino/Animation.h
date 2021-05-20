@@ -65,25 +65,34 @@ void ShowAnimation(bool Start) {                                //This would be 
     case 0: {                                                   //BLINK
         static byte _Counter;
         static bool _Direction;
+        static bool _GoingOn;
         if (Start) {
           _Counter = 0;
+          _GoingOn = true;
           _Direction = random8(0, 2);
         }
-        EVERY_N_MILLISECONDS((10000 / TotalLEDsClock) - 1) {    //Make it so it does a full round every 10s
-          LED_Blink(0, TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
+#define ANIMATION_TIME_BLINK (10000 / TotalLEDsClock) - 1
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_BLINK) {            //Make it so it does a full round every 10s
+          if (_GoingOn)
+            LED_Blink(0, TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
+          else
+            LED_Blink(0, TotalLEDsClock, CRGB(0, 0, 0), 1, &_Counter, _Direction, false);
+          if (_Counter == 0)
+            _GoingOn = !_GoingOn;
           UpdateLEDs = true;
         }
       } break;
     case 1: {                                                   //BPM
         CRGBPalette16 palette = PartyColors_p;                  //(const CRGBPalette16 &pal, uint8_t index, uint8_t brightness=255, TBlendType blendType=LINEARBLEND)
         byte beat = beatsin8(20, 64, 255);
-#define gHue 9
+        const byte gHue = 9;
         for (byte i = 0; i < TotalLEDsClock; i++)
           LEDs[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
         UpdateLEDs = true;
       } break;
     case 2: {                                                   //CONFETTI
-        EVERY_N_MILLISECONDS(1000 / 60) {                       //Limit to 60FPS
+#define ANIMATION_TIME_CONFETTI 1000 / 60
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_CONFETTI) {         //Limit to 60FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           EVERY_N_MILLISECONDS(50) {
             LEDs[random8(TotalLEDsClock)] += AnimationRGB;
@@ -99,7 +108,8 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 4: {                                                   //GLITTER
-        EVERY_N_MILLISECONDS(1000 / 60) {                       //Limit to 60FPS
+#define ANIMATION_TIME_GLITTER 1000 / 60
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_GLITTER) {          //Limit to 60FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           if (random8() < 40)                                   //x/255 change to exectue:
             LEDs[random8(TotalLEDsClock)] += AnimationRGB;
@@ -107,7 +117,8 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 5: {                                                   //JUGGLE
-        EVERY_N_MILLISECONDS(1000 / 30) {                       //Limit to x FPS
+#define ANIMATION_TIME_JUGGLE 1000 / 30
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_JUGGLE) {           //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 10);
           byte dothue = 0;
           for (byte i = 0; i < 8; i++) {
@@ -125,7 +136,8 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Length = random8(2, TotalLEDsClock / (_Sets + 1));
           _Direction = random8(0, 2);
         }
-        EVERY_N_MILLISECONDS((10000 + 500) / (TotalLEDsClock * 3)) { //define the speed so it goes around 3 times in 10seconds
+#define ANIMATION_TIME_MOVE (10000 + 500) / (TotalLEDsClock * 3)
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_MOVE) {             //define the speed so it goes around 3 times in 10seconds
           LED_Move(0, TotalLEDsClock, AnimationRGB, _Sets, _Length, &_Counter, _Direction);
           UpdateLEDs = true;
         }
@@ -137,13 +149,15 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 8: {                                                   //SINELON
-        EVERY_N_MILLISECONDS(1000 / 30) {                       //Limit to x FPS
+#define ANIMATION_TIME_SINELON 1000 / 30
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON) {          //Limit to x FPS
           AnimationSinelon(AnimationRGB, 5, Start, 13);
           UpdateLEDs = true;
         }
       } break;
     case 9: {                                                   //SINELON2
-        EVERY_N_MILLISECONDS(1000 / 30) {                       //Limit to x FPS
+#define ANIMATION_TIME_SINELON2 1000 / 30
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON2) {         //Limit to x FPS
           if (AnimationSinelon(AnimationRGB, 1, Start, 13))
             SetNewColor();
           UpdateLEDs = true;
@@ -223,7 +237,8 @@ void ShowAnimation(bool Start) {                                //This would be 
           }
           UpdateLEDs = true;
         }
-        EVERY_N_MILLISECONDS(400 / PacmanMouthOpen) {           //Execute animation in such way every WAKA is 0.4seconds as original (~10bites in 101frames at 25FPS=0.4S per WAKA)
+#define ANIMATION_TIME_PACMAN 400 / PacmanMouthOpen
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_PACMAN) {           //Execute animation in such way every WAKA is 0.4seconds as original (~10bites in 101frames at 25FPS=0.4S per WAKA)
           LED_BackAndForth(LEDtoPosition(_LEDPosU), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter,  &_Direcion,  false, true, TotalLEDsClock);              //Upper lip (or lower if direction is reversed)
           LED_BackAndForth(LEDtoPosition(_LEDPosL), PacmanMouthOpenhalf, CRGB(255, 255, 0), &_Counter2, & _Direcion2, true, true, TotalLEDsClock);              //Lower lip
           if (_Miss) {
