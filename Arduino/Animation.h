@@ -21,17 +21,15 @@ CRGB AnimationRGB = {0, 0, 0};
 //
 //And some not universal LED functions:
 //==================================================
-bool AnimationSinelon(CRGB rgb, byte DimBy, bool Start, byte BPM) { // a colored dot sweeping back and forth, with fading trails
+bool AnimationSinelon(CRGB rgb, byte DimBy, byte BPM) {         // a colored dot sweeping back and forth, with fading trails
   //byte rgb[3] = {255, 0, 0};                                  //The color value
   //byte DimBy = 2;                                             //Delay in ms to fade to black
   //Returns true if this is the start
   fadeToBlackBy(LEDs, TotalLEDsClock, DimBy);
-  byte pos = 0;
-  if (Start) pos = 0;
-  pos = beatsin8(BPM, 0, TotalLEDsClock - 1);
-  LEDs[pos] += rgb;
+  byte pos = beatsin8(BPM, 0, TotalLEDsClock - 1);
+  LEDs[LEDtoPosition(pos)] += rgb;
   static byte Lastpos;
-  if (pos == 0 and Lastpos != pos) {                            //If we just ended
+  if ((pos == 0 or pos == TotalLEDsClock - 1) and Lastpos != pos) { //If we just ended
     Lastpos = pos;
     return true;
   }
@@ -74,9 +72,9 @@ void ShowAnimation(bool Start) {                                //This would be 
 #define ANIMATION_TIME_BLINK (10000 / TotalLEDsClock) - 1
         EVERY_N_MILLISECONDS(ANIMATION_TIME_BLINK) {            //Make it so it does a full round every 10s
           if (_GoingOn)
-            LED_Blink(0, TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
+            LED_Blink(LEDtoPosition(0), TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
           else
-            LED_Blink(0, TotalLEDsClock, CRGB(0, 0, 0), 1, &_Counter, _Direction, false);
+            LED_Blink(LEDtoPosition(0), TotalLEDsClock, CRGB(0, 0, 0), 1, &_Counter, _Direction, false);
           if (_Counter == 0)
             _GoingOn = !_GoingOn;
           UpdateLEDs = true;
@@ -126,7 +124,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           fadeToBlackBy(LEDs, TotalLEDsClock, 10);
           byte dothue = 0;
           for (byte i = 0; i < 8; i++) {
-            LEDs[beatsin8(i + 7, 0, TotalLEDsClock)] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
+            LEDs[LEDtoPosition(beatsin8(i + 7, 0, TotalLEDsClock))] |= CHSV(dothue, 200, 255); //CHSV = 'angle' (of color wheel), Saturation(rich/pale), 'bright'
             dothue += 32;
           }
           UpdateLEDs = true;
@@ -156,7 +154,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         if (Start) ClockClear();
 #define ANIMATION_TIME_SINELON 1000 / 120
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON) {          //Limit to x FPS
-          AnimationSinelon(AnimationRGB, 5, Start, 13);
+          AnimationSinelon(AnimationRGB, 5, 13);
           UpdateLEDs = true;
         }
       } break;
@@ -164,7 +162,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         if (Start) ClockClear();
 #define ANIMATION_TIME_SINELON2 1000 / 120
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON2) {         //Limit to x FPS
-          if (AnimationSinelon(AnimationRGB, 1, Start, 13))
+          if (AnimationSinelon(AnimationRGB, 1, 13))
             SetNewColor();
           UpdateLEDs = true;
         }
