@@ -96,8 +96,14 @@ void handle_Set() {
 #ifdef Server_SerialEnabled
   Serial.println();
 #endif //Server_SerialEnabled
-  if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
-    FastLED.clear();
+
+
+  //Do not clear the clock/LED, we could need it for PHYSICS, but unsure how this would impact Section support, will fix later when I know more
+
+  //if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
+  //  FastLED.clear();
+
+  
   bool ColorUpdated = false;
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown

@@ -91,6 +91,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         UpdateLEDs = true;
       } break;
     case 2: {                                                   //CONFETTI
+        if (Start) ClockClear();
 #define ANIMATION_TIME_CONFETTI 1000 / 60
         EVERY_N_MILLISECONDS(ANIMATION_TIME_CONFETTI) {         //Limit to 60FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
@@ -102,12 +103,14 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 3: {                                                   //FLASH
+        if (Start) ClockClear();
         EVERY_N_MILLISECONDS(500) {
           LED_Flash(0, TotalLEDsClock, AnimationRGB);
           UpdateLEDs = true;
         }
       } break;
     case 4: {                                                   //GLITTER
+        if (Start) ClockClear();
 #define ANIMATION_TIME_GLITTER 1000 / 60
         EVERY_N_MILLISECONDS(ANIMATION_TIME_GLITTER) {          //Limit to 60FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
@@ -117,6 +120,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 5: {                                                   //JUGGLE
+        if (Start) ClockClear();
 #define ANIMATION_TIME_JUGGLE 1000 / 30
         EVERY_N_MILLISECONDS(ANIMATION_TIME_JUGGLE) {           //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 10);
@@ -149,6 +153,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 8: {                                                   //SINELON
+        if (Start) ClockClear();
 #define ANIMATION_TIME_SINELON 1000 / 30
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON) {          //Limit to x FPS
           AnimationSinelon(AnimationRGB, 5, Start, 13);
@@ -156,6 +161,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 9: {                                                   //SINELON2
+        if (Start) ClockClear();
 #define ANIMATION_TIME_SINELON2 1000 / 30
         EVERY_N_MILLISECONDS(ANIMATION_TIME_SINELON2) {         //Limit to x FPS
           if (AnimationSinelon(AnimationRGB, 1, Start, 13))
@@ -168,6 +174,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         static byte BlinkCounter;
         static byte BlinkEachxLoops = 20;
         if (Start) {
+          ClockClear();
           BlinkLeft = random8(0, 2);
           BlinkCounter = 0;
           BlinkEachxLoops = random8(20, 50);
@@ -249,34 +256,34 @@ void ShowAnimation(bool Start) {                                //This would be 
         }
       } break;
     case 13: {                                                  //PHYSICS
-#define Speed -0.02
-#define Drag 0.981
-        CRGB Saved_Color[TotalLEDsClock];
-        float Position[TotalLEDsClock];
-        float Velocity[TotalLEDsClock];
-        if (Start) {
-
-          LED_Rainbow(0, TotalLEDsClock, 255 / TotalLEDsClock);
-
+#define Speed -0.004   //Lower = slower
+#define Drag 0.995      //Lower = more slowdown per step
+#define FallToLED TotalLEDsClock / 2
+        static CRGB Saved_Color[TotalLEDsClock];
+        static float Position[TotalLEDsClock];
+        static float Velocity[TotalLEDsClock];
+        EVERY_N_SECONDS(30) {                                   //Just repeat is sometimes, to keep the standalone Mode intresting
           for (int i = 0; i < TotalLEDsClock; i++) {
             Position[i] = i;
-            Saved_Color[i].r = LEDs[i].r;
-            Saved_Color[i].g = LEDs[i].g;
-            Saved_Color[i].b = LEDs[i].b;
+            Velocity[i] = 0;
           }
-          //memcpy(Saved_Color, LEDs, sizeof(Saved_Color));            //Destination, Source, Size http://www.cplusplus.com/reference/cstring/memcpy/
         }
-#define ANIMATION_TIME_PHYSICS 1000/10
-        EVERY_N_MILLISECONDS(ANIMATION_TIME_PHYSICS) {
-          LED_Fill(1, TotalLEDsClock - 1, CRGB(0, 0, 0), TotalLEDsClock); //Clear All LEDs so we start from a blank slate
-
-          LED_Flash(0, 1, CRGB(255, 0, 0), CRGB(0, 0, 255), TotalLEDsClock);
-
+        if (Start) {
           for (int i = 0; i < TotalLEDsClock; i++) {
-            float Acceleration = Speed * (Position[i] - TotalLEDsClock / 2);//Calculate howmuch we wish to move (just linear)  https://www.desmos.com/calculator/ljo4mllyzq   y=-\frac{1}{2}\left(x-b\right)
+            Position[i] = i;
+            Velocity[i] = 0;
+            Saved_Color[i] = LEDs[LEDtoPosition(i)];            //Dont use memcpy since its about the same speed, but doesnt allow the offset
+          }
+        }
+#define ANIMATION_TIME_PHYSICS 1000/60
+        EVERY_N_MILLISECONDS(ANIMATION_TIME_PHYSICS) {
+          ClockClear();                                         //Clear the LEDs so we start from a blank slate
+          for (int i = 0; i < TotalLEDsClock; i++) {
+            float Acceleration = Speed * (Position[i] - FallToLED);//Calculate howmuch we wish to move (just linear)  https://www.desmos.com/calculator/ljo4mllyzq   y=-\frac{1}{2}\left(x-b\right)
             Velocity[i] = Velocity[i] * Drag + Acceleration;    //Set the Velocity to be (the speed we shere add) * (Drag) + (howmuch we wish to move)
             Position[i] = Position[i] + Velocity[i];            //Calculate new position
-            LED_Add(LEDtoPosition(round(Position[i])), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
+            signed int _Pos = round(Position[i]);
+            LED_Add(LEDtoPosition(_Pos), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
           }
           UpdateLEDs = true;
         }
@@ -300,6 +307,5 @@ void StartAnimation(byte ID, int Time) {
 #ifdef SerialEnabled
   Serial.println("AN: Selected special mode " + String(CurrentAnimation));
 #endif //SerialEnabled
-  FastLED.clear();
   ShowAnimation(true);
 }
