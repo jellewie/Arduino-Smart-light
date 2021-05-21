@@ -96,8 +96,14 @@ void handle_Set() {
 #ifdef Server_SerialEnabled
   Serial.println();
 #endif //Server_SerialEnabled
-  if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
-    FastLED.clear();
+
+
+  //Do not clear the clock/LED, we could need it for PHYSICS, but unsure how this would impact Section support, will fix later when I know more
+
+  //if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
+  //  FastLED.clear();
+
+  
   bool ColorUpdated = false;
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown
@@ -230,7 +236,7 @@ void handle_OnConnect() {
                       "let Sg=new Slider('Green');"
                       "let Sb=new Slider('Blue');"
 
-                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','PACMAN','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
+                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','PACMAN','PHYSICS','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
                       "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK']});"
                       "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','RAINBOW']});"
 
