@@ -80,13 +80,16 @@ void handle_Set() {
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockHourAnalog) {
       ClockHourAnalog = IsTrue(ArgValue);
+      if (ClockHourAnalog == false)
+        ClockAnalog = false;
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetLEDOffset) {
       LEDOffset = constrain((ArgValue.toInt()), 0, TotalLEDs);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetClockAnalog) {
-      ClockHourAnalog = true;
       ClockAnalog = IsTrue(ArgValue);
+      if (ClockAnalog)
+        ClockHourAnalog = true;
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSection) {
       Section = ArgValue.toInt();
@@ -103,7 +106,7 @@ void handle_Set() {
   //if (LastMode != Mode and Section == 0)                        //If mode has updated, and we are talking about the whole LEDstrip, clear the current state
   //  FastLED.clear();
 
-  
+
   bool ColorUpdated = false;
   if (Mode == WIFI) AnimationCounter = 0;
   if (AnimationCounter != 0) {                                  //Animation needs to be shown
