@@ -41,7 +41,7 @@ void UpdateAndShowClock(bool ShowClock, bool ForceClock) {
 #ifdef Time_SerialEnabled
         Serial.println("TM: Start Hourly Animation");
 #endif //Time_SerialEnabled
-        StartAnimation(random(0, TotalAnimations), HourlyAnimationS);//Start a random Animation
+        StartAnimation(random(0, TotalAnimations + 1), HourlyAnimationS); //Start a random Animation
         ShowClock = false;                                      //Do not show the clock, an animation will be shown
       }
     }
