@@ -169,7 +169,7 @@ void loop() {
   Serial.println("LT: Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
-  if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false); //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
+  if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false);     //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
   if (AnimationCounter != 0)                                    //Animation needs to be shown
     ShowAnimation(false);
@@ -243,7 +243,12 @@ void loopLEDS() {
     case CLOCK: {
         if (LastMode != Mode) {                                 //If mode changed
           AnimationCounter = 0;
-          WiFiManager.Start();                                  //Start WIFI if we haven't
+          if (WiFi.status() != WL_CONNECTED) {                  //If no WiFi has been set-up
+            if (!TimeSet)                                       //If the time has not been set before
+              WiFiManager.Start();                              //Start WIFI if we haven't
+            else
+              WiFiManager.CheckAndReconnectIfNeeded(false);     //Try to connect to WiFi, but dont start ApMode
+          }
         }
         if (AnimationCounter == 0)                              //If no (hourly) animation is playing
           UpdateAndShowClock(true);
