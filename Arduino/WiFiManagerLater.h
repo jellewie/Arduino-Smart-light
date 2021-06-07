@@ -98,7 +98,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     //Tasks
     //==============================
     default:
-      if (ValueID < 17 + 8) {
+      if (ValueID < 17 + TaskLimit) {
         byte i = ValueID - 17;
         String _Vars[5];                                        //Create a space to but the cut string in
         CutVariable(Value, &_Vars[0], 5);                       //Deconstruct the string, and put it into parts
@@ -142,7 +142,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     //Tasks
     //==============================
     default:
-      if (ValueID < 17 + 8) {
+      if (ValueID < 17 + TaskLimit) {
         byte i = ValueID - 17;
         if (TaskList[i].Type != 0 and TaskList[i].ExectuteAt.Ticks == 0)
           return String(TaskList[i].Type) + "," + String(TaskList[i].ExectuteAt.HH) + "," + String(TaskList[i].ExectuteAt.MM) + "," + String(TaskList[i].ExectuteAt.SS) + "," + TaskList[i].Var;

@@ -5,7 +5,7 @@
                   'AnimationRGB' can be used for the user set RGB color
                   'Start' Can be used to detect the start of the animation
                   Note that 'UpdateLEDs = true;' must be set to update the leds
-  Animation.ino:  Update 'TotalAnimations' to be x+1
+  Animation.ino:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
   =====To add it as a new mode (and not just animation)=====
   functions.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
                 Also add to 'enum Modes {'
@@ -13,7 +13,7 @@
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
-byte TotalAnimations = 13;
+byte TotalAnimations = 14;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -219,6 +219,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         static byte _Counter, _Counter2, _LEDPosU, _LEDPosL;
         static bool _Direcion, _Direcion2, _Left, _Miss;
         if (Start) {
+          AnimationRGB = CRGB(255, 255, 0);                     //Set this color, to the web interface would show it
           _Left = random8(0, 2);
           if (random8(0, 4) == 0)                               //Make Miss apearing rarely
             _Miss = random8(0, 2);
@@ -228,7 +229,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           _Counter2 = 0;
           _Direcion = false;
           _Direcion2 = false;
-          LED_Fill(0, TotalLEDsClock, CRGB(255, 255, 0), TotalLEDsClock); //Fill the whole stip with yellow, we will but stuff out/overwrite it if we need so
+          LED_Fill(0, TotalLEDsClock, AnimationRGB, TotalLEDsClock); //Fill the whole stip with yellow, we will but stuff out/overwrite it if we need so
           if (_Left) {
             _LEDPosU = (PacmanMouthMiddle - PacmanMouthOpenhalf) + TotalLEDsClock / 2;  //Upperlip position + half a clock
             _LEDPosL = PacmanMouthMiddle + TotalLEDsClock / 2;

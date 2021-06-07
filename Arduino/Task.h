@@ -12,11 +12,11 @@
   Delay based tasks will be auto deleted (execte X in Y ticks)
 */
 
-#define TaskLimit 16                                            //Defined as an byte in for loops, so 255 at max
+#define TaskLimit 16                                            //Defined as an byte in for loops, (255 at max), Note this is hooked into WiFimanager EEPROM settings, updating from git after changing this value is NOT recommened
 //#define Task_SerialEnabled
 #define EEPROMSaveDelayMS 30000                                 //Save to EEPROM in X ms
-enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME, AUTOBRIGHTNESS, HOURLYANIMATIONS}; //Just to make the code easier to read
-String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", "CHANGERGB", "SAVEEEPROM", "SYNCTIME", "AUTOBRIGHTNESS", "HOURLYANIMATIONS"}; //ALL CAPS!
+enum {NONE, SWITCHMODE, DIMMING, BRIGHTEN, RESETESP, CHANGERGB, SAVEEEPROM, SYNCTIME, AUTOBRIGHTNESS, HOURLYANIMATIONS, RANDOMANIMATION}; //Just to make the code easier to read
+String TaskString[] = {"NONE", "SWITCHMODE", "DIMMING", "BRIGHTEN", "RESETESP", "CHANGERGB", "SAVEEEPROM", "SYNCTIME", "AUTOBRIGHTNESS", "HOURLYANIMATIONS", "RANDOMANIMATION"}; //ALL CAPS!
 
 const byte Task_Amount = sizeof(ModesString) / sizeof(ModesString[0]); //Why filling this in if we can automate that? :)
 
@@ -138,6 +138,12 @@ bool DoTask(TASK Item) {
     case HOURLYANIMATIONS: {
         HourlyAnimationS = constrain(Item.Var.toInt(), 0, 255);
       } break;
+    case RANDOMANIMATION: {
+        //Var = AnimationShowTime where 0=HourlyAnimationS
+        int AnimationShowTime = Item.Var.toInt();
+        if (AnimationShowTime == 0) AnimationShowTime = HourlyAnimationS;
+        StartAnimation(random8(0, TotalAnimations), AnimationShowTime); //Start a random Animation
+      } break;
     default:
       returnValue = false;
       break;
@@ -175,6 +181,9 @@ String VarCompress(byte ID, String IN) {
       } break;
     case HOURLYANIMATIONS: {
         return String(constrain(IN.toInt(), 0, 255));
+      } break;
+    case RANDOMANIMATION: {
+        return String(IN.toInt());
       } break;
   }
   return IN;
@@ -325,7 +334,8 @@ void ScheduleWriteToEEPROM() {
   TASK TempTask;
   TempTask.Type = SAVEEEPROM;                                   //Create a new EEPROM write command
   TempTask.ExectuteAt.Ticks = millis() + EEPROMSaveDelayMS;     //Schedule to write data to EEPROM
-  AddTask(TempTask, true);                                      //Add the command to the task list
+  if (not(AddTask(TempTask, true)))                             //Add the command to the task list
+    DoTask(TempTask);                                           //If the command could not be added to the list, run it now
 }
 void Tasks_handle_Settings() {
   String ERRORMSG = "";
@@ -379,6 +389,7 @@ void Tasks_handle_Settings() {
               if (AddTask(TempTask)) {
                 if (TempTask.ExectuteAt.Ticks == 0)             //If it is a time event (HH:MM:SS)
                   ScheduleWriteToEEPROM();                      //Schedule to save the changes to EEPROM
+                ERRORMSG += "Could not save tasklist\n";
               } else
                 ERRORMSG += "Could not add tasks\n";
             }
