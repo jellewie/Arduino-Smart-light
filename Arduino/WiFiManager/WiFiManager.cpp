@@ -86,8 +86,10 @@ String CWiFiManager::Get_Value(byte ValueID, bool Safe, bool Convert) {
 #ifdef WiFiManager_SerialEnabled
   Serial.println(" = " + Return_Value);
 #endif //WiFiManager_SerialEnabled
-  Return_Value.replace("\"", "'");                              //Make sure to change char("), since we can't use that, change to char(')
-  Return_Value.replace(String(EEPROM_Seperator), " ");          //Make sure to change the EEPROM seperator, since we can't use that
+  if (!Safe){
+    Return_Value.replace("\"", "&quot;");                         //Make sure to change char("), since we can't use that, change to char(')
+    Return_Value.replace(String(EEPROM_Seperator), " ");          //Make sure to change the EEPROM seperator, since we can't use that
+  }
   return String(Return_Value);
 }
 void CWiFiManager::Status_Start() {
@@ -421,8 +423,8 @@ void CWiFiManager::handle_Settings() {
   for (int i = 0; i < server.args(); i++) {
     int j = server.argName(i).toInt();
     String ArgValue = server.arg(i);
-    ArgValue.trim();
     if (j > 0 and j < 255 and ArgValue != "") {
+	  ArgValue.trim();
       if (Set_Value(j, ArgValue))
         HTML += "Succesfull '" + String(j) + "'='" + ArgValue + "'\n";
       else
