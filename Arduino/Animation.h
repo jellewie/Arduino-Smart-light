@@ -72,9 +72,9 @@ void ShowAnimation(bool Start) {                                //This would be 
 #define ANIMATION_TIME_BLINK (10000 / TotalLEDsClock) - 1
         EVERY_N_MILLISECONDS(ANIMATION_TIME_BLINK) {            //Make it so it does a full round every 10s
           if (_GoingOn)
-            LED_Blink(LEDtoPosition(0), TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction);
+            LED_Blink(LEDtoPosition(0), TotalLEDsClock, AnimationRGB, 1, &_Counter, _Direction, true, TotalLEDsClock);
           else
-            LED_Blink(LEDtoPosition(0), TotalLEDsClock, CRGB(0, 0, 0), 1, &_Counter, _Direction, false);
+            LED_Blink(LEDtoPosition(0), TotalLEDsClock, CRGB(0, 0, 0), 1, &_Counter, _Direction, false, TotalLEDsClock);
           if (_Counter == 0)
             _GoingOn = !_GoingOn;
           UpdateLEDs = true;
