@@ -94,7 +94,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         EVERY_N_MILLISECONDS(ANIMATION_TIME_CONFETTI) {         //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           EVERY_N_MILLISECONDS(50) {
-            LEDs[random8(TotalLEDsClock)] += AnimationRGB;
+            LEDs[random(TotalLEDsClock)] += AnimationRGB;
           }
           SetNewColor();
           UpdateLEDs = true;
@@ -113,7 +113,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         EVERY_N_MILLISECONDS(ANIMATION_TIME_GLITTER) {          //Limit to x FPS
           fadeToBlackBy(LEDs, TotalLEDsClock, 1);               //Dim a color by (X/256ths)
           if (random8() < 40)                                   //x/255 change to exectue:
-            LEDs[random8(TotalLEDsClock)] += AnimationRGB;
+            LEDs[random(TotalLEDsClock)] += AnimationRGB;
           UpdateLEDs = true;
         }
       } break;
@@ -135,7 +135,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         static bool _Direction;
         if (Start) {
           _Sets = random8(2, 9);
-          _Length = random8(2, TotalLEDsClock / (_Sets + 1));
+          _Length = random(2, TotalLEDsClock / (_Sets + 1));
           _Direction = random8(0, 2);
         }
 #define ANIMATION_TIME_MOVE (10000 + 500) / (TotalLEDsClock * 3)
