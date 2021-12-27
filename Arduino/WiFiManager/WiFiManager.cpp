@@ -191,12 +191,11 @@ void CWiFiManager::StartServer() {
 void CWiFiManager::EnableSetup(bool State) {
 #ifdef WiFiManager_SerialEnabled
   if (State) {
+	Serial.print("WM: Settings page online, ip=");
     if (WiFi.status() == WL_CONNECTED)
-      Serial.println("WM: Settings page online");
-    else {
-      Serial.print("WM: Settings page online ip=");
+      Serial.println(WiFi.localIP());
+    else
       Serial.println(WiFi.softAPIP());
-    }
   } else
     Serial.println("WM: Settings page offline");
 #endif //WiFiManager_SerialEnabled
@@ -511,7 +510,7 @@ void CWiFiManager::handle_update2() {
 }
 #endif //WiFiManager_OTA
 #ifdef WiFiManager_DoRequest
-byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json, byte TimeOut) {
+byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json, byte TimeOut, String _Header) {
   /* Returns:
     0= Unknown error (responce out of range)  REQ_UNK
     1= Done (responce code 200)               REQ_SUCCES
@@ -522,7 +521,7 @@ byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json
     10-19= Unknown server error (first digit Responce=X-10, for example 4 means an 4## client error (like 403 Forbidden))
   */
 #ifdef WiFiManager_SerialEnabled
-  Serial.println("WM_REQ: DO REQUEST: " + String(_IP) + ":" + _Port + _Path + " _Data=" + _Json);
+  Serial.println("WM_REQ: DO REQUEST: " + String(_IP) + ":" + _Port + _Path + " _ExtraHeader=" + _Header + "_Data=" + _Json);
 #endif //WiFiManager_SerialEnabled
 
   if (!WiFiManager.CheckAndReconnectIfNeeded(false))
@@ -534,6 +533,9 @@ byte CWiFiManager::DoRequest(char _IP[16], int _Port, String _Path, String _Json
   client.println("PUT " + _Path + " HTTP/1.1");
   client.println("Content-Length: " + String(_Json.length()));
   client.println("Content-Type: application/json");
+  if (_Header != ""){
+	client.println(_Header);
+  }
   client.println();                                             //Terminate headers with a blank line
   client.print(_Json);
   //Try to look for a responce code 'HTTP/1.1 200 OK' = 200
