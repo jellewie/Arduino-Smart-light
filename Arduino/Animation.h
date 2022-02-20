@@ -84,7 +84,7 @@ void ShowAnimation(bool Start) {                                //This would be 
         CRGBPalette16 palette = PartyColors_p;                  //(const CRGBPalette16 &pal, uint8_t index, uint8_t brightness=255, TBlendType blendType=LINEARBLEND)
         byte beat = beatsin8(20, 64, 255);
         const byte gHue = 9;
-        for (byte i = 0; i < TotalLEDsClock; i++)
+        for (int i = 0; i < TotalLEDsClock; i++)
           LEDs[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
         UpdateLEDs = true;
       } break;

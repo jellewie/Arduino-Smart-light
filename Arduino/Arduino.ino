@@ -57,7 +57,7 @@ bool UpdateLEDs;                                                //If we need to 
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
 byte LastMode = -1;                                             //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
-const byte TotalLEDs = 60;                                      //The total amounts of LEDs in the strip
+const int TotalLEDs = 60;                                      //The total amounts of LEDs in the strip
 #define LEDSections TotalLEDs / 60                              //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
 const int TotalLEDsClock = LEDSections * 60;                   //The amount of LEDs in the clock
 int AnimationCounter;                                           //Time in seconds that a AnimationCounter Animation needs to be played
