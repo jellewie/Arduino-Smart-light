@@ -71,6 +71,7 @@ extern void StartAnimation(byte ID, int Time);                  //^ Required for
 
 #include <FastLED.h>                                            //Include the libary FastLED (If you get a error here, make sure it's installed!)
 CRGB LEDs[TotalLEDs];
+CRGB RGBColor;
 
 #include "Button/Button.h"
 Button ButtonsA = {PDI_Button, INPUT, PAO_LED};

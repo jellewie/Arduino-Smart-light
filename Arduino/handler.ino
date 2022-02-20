@@ -112,16 +112,18 @@ void handle_Set() {
     if (NewG != -1) AnimationRGB[1] = NewG;                     //^
     if (NewB != -1) AnimationRGB[2] = NewB;                     //^
   } else {
+    if (Section > 1)                                            //If it's about a specific section
+      ColorUpdated = true;                                      //Restore the last used colour as default (will be overwritten if needed)
     if (NewR != -1) {
-      LEDs[TotalLEDs - 1].r = NewR;                             //Set animation color
+      RGBColor.r = NewR;                                        //Set animation color
       ColorUpdated = true;
     }
     if (NewG != -1) {
-      LEDs[TotalLEDs - 1].g = NewG;                             //^
+      RGBColor.g = NewG;                                        //^
       ColorUpdated = true;
     }
     if (NewB != -1) {
-      LEDs[TotalLEDs - 1].b = NewB;                             //^
+      RGBColor.b = NewB;                                        //^
       ColorUpdated = true;
     }
   }
@@ -138,7 +140,7 @@ void handle_Set() {
       FromLED   = TotalLEDsClock + 1;
       AmountLED = TotalLEDs - FromLED;
     }
-    fill_solid(&(LEDs[FromLED]), AmountLED, LEDs[TotalLEDs - 1]); //Change the whole LED strip to have the color of the last set LED
+    fill_solid(&(LEDs[FromLED]), AmountLED, RGBColor); //Change the whole LED strip to have the color of the last set LED
   } else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
     for (int i = 0; i < 100; i++) {                             //Just wait for a few ms to make sure the "reset command recieved" has been send
@@ -358,7 +360,9 @@ void handle_Info() {
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " = 255-(P*(raw-N)-O)\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
-                   "TotalLEDs = " + String(TotalLEDs) + " Sections = " + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
+                   "TotalLEDs = " + String(TotalLEDs) + ", Sections = " + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
+                   "AnimationRGB = " + String(AnimationRGB[0]) + "," + String(AnimationRGB[1]) + "," + String(AnimationRGB[2]) + "\n"
+                   "RGBColor = " + String(RGBColor[0]) + "," + String(RGBColor[1]) + "," + String(RGBColor[2]) + "\n"
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
