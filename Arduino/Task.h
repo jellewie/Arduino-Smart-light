@@ -180,7 +180,7 @@ String VarCompress(byte ID, String IN) {
         return String(IsTrue(IN));
       } break;
     case HOURLYANIMATIONS: {
-        return String(constrain(IN.toInt(), 0, 255));
+        return String(constrain(IN.toInt(), 0, 32767));
       } break;
     case RANDOMANIMATION: {
         return String(IN.toInt());
