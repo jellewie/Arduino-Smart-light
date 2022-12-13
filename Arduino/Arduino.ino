@@ -74,7 +74,7 @@ CRGB LEDs[TotalLEDs];
 CRGB RGBColor;
 
 #include "Button/Button.h"
-Button ButtonsA = {PDI_Button, INPUT, PAO_LED};
+Button ButtonsA = {PDI_Button, INPUT, LED_BUILTIN};
 
 #define StableAnalog_AnalogResolution 10                        //ESP32 does not support 8bit (byte) analog readings, to set to 10 and scale down to 8
 #include "StableAnalog/StableAnalog.h"
