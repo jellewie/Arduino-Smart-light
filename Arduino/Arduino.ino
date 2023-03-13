@@ -47,8 +47,7 @@ byte ClockHourLines = 0;                                        //SOFT_SETTING h
 bool ClockHourAnalog = false;                                   //SOFT_SETTING If the clock needs to display the hour with 60 steps instead of 12 full hour steps
 byte LEDOffset = 0;                                             //SOFT_SETTING Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations
 bool ClockAnalog = false;                                       //SOFT_SETTING Makes it so the LEDs dont step, but smootly transition
-long gmtOffset_sec = 0;                                         //SOFT_SETTING Set to you GMT offset (in seconds)
-int  daylightOffset_sec = 0;                                    //SOFT_SETTING Set to your daylight offset (in seconds)
+String timeZone = "CET-1CEST,M3.5.0,M10.5.0/3";                 //SOFT_SETTING Set to you Timezone, see https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
 byte PotMinChange = 2;                                          //SOFT_SETTING How much the pot_value needs to change before we process it
 byte PotStick = PotMinChange + 1;                               //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                                 //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
@@ -65,6 +64,7 @@ TimeS TimeCurrent;                                              //Where we save 
 byte ModeBeforeOff = ON;
 extern byte TotalAnimations;                                    //^ Required for Clock.h
 extern void StartAnimation(byte ID, int Time);                  //^ Required for Clock.h
+struct tm timeinfo;                                             //https://www.cplusplus.com/reference/ctime/tm/ (Blobal here to make accesable for debug '/info' page)
 
 #include "WiFiManagerBefore.h"                                  //Define what options to use/include or to hook into WiFiManager
 #include "WiFiManager/WiFiManager.h"                            //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed      https://github.com/jellewie/Arduino-WiFiManager

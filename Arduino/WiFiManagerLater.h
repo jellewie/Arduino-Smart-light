@@ -55,27 +55,12 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
       } break;
     case 10:  ClockAnalog        = IsTrue(Value);             return true;  break;
     case 11: {
-        if (not StringIsDigit(Value))                         return false;  //No number given
-        if (gmtOffset_sec != Value.toInt()) {
-          gmtOffset_sec = Value.toInt();
-          TASK TempTask;                                        //Create a space to put a new Task in
-          TempTask.Type       = SYNCTIME;                       //Set the ID of the task to SYNCTIME
-          TempTask.ExectuteAt = TimeS{0, 0, 0, 1};              //Set the task to be executed in 1ms (basically ASAP)
-          AddTask(TempTask);                                    //Add the Task command to the task list
-          return true;
-        }
-        return false;
+        if (Value.length() < 4)                               return false;  //Number instead of string given
+        if (StringIsDigit(Value))                             return false;  //Emthy string given (to short to contain the proper data)
+        timeZone = Value;     
+        return true;
       } break;
     case 12: {
-        if (not StringIsDigit(Value))                         return false;  //No number given
-        if (daylightOffset_sec != Value.toInt()) {
-          daylightOffset_sec = Value.toInt();
-          TASK TempTask;                                        //Create a space to put a new Task in
-          TempTask.Type       = SYNCTIME;                       //Set the ID of the task to SYNCTIME
-          TempTask.ExectuteAt = TimeS{0, 0, 0, 1};              //Set the task to be executed in 1ms (basically ASAP)
-          AddTask(TempTask);                                    //Add the Task command to the task list
-          return true;
-        }
         return false;
       } break;
     case 13: {
@@ -130,10 +115,10 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 6:   return String(AutoBrightnessO);                                                   break;
     case 7:   return String(ClockHourLines);                                                    break;
     case 8:   return Convert ? IsTrueToString(ClockHourAnalog)      : String(ClockHourAnalog);  break;
-    case 9:   return String(LEDOffset);                                                       break;
+    case 9:   return String(LEDOffset);                                                         break;
     case 10:  return Convert ? IsTrueToString(ClockAnalog)          : String(ClockAnalog);      break;
-    case 11:  return String(gmtOffset_sec);                                                     break;
-    case 12:  return String(daylightOffset_sec);                                                break;
+    case 11:  return timeZone;                                                                  break;
+    case 12:  return "";                                                                        break;
     case 13:  return String(PotMinChange);                                                      break;
     case 14:  return String(PotStick);                                                          break;
     case 15:  return String(PotMin);                                                            break;

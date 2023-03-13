@@ -353,6 +353,8 @@ void handle_UpdateTime() {
 }
 void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  char TimeMessage[100] = {0};
+  strftime(TimeMessage, sizeof(TimeMessage), "%Ec zone %Z %z ", &timeinfo); //https://cplusplus.com/reference/ctime/strftime/
   String Message = "https://github.com/jellewie/Arduino-Smart-light\n"
                    "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " + String(WiFi.macAddress()) + "\n"
@@ -360,6 +362,7 @@ void handle_Info() {
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " = 255-(P*(raw-N)-O)\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
+                   "Time thingies DST=" + IsTrueToString(timeinfo.tm_isdst) + " " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min) + ":" + String(timeinfo.tm_sec) + String(timeinfo.tm_mday) + "-" + String(timeinfo.tm_mon) + "-" + String(timeinfo.tm_year + 1900) + "\n" + TimeMessage + "\n"
                    "TotalLEDs = " + String(TotalLEDs) + ", Sections = " + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
                    "AnimationRGB = " + String(AnimationRGB[0]) + "," + String(AnimationRGB[1]) + "," + String(AnimationRGB[2]) + "\n"
                    "RGBColor = " + String(RGBColor[0]) + "," + String(RGBColor[1]) + "," + String(RGBColor[2]) + "\n"

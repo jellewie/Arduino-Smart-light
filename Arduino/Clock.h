@@ -130,8 +130,10 @@ bool UpdateTime() {
 #ifdef Time_SerialEnabled
   Serial.println("TM: Get server time");
 #endif //Time_SerialEnabled
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  struct tm timeinfo;                                           //https://www.cplusplus.com/reference/ctime/tm/
+  configTime(0, 0, ntpServer);
+  setenv("TZ", timeZone.c_str(), 1);   //https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+  tzset();
+
   if (!getLocalTime(&timeinfo, Clock_ConnectionTimeOutMS)) {
 #ifdef Time_SerialEnabled
     Serial.println("TM: Failed to obtain time");
@@ -139,17 +141,14 @@ bool UpdateTime() {
     LastMode = -1;                                              //Re-init the mode
     return false;
   }
-  time_t Temptimeinfo = mktime(&timeinfo);
-  struct tm *timeinfoLocal;
-  timeinfoLocal = localtime(&Temptimeinfo);                     //Convert UTC time to local time to exclude include DST offset automatically
+  
 #ifdef Time_SerialEnabled
   Serial.println(&timeinfo, "TM: UTC: %A, %B %d %Y %H:%M:%S");
-  Serial.println("TM: LOCAL: " + String(timeinfoLocal->tm_hour) + ":" + String(timeinfoLocal->tm_min) + ":" + String(timeinfoLocal->tm_sec));
 #endif //Time_SerialEnabled
   TimeCurrent.Ticks = millis();
-  TimeCurrent.HH = timeinfoLocal->tm_hour;
-  TimeCurrent.MM = timeinfoLocal->tm_min;
-  TimeCurrent.SS = timeinfoLocal->tm_sec;
+  TimeCurrent.HH = timeinfo.tm_hour;
+  TimeCurrent.MM = timeinfo.tm_min;
+  TimeCurrent.SS = timeinfo.tm_sec;
   TimeSet = true;
   if (Mode == CLOCK) UpdateAndShowClock(true, true);            //If we are curently in CLOCK mode, make sure to update the shown time
   LastMode = -1;                                                //Re-init the mode
