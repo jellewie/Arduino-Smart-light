@@ -1,5 +1,7 @@
 /*Written by JelleWho https://github.com/jellewie
   TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
+
+  2023-07-24 PAO_MIC is on the SAME pin as PAI_B, so both can not be active at the same time. We need ADC1 if we also use WiFi
 */
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
@@ -26,6 +28,7 @@
 #define LED_TYPE WS2812B                                        //WS2812B for 5V LEDs, WS2813 for 12V LEDs
 const char* ntpServer = "pool.ntp.org";                         //The server where to get the time from
 const byte PAO_LED = 25;                                        //To which pin the <LED strip> is connected to
+const byte PAO_MIC = 34;                                        //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                                          //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                                          //
 const byte PAI_B = 34;                                          //
@@ -40,6 +43,7 @@ byte BootMode = OFF;                                            //SOFT_SETTING I
 byte HourlyAnimationS = 10;                                     //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;                                 //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = true;                                     //SOFT_SETTING If the auto brightness is enabled
+bool AudioLink = false;                                         //SOFT_SETTING If the AudioLink is enabled
 float AutoBrightnessP = 1.04;                                   //SOFT_SETTING Brightness = y=255-(P*(x-N)-O) https://www.desmos.com/calculator/lmezlpkwsp
 byte AutoBrightnessN = 10;                                      //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
 byte AutoBrightnessO = 5;                                       //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
@@ -83,6 +87,7 @@ StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
+StableAnalog AUDIO = StableAnalog(PAO_MIC);
 
 #include "Functions.h"
 #include "time.h"                                               //We need this for the clock function to get the time (Time library)
@@ -123,6 +128,7 @@ void setup() {
   //Set up all server UrlRequest stuff
   //===========================================================================
   server.on("/",            handle_OnConnect);                  //Call the 'handleRoot' function when a client requests URL "/"
+  server.on("/main",        handle_Main);
   server.on("/get",         handle_Getcolors);
   server.on("/set",         handle_Set);
   server.on("/gettasks",    Tasks_handle_GetTasks);
@@ -207,6 +213,7 @@ void loop() {
         Mode = RESET;
     }
     UpdateBrightness(false);                                    //Check if manual input potmeters has changed, if so flag the update
+    UpdateAudio(false);                                       //Check if the AudioLink is needed
     UpdateColor(false);                                         //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }

@@ -21,6 +21,7 @@
 #define PreFixSetLEDOffset "o"
 #define PreFixSetClockAnalog "c"
 #define PreFixSection "s"           //''or'0'=All, 1=TotalLEDsClock, 2=!(TotalLEDsClock)
+#define PreFixAudioLink "d"
 
 //<ip>/time[?PreFix=Value][&....]                               //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
@@ -56,8 +57,14 @@ void handle_Set() {
       if (Mode == ON) Mode = WIFI;                              //If we are on manual, switch to WIFI
       AutoBrightness = false;
       FastLED.setBrightness(constrain((ArgValue.toInt()), 1, 255));
+    } else if (ArguName == PreFixAudioLink) {
+      AudioLink = IsTrue(ArgValue);
+      if (AudioLink) AutoBrightness = false;
+      UpdateBrightness(true);
+      DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetAutoBrightness) {
       AutoBrightness = IsTrue(ArgValue);
+      if (AutoBrightness) AudioLink = false;
       UpdateBrightness(true);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetAutoBrightnessN) {
@@ -168,7 +175,8 @@ void handle_Getcolors() {
                "\"ha\":\"" + HourlyAnimationS + "\","
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
-               "\"c\":\"" + IsTrueToString(ClockAnalog) + "\",";
+               "\"c\":\"" + IsTrueToString(ClockAnalog) + "\","
+               "\"d\":\"" + IsTrueToString(AudioLink) + "\",";
   byte r = LEDs[TotalLEDs - 1].r, g = LEDs[TotalLEDs - 1].g, b = LEDs[TotalLEDs - 1].b; //Set RGB to be the color of the last LED
   if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show the set animation color)
     r = AnimationRGB[0];
@@ -186,6 +194,9 @@ void handle_OnConnect() {
     WiFiManager_handle_Connect();                               //Since we have no internet/WIFI connection, handle request as an APmode request
     return;
   }
+  handle_Main();
+}
+void handle_Main() {
   /*HTML USEFULL STEPS:
     Compress the code (line enter and spaces) https://htmlcompressor.com/compressor/ https://www.textfixer.com/html/compress-html-compression.php (This can save like 66% of the bytes!)
     Replace " with \"
@@ -246,6 +257,7 @@ void handle_OnConnect() {
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "let Di=new DropDown({name:'Auto brightness',setParamName:'i',possibleValues:['FALSE','TRUE']});"
+                      "let Dd=new DropDown({name:'AudioLink',setParamName:'d',possibleValues:['FALSE','TRUE']});"
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "let Dha=new DropDown({name:'Hourly animation',setParamName:'ha',possibleValues:['FALSE','2','5','10']});"

@@ -57,12 +57,10 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 11: {
         if (Value.length() < 4)                               return false;  //Number instead of string given
         if (StringIsDigit(Value))                             return false;  //Emthy string given (to short to contain the proper data)
-        timeZone = Value;     
+        timeZone = Value;
         return true;
       } break;
-    case 12: {
-        return false;
-      } break;
+    case 12:   AudioLink         = IsTrue(Value);             return true;  break;
     case 13: {
         if (not StringIsDigit(Value))                         return false;  //No number given
         PotMinChange             = ToByte(Value);             return true;  break;
@@ -118,7 +116,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 9:   return String(LEDOffset);                                                         break;
     case 10:  return Convert ? IsTrueToString(ClockAnalog)          : String(ClockAnalog);      break;
     case 11:  return timeZone;                                                                  break;
-    case 12:  return "";                                                                        break;
+    case 12:  return Convert ? IsTrueToString(AudioLink)            : String(AudioLink);        break;
     case 13:  return String(PotMinChange);                                                      break;
     case 14:  return String(PotStick);                                                          break;
     case 15:  return String(PotMin);                                                            break;

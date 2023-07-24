@@ -192,6 +192,15 @@ byte GetAutoBrightness(byte Value) {
   Answer = round(Answer);                                       //Round to nearest instead of down
   return 255 - constrain(Answer, 0, 254);
 }
+void UpdateAudio(bool ForceUpdate) {
+  if (digitalRead(PAI_DisablePOTs) == LOW) return;              //If the POTs are disabled with hardware
+  if (!AudioLink) return;                                       //If AudioLink is disabled, dont continue
+  POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  if (D.Changed or ForceUpdate) {
+    FastLED.setBrightness(GetAutoBrightness(D.Value));
+    UpdateLEDs = true;
+  }
+}
 void UpdateBrightness(bool ForceUpdate) {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   if (AutoBrightness) {
