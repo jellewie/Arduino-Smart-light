@@ -55,9 +55,9 @@ void ShowAnimation(bool Start) {                                //This would be 
   EVERY_N_SECONDS(1) {
     if (AnimationCounter != -1)
       AnimationCounter = AnimationCounter - 1;
-#ifdef SerialEnabled
+#ifdef Animation_SerialEnabled
     Serial.println("AN: AnimationCounter=" + String(AnimationCounter));
-#endif //SerialEnabled
+#endif //Animation_SerialEnabled
   }
   switch (CurrentAnimation) {
     case 0: {                                                   //BLINK
@@ -290,9 +290,9 @@ void ShowAnimation(bool Start) {                                //This would be 
 
     default:
       AnimationCounter = 0;                                     //Stop animation
-#ifdef SerialEnabled
+#ifdef Animation_SerialEnabled
       Serial.println("AN: Animation with ID " + String(CurrentAnimation) + " not found");
-#endif //SerialEnabled
+#endif //Animation_SerialEnabled
       break;
   }
 }
@@ -303,8 +303,8 @@ void StartAnimation(byte ID, int Time) {
     AnimationCounter += 1;                                      //Stop at the given time
   CurrentAnimation = ID;
   SetNewColor();
-#ifdef SerialEnabled
+#ifdef Animation_SerialEnabled
   Serial.println("AN: Selected special mode " + String(CurrentAnimation));
-#endif //SerialEnabled
+#endif //Animation_SerialEnabled
   ShowAnimation(true);
 }

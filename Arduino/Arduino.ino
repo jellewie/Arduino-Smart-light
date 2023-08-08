@@ -19,6 +19,7 @@
 #define     OTA_SerialEnabled                                   //OTA:
 #define     RGBL_SerialEnabled                                  //RG:
 //#define     Audio_SerialEnabled                                 //AU:
+#define     Animation_SerialEnabled                             //AN
 //#define     LoopTime_SerialEnabled                            //LT:
 //#define     TimeExtra_SerialEnabled                           //TME:
 //#define     UpdateLEDs_SerialEnabled                          //UL:
