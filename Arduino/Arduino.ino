@@ -18,6 +18,7 @@
 #define     SetupTime_SerialEnabled                             //ST:
 #define     OTA_SerialEnabled                                   //OTA:
 #define     RGBL_SerialEnabled                                  //RG:
+//#define     Audio_SerialEnabled                                 //AU:
 //#define     LoopTime_SerialEnabled                            //LT:
 //#define     TimeExtra_SerialEnabled                           //TME:
 //#define     UpdateLEDs_SerialEnabled                          //UL:
@@ -44,6 +45,7 @@ byte HourlyAnimationS = 10;                                     //SOFT_SETTING I
 byte DoublePressMode = RAINBOW;                                 //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = true;                                     //SOFT_SETTING If the auto brightness is enabled
 bool AudioLink = false;                                         //SOFT_SETTING If the AudioLink is enabled
+bool StandAlone = false;                                        //SOFT_SETTING If the StandAlone is enabled
 float AutoBrightnessP = 1.04;                                   //SOFT_SETTING Brightness = y=255-(P*(x-N)-O) https://www.desmos.com/calculator/lmezlpkwsp
 byte AutoBrightnessN = 10;                                      //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
 byte AutoBrightnessO = 5;                                       //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
@@ -56,6 +58,12 @@ byte PotMinChange = 2;                                          //SOFT_SETTING H
 byte PotStick = PotMinChange + 1;                               //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                                 //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
 char Name[16] = "smart-clock";                                  //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+float AudioMultiplier = 2;                                      //SOFT_SETTING Howmuch to amplify the input signal (Idealy when loud it should be 255)
+byte MinAudioBrightness = 1;                                    //SOFT_SETTING Minimum amount of brighness that will be applied with Audiolink
+byte MaxAudioBrightness = 255;                                  //SOFT_SETTING Maximum amount of brighness that can be applied with Audiolink
+const byte AmountAudioAverageEnd = 3;                           //howmuch to smooth the LEDs responoce (Its after the math)(Max 64! recomended to keep low like 3-5)
+byte AudioRawLog[250];                                          //Used to log audio sensory data in
+const byte AudioLog_Amount = sizeof(AudioRawLog) / sizeof(AudioRawLog[0]);//Why filling this in if we can automate that? :)
 bool UpdateLEDs;                                                //If we need to physically update the LEDs
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
@@ -176,6 +184,7 @@ void loop() {
   Serial.println("LT: Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
+  if (StandAlone) StandAloneAPMode();
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false);     //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
   if (AnimationCounter != 0)                                    //Animation needs to be shown
@@ -213,7 +222,7 @@ void loop() {
         Mode = RESET;
     }
     UpdateBrightness(false);                                    //Check if manual input potmeters has changed, if so flag the update
-    UpdateAudio(false);                                       //Check if the AudioLink is needed
+    UpdateAudio(false);                                         //Check if the AudioLink is needed
     UpdateColor(false);                                         //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
@@ -275,6 +284,13 @@ void loopLEDS() {
     case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
     case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
     case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
+    case STANDALONE:
+      if (LastMode != Mode)
+        StandAlone = true;
+      WiFiManager.EnableSetup(true);                            //Enable setup page
+      Mode = RAINBOW;
+      StartAnimation(7,  -2);
+      break;
     default:
 #ifdef SerialEnabled
       Serial.println("mode with ID " + String(Mode) + " not found");

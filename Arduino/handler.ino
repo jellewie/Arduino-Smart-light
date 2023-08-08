@@ -139,7 +139,7 @@ void handle_Set() {
   if (ColorUpdated) {
     int FromLED = 0, AmountLED = TotalLEDs;
     if (Section == 0) {                                         //If we are talking about all LEDs
-      Mode = WIFI;
+      if (Mode != STANDALONE) Mode = WIFI;
     } else if (Section == 1) {                                  //If clock only
       AmountLED = TotalLEDsClock;
     } else if (Section == 2) {                                  //If every section except the clock
@@ -251,9 +251,9 @@ void handle_Main() {
                       "let Sg=new Slider('Green');"
                       "let Sb=new Slider('Blue');"
 
-                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','PACMAN','PHYSICS','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
-                      "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK']});"
-                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','BLINK','RAINBOW']});"
+                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','MOVE','PACMAN','PHYSICS','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
+                      "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE']});"
+                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','STANDALONE','RAINBOW']});"
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "let Di=new DropDown({name:'Auto brightness',setParamName:'i',possibleValues:['FALSE','TRUE']});"
@@ -304,6 +304,7 @@ void handle_Main() {
                       "Dbm.value=json.bm;"
                       "Ddm.value=json.dm;"
                       "Di.value=json.i;"
+                      "Dd.value=json.d;"
                       "Dha.value=json.ha;"
                       "Dhl.value=json.hl;"
                       "Da.value=json.a;"
@@ -365,6 +366,16 @@ void handle_UpdateTime() {
 }
 void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+  byte MicRaw = analogRead(PAO_MIC) / 4;
+  byte AudioLowest = 255;
+  byte AudioHighest = 0;
+  for (byte i = 0; i < AudioLog_Amount ; i++) {
+    if (AudioRawLog[i] < AudioLowest)
+      AudioLowest = AudioRawLog[i];
+    if (AudioRawLog[i] > AudioHighest)
+      AudioHighest = AudioRawLog[i];
+  }
   char TimeMessage[100] = {0};
   strftime(TimeMessage, sizeof(TimeMessage), "%Ec zone %Z %z ", &timeinfo); //https://cplusplus.com/reference/ctime/strftime/
   String Message = "https://github.com/jellewie/Arduino-Smart-light\n"
@@ -373,17 +384,21 @@ void handle_Info() {
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "AutoBrightness Value raw = " + String(L.Value) + " (255=dark, 0=bright!)\n"
                    "AutoBrightness Value math = " + String(GetAutoBrightness(L.Value)) + " = 255-(P*(raw-N)-O)\n"
+                   "AudioLink Value raw = " + String(MicRaw) + " converted = " + ConvertAudioVolume(D.Value, MicRaw) + " = ABS(raw-average)*AudioMultiplier (255=loud, 0=quit)\n"
                    "Current time = " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS) + "\n"
                    "Time thingies DST=" + IsTrueToString(timeinfo.tm_isdst) + " " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min) + ":" + String(timeinfo.tm_sec) + String(timeinfo.tm_mday) + "-" + String(timeinfo.tm_mon) + "-" + String(timeinfo.tm_year + 1900) + "\n" + TimeMessage + "\n"
                    "TotalLEDs = " + String(TotalLEDs) + ", Sections = " + String(LEDSections) + " (Clock=" + String(TotalLEDsClock) + ")\n"
                    "AnimationRGB = " + String(AnimationRGB[0]) + "," + String(AnimationRGB[1]) + "," + String(AnimationRGB[2]) + "\n"
-                   "RGBColor = " + String(RGBColor[0]) + "," + String(RGBColor[1]) + "," + String(RGBColor[2]) + "\n"
-                   "\nSOFT_SETTINGS\n";
+                   "RGBColor = " + String(RGBColor[0]) + "," + String(RGBColor[1]) + "," + String(RGBColor[2]) + "\n";
+#ifdef SerialEnabled
+  Message += "Serial is enabled\n";
+#endif //SerialEnabled
+  Message += "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
-#ifdef SerialEnabled
-  Message += "\nSerial is enabled";
-#endif //SerialEnabled
+  Message += "\nAUDIO LOG RAW: L=" + String(AudioLowest) + " A=" + String(D.Value)  + " H=" + String(AudioHighest) + "\n";
+  for (byte i = 0; i < AudioLog_Amount ; i++)
+    Message += String(i) + " = " + String(AudioRawLog[i]) + "\n";
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Info" + Message);
