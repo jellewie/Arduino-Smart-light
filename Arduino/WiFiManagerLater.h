@@ -84,11 +84,19 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
       } break;
     case 34: {
         if (not StringIsDigit(Value))                         return false;  //No number given
-        MinAudioBrightness       = ToByte(Value);             return true;
+        AudioAddition            = Value.toInt();             return true;
       } break;
     case 35: {
         if (not StringIsDigit(Value))                         return false;  //No number given
+        MinAudioBrightness       = ToByte(Value);             return true;
+      } break;
+    case 36: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
         MaxAudioBrightness       = ToByte(Value);             return true;
+      } break;
+    case 37: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        AmountAudioAverageEnd    = ToByte(Value);             return true;
       } break;
     //==============================
     //Tasks
@@ -135,8 +143,10 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 15:  return String(PotMin);                                                            break;
     case 16:  return String(Name);                                                              break;
     case 33:  return String(AudioMultiplier);                                                   break;
-    case 34:  return String(MinAudioBrightness);                                                break;
-    case 35:  return String(MaxAudioBrightness);                                                break;
+    case 34:  return String(AudioAddition);                                                     break;
+    case 35:  return String(MinAudioBrightness);                                                break;
+    case 36:  return String(MaxAudioBrightness);                                                break;
+    case 37:  return String(AmountAudioAverageEnd);                                             break;
     //==============================
     //Tasks
     //==============================

@@ -59,11 +59,12 @@ byte PotMinChange = 2;                                          //SOFT_SETTING H
 byte PotStick = PotMinChange + 1;                               //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                                 //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
 char Name[16] = "smart-clock";                                  //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
-float AudioMultiplier = 2;                                      //SOFT_SETTING Howmuch to amplify the input signal (Idealy when loud it should be 255)
+float AudioMultiplier = 2;                                      //SOFT_SETTING Howmuch to amplify the input signal (Idealy when loud the ouput should be 255)
+int AudioAddition = 0;                                          //SOFT_SETTING Howmuch to add to the input signal
 byte MinAudioBrightness = 1;                                    //SOFT_SETTING Minimum amount of brighness that will be applied with Audiolink
 byte MaxAudioBrightness = 255;                                  //SOFT_SETTING Maximum amount of brighness that can be applied with Audiolink
-const byte AmountAudioAverageEnd = 3;                           //howmuch to smooth the LEDs responoce (Its after the math)(Max 64! recomended to keep low like 3-5)
-byte AudioRawLog[250];                                          //Used to log audio sensory data in
+byte AmountAudioAverageEnd = 6;                                 //SOFT_SETTING howmuch to smooth the LEDs responoce (Its after the math)(Max 64! recomended to keep low like 3-5)
+byte AudioRawLog[1000];                                         //Used to log audio sensory data in
 const byte AudioLog_Amount = sizeof(AudioRawLog) / sizeof(AudioRawLog[0]);//Why filling this in if we can automate that? :)
 bool UpdateLEDs;                                                //If we need to physically update the LEDs
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
@@ -153,6 +154,7 @@ void setup() {
   for (int i = 0; i < StableAnalog_AverageAmount + 2; i++) {
     UpdateColor(false);                                         //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
+    AUDIO.ReadStable();
   }
   FastLED.setBrightness(8);                                     //Set boot Brightness
   //===========================================================================

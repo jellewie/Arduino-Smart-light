@@ -191,7 +191,7 @@ byte ConvertAudioVolume(byte Average, byte Reading) {           //Just do the ma
   float Answer = abs(Reading - Average) ;
   Answer = round(Answer * AudioMultiplier);                     //Round to nearest instead of just down
   //Just return an average of this value
-  static byte Point[AmountAudioAverageEnd];
+  static byte Point[255];                                       //Set this to byte size, so the user can adjust it with SOFT_SETTING
   static byte Counter = 0;
   static int Total = 0;
   Total -= Point[Counter];   //Remove old measurement
@@ -203,10 +203,10 @@ byte ConvertAudioVolume(byte Average, byte Reading) {           //Just do the ma
 #ifdef Audio_SerialEnabled
   Serial.println("AU: avg=" + String(Average) + " raw=" + String(Reading) + " ans=" + String(byte(round(Answer))) + " avg(ans)=" + String(AverageValue));
 #endif //Audio_SerialEnabled
-  return constrain(AverageValue, MinAudioBrightness, MaxAudioBrightness);
+  return constrain(AverageValue + AudioAddition, MinAudioBrightness, MaxAudioBrightness);
 }
 void LogAudio(byte Value) {                                     //Save the last measurements in a log, so we can debug log it to the user
-  static byte i = 0;
+  static int i = 0;
   AudioRawLog[i] = Value;
   i = i + 1;
   if (i > AudioLog_Amount) i = 0;
@@ -214,8 +214,12 @@ void LogAudio(byte Value) {                                     //Save the last 
 byte GetAutoVolume() {                                          //Take a new measurement and return the convertion
   byte Value = analogRead(PAO_MIC) / 4;
   LogAudio(Value);
-  POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
-  byte Answer = ConvertAudioVolume(D.Value, Value);
+  static byte SensorValue = 0;
+  EVERY_N_MILLISECONDS(200) {                                   //Delay the amount where the average is based on, this results in 16*200ms= the last 3.2 seconds
+    POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
+    SensorValue = D.Value;
+  }
+  byte Answer = ConvertAudioVolume(SensorValue, Value);
   return Answer;
 }
 void UpdateAudio(bool ForceUpdate) {
