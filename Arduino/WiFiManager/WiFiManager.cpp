@@ -402,6 +402,10 @@ void CWiFiManager::RunServer() {
   StartServer();                                                //Start server if we havn't yet
   server.handleClient();
 }
+void CWiFiManager::handleClient() {
+  StartServer();                                                //Start server if we havn't yet
+  server.handleClient();
+}
 void CWiFiManager::handle_Connect() {
   if (!SettingsEnabled) return;                                 //If settingscommand is disabled: Stop right away, and do noting
   String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>" + String(Name) + " settings</strong><br><br><form action=\"/setup?\" method=\"post\">";
