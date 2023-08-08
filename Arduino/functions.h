@@ -207,7 +207,6 @@ byte ConvertAudioVolume(byte Average, byte Reading) {           //Just do the ma
 }
 void LogAudio(byte Value) {                                     //Save the last measurements in a log, so we can debug log it to the user
   static byte i = 0;
-  Serial.println(" log " + String(Value) + " at " + String(i));
   AudioRawLog[i] = Value;
   i = i + 1;
   if (i > AudioLog_Amount) i = 0;
