@@ -83,7 +83,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         AudioMultiplier          = Value.toFloat();           return true;
       } break;
     case 34: {
-        if (not StringIsDigit(Value))                         return false;  //No number given
+        if (not StringIsDigit(Value, '-'))                    return false;  //No number given
         AudioAddition            = Value.toInt();             return true;
       } break;
     case 35: {
