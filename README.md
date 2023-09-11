@@ -197,8 +197,8 @@ Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will 
 - **ClockHourAnalog** Will use all 60 LEDs to display the hour, not just stick to wholes and use 12.
 - **ClockOffset** Number of LEDs to offset/rotate the clock, so 12 o'clock would be UP. Does NOT work in Animations.
 - **ClockAnalog** Makes it so the LEDs do not step but smoothly transition. This does cost considerable more processing power. Makes ClockHourAnalog useless. https://www.desmos.com/calculator/zkl6idhjvx
-- **gmtOffset_sec** Offset of time in seconds of GMT, for example Amsterdam is GMT+1h so that is 3600 seconds.
-- **daylightOffset_sec** Offset of time in seconds daylight saving time, for example Amsterdam has a 1 hour saving time so thats 3600 seconds.
+- **timeZone** Set to you Timezone, see https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv, for example "CET-1CEST,M3.5.0,M10.5.0/3" for Amsterdam (DEFAULT)
+- **RESERVED**
 - **PotMinChange** How much the pot_value needs to change before we process it.
 - **PotStick** If this close to HIGH or LOW stick to it.
 - **PotMin** On how much pot_value_change need to change, to set mode to manual.
@@ -206,7 +206,7 @@ Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will 
 - **Task#** 8 tasks (0-7), the format is described in [task-list](#task-list)
 
 ### Clock mode
-For the use of clock mode the right time zone needs to be set up, these are stored in gmtOffset_sec and daylightOffset_sec (Default to Amsterdam time). 
+For the use of clock mode the right time zone needs to be set up, these are stored in timeZone (Default to Amsterdam). 
 
 Clock mode can only be started when WIFI has been connected and the user switches mode, after switching to Clockmode the lamp will turn PURPLE/GREEN/PURPLE/GREEN this means it is getting the time from a time server.
 
