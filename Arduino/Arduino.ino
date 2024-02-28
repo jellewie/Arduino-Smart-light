@@ -1,5 +1,7 @@
 /*Written by JelleWho https://github.com/jellewie
   TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
+
+  2023-07-24 PAO_MIC is on the SAME pin as PAI_B, so both can not be active at the same time. We need ADC1 if we also use WiFi
 */
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
@@ -16,6 +18,8 @@
 #define     SetupTime_SerialEnabled                             //ST:
 #define     OTA_SerialEnabled                                   //OTA:
 #define     RGBL_SerialEnabled                                  //RG:
+#define     Animation_SerialEnabled                             //AN
+//#define     Audio_SerialEnabled                               //AU:
 //#define     LoopTime_SerialEnabled                            //LT:
 //#define     TimeExtra_SerialEnabled                           //TME:
 //#define     UpdateLEDs_SerialEnabled                          //UL:
@@ -26,6 +30,7 @@
 #define LED_TYPE WS2812B                                        //WS2812B for 5V LEDs, WS2813 for 12V LEDs
 const char* ntpServer = "pool.ntp.org";                         //The server where to get the time from
 const byte PAO_LED = 25;                                        //To which pin the <LED strip> is connected to
+const byte PAO_MIC = 34;                                        //To which pin the <LED strip> is connected to
 const byte PAI_R = 32;                                          //               ^ <Red potmeter> ^
 const byte PAI_G = 33;                                          //
 const byte PAI_B = 34;                                          //
@@ -40,6 +45,8 @@ byte BootMode = OFF;                                            //SOFT_SETTING I
 byte HourlyAnimationS = 10;                                     //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;                                 //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = true;                                     //SOFT_SETTING If the auto brightness is enabled
+bool AudioLink = false;                                         //SOFT_SETTING If the AudioLink is enabled
+bool StandAlone = false;                                        //SOFT_SETTING If the StandAlone is enabled
 float AutoBrightnessP = 1.04;                                   //SOFT_SETTING Brightness = y=255-(P*(x-N)-O) https://www.desmos.com/calculator/lmezlpkwsp
 byte AutoBrightnessN = 10;                                      //SOFT_SETTING ^                        [Just the lowest raw sensor value you can find]
 byte AutoBrightnessO = 5;                                       //SOFT_SETTING ^                        [Just an brigtness offset, so it can be set to be globaly more bright]
@@ -52,6 +59,13 @@ byte PotMinChange = 2;                                          //SOFT_SETTING H
 byte PotStick = PotMinChange + 1;                               //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                                 //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
 char Name[16] = "smart-clock";                                  //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+float AudioMultiplier = 2;                                      //SOFT_SETTING Howmuch to amplify the input signal (Idealy when loud the ouput should be 255)
+int AudioAddition = 0;                                          //SOFT_SETTING Howmuch to add to the input signal
+byte MinAudioBrightness = 1;                                    //SOFT_SETTING Minimum amount of brighness that will be applied with Audiolink
+byte MaxAudioBrightness = 255;                                  //SOFT_SETTING Maximum amount of brighness that can be applied with Audiolink
+byte AmountAudioAverageEnd = 6;                                 //SOFT_SETTING howmuch to smooth the LEDs responoce (Its after the math)(Max 64! recomended to keep low like 3-5)
+byte AudioRawLog[1000];                                         //Used to log audio sensory data in
+const byte AudioLog_Amount = sizeof(AudioRawLog) / sizeof(AudioRawLog[0]);//Why filling this in if we can automate that? :)
 bool UpdateLEDs;                                                //If we need to physically update the LEDs
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
@@ -83,6 +97,7 @@ StableAnalog GREEN = StableAnalog(PAI_G);
 StableAnalog BLUE  = StableAnalog(PAI_B);
 StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
+StableAnalog AUDIO = StableAnalog(PAO_MIC);
 
 #include "Functions.h"
 #include "time.h"                                               //We need this for the clock function to get the time (Time library)
@@ -111,6 +126,8 @@ void setup() {
   //===========================================================================
   attachInterrupt(ButtonsA.PIN_Button, ISR_ButtonsA, CHANGE);
   pinMode(PAI_DisablePOTs, INPUT_PULLUP);                       //Pull the pin up, so the pin is by default HIGH if not attached
+  if (digitalRead(PAI_DisablePOTs) == HIGH)                     //If the POTs are enabled with hardware
+    AudioLink = false;                                          //Do not allow AudioLink if Pots are enabled
   //===========================================================================
   //Set default settings
   //===========================================================================
@@ -123,6 +140,7 @@ void setup() {
   //Set up all server UrlRequest stuff
   //===========================================================================
   server.on("/",            handle_OnConnect);                  //Call the 'handleRoot' function when a client requests URL "/"
+  server.on("/main",        handle_Main);
   server.on("/get",         handle_Getcolors);
   server.on("/set",         handle_Set);
   server.on("/gettasks",    Tasks_handle_GetTasks);
@@ -138,6 +156,7 @@ void setup() {
   for (int i = 0; i < StableAnalog_AverageAmount + 2; i++) {
     UpdateColor(false);                                         //Trash some measurements, so we get a good average on start
     UpdateBrightness(false);
+    AUDIO.ReadStable();
   }
   FastLED.setBrightness(8);                                     //Set boot Brightness
   //===========================================================================
@@ -170,6 +189,7 @@ void loop() {
   Serial.println("LT: Loop took ms:\t" + String(LoopMs));
 #endif //LoopTime_SerialEnabled
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
+  if (StandAlone) StandAloneAPMode();
   if (TimeSet and Mode != CLOCK) UpdateAndShowClock(false);     //If we are not in clock mode but the time has been set, update the internal time before ExecuteTask
   ExecuteTask();
   if (AnimationCounter != 0)                                    //Animation needs to be shown
@@ -207,6 +227,7 @@ void loop() {
         Mode = RESET;
     }
     UpdateBrightness(false);                                    //Check if manual input potmeters has changed, if so flag the update
+    UpdateAudio(false);                                         //Check if the AudioLink is needed
     UpdateColor(false);                                         //Check if manual input potmeters has changed, if so flag the update
     loopLEDS();
   }
@@ -268,6 +289,13 @@ void loopLEDS() {
     case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
     case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
     case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
+    case STANDALONE:
+      if (LastMode != Mode)
+        StandAlone = true;
+      WiFiManager.EnableSetup(true);                            //Enable setup page
+      Mode = RAINBOW;
+      StartAnimation(7,  -2);
+      break;
     default:
 #ifdef SerialEnabled
       Serial.println("mode with ID " + String(Mode) + " not found");

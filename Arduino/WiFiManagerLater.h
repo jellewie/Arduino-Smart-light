@@ -57,12 +57,10 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 11: {
         if (Value.length() < 4)                               return false;  //Number instead of string given
         if (StringIsDigit(Value))                             return false;  //Emthy string given (to short to contain the proper data)
-        timeZone = Value;     
+        timeZone = Value;
         return true;
       } break;
-    case 12: {
-        return false;
-      } break;
+    case 12:   AudioLink         = IsTrue(Value);             return true;  break;
     case 13: {
         if (not StringIsDigit(Value))                         return false;  //No number given
         PotMinChange             = ToByte(Value);             return true;  break;
@@ -78,6 +76,27 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 16: {
         if (Value.length() > sizeof(Name))                    return false; //Length is to long, it would not fit so stop here
         Value.toCharArray(Name, 16);                          return true;
+      } break;
+    case 33: {
+        Value.replace(",", ".");                                //Replace EN to UN decimal seperator (thats what Arduino uses)
+        if (not StringIsDigit(Value, '.', '-'))               return false;  //No float number given
+        AudioMultiplier          = Value.toFloat();           return true;
+      } break;
+    case 34: {
+        if (not StringIsDigit(Value, '-'))                    return false;  //No number given
+        AudioAddition            = Value.toInt();             return true;
+      } break;
+    case 35: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        MinAudioBrightness       = ToByte(Value);             return true;
+      } break;
+    case 36: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        MaxAudioBrightness       = ToByte(Value);             return true;
+      } break;
+    case 37: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        AmountAudioAverageEnd    = ToByte(Value);             return true;
       } break;
     //==============================
     //Tasks
@@ -118,11 +137,16 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 9:   return String(LEDOffset);                                                         break;
     case 10:  return Convert ? IsTrueToString(ClockAnalog)          : String(ClockAnalog);      break;
     case 11:  return timeZone;                                                                  break;
-    case 12:  return "";                                                                        break;
+    case 12:  return Convert ? IsTrueToString(AudioLink)            : String(AudioLink);        break;
     case 13:  return String(PotMinChange);                                                      break;
     case 14:  return String(PotStick);                                                          break;
     case 15:  return String(PotMin);                                                            break;
     case 16:  return String(Name);                                                              break;
+    case 33:  return String(AudioMultiplier);                                                   break;
+    case 34:  return String(AudioAddition);                                                     break;
+    case 35:  return String(MinAudioBrightness);                                                break;
+    case 36:  return String(MaxAudioBrightness);                                                break;
+    case 37:  return String(AmountAudioAverageEnd);                                             break;
     //==============================
     //Tasks
     //==============================
@@ -187,4 +211,14 @@ bool WiFiManagerUser_HandleAP() {                               //Called when in
     ESP.restart();                                              //Restart the ESP
   }
   return false;
+}
+byte StandAloneAPMode() {
+  static bool Started = false;
+  if (!Started) {
+    WiFi.mode(WIFI_AP_STA);                               //https://github.com/espressif/arduino-esp32/blob/1287c529330d0c11853b9f23ddf254e4a0bc9aaf/libraries/WiFi/src/WiFiType.h#L33
+    if (!WiFi.softAP(Name))                                       //config doesn't seem to work, so do not use it: 'WiFi.softAPConfig(ap_local_IP, ap_gateway, ap_subnet)'
+      return 2;
+  }
+  WiFiManager.handleClient();
+  return 1;
 }

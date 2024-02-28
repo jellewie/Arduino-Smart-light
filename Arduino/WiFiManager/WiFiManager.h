@@ -85,6 +85,7 @@ class CWiFiManager {
     enum {REQ_UNK, REQ_SUCCES, REQ_HUB_CONNECT_ERROR, REQ_TIMEOUT, REQ_PAGE_NOT_FOUND, REQ_SETUP_REQUIRED};
     byte DoRequest(char _IP[16], int _Port = 80, String _Path = "", String _Json = "", byte TimeOut = 0, String Header = "");
 #endif //WiFiManager_DoRequest
+    void handleClient();
 };
 
 CWiFiManager WiFiManager;
