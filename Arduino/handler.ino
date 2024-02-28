@@ -58,8 +58,12 @@ void handle_Set() {
       AutoBrightness = false;
       FastLED.setBrightness(constrain((ArgValue.toInt()), 1, 255));
     } else if (ArguName == PreFixAudioLink) {
-      AudioLink = IsTrue(ArgValue);
-      if (AudioLink) AutoBrightness = false;
+      if (digitalRead(PAI_DisablePOTs) == HIGH) {               //If the POTs are enabled with hardware
+        AudioLink = false;                                      //Do not allow AudioLink if Pots are enabled
+      } else {
+        AudioLink = IsTrue(ArgValue);
+        if (AudioLink) AutoBrightness = false;
+      }
       UpdateBrightness(true);
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSetAutoBrightness) {

@@ -44,7 +44,7 @@ const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "Hou
 const int EEPROM_size = 512;
 
 #define WiFiManagerUser_Name_Defined
-//char Name[1s6] = "ESP32";                                      //If you want to define the name somewhere else use 'char* Name = Name'
+//char Name[16] = "ESP32";                                      //If you want to define the name somewhere else use 'char* Name = Name'
 
 #define WiFiManager_mDNS
 

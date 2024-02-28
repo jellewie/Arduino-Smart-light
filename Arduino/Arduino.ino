@@ -126,6 +126,8 @@ void setup() {
   //===========================================================================
   attachInterrupt(ButtonsA.PIN_Button, ISR_ButtonsA, CHANGE);
   pinMode(PAI_DisablePOTs, INPUT_PULLUP);                       //Pull the pin up, so the pin is by default HIGH if not attached
+  if (digitalRead(PAI_DisablePOTs) == HIGH)                     //If the POTs are enabled with hardware
+    AudioLink = false;                                          //Do not allow AudioLink if Pots are enabled
   //===========================================================================
   //Set default settings
   //===========================================================================
