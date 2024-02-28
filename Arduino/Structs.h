@@ -19,6 +19,12 @@ const byte Modes_Amount = sizeof(ModesString) / sizeof(ModesString[0]);//Why fil
 String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
+IPAddress String2IpAddress(String ipString) {
+  IPAddress result;
+  if (result.fromString(ipString))
+    return result;
+  return IPAddress(0,0,0,0);
+}
 bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
 bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
   //IgnoreChar can be used to ignore ',' or '.' or '-'

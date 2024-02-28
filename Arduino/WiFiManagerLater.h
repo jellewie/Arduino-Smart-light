@@ -98,6 +98,21 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         if (not StringIsDigit(Value))                         return false;  //No number given
         AmountAudioAverageEnd    = ToByte(Value);             return true;
       } break;
+    case 38: {
+        if (HA_MQTT_Enabled)                                  return false;  //Can only be changed before MQTT is enabled/settup
+        IPAddress result = String2IpAddress(Value);
+        if (result == IPAddress(0, 0, 0, 0))                  return false; //No valid IP
+        HA_BROKER_ADDR           = result;                    return true;
+      } break;
+    case 39: {
+        if (HA_MQTT_Enabled)                                  return false;  //Can only be changed before MQTT is enabled/settup
+        HA_BROKER_USERNAME       = Value;                     return true;
+      } break;
+    case 40: {
+        if (HA_MQTT_Enabled)                                  return false;  //Can only be changed before MQTT is enabled/settup
+        HA_BROKER_PASSWORD       = Value;                     return true;
+      } break;
+    case 41: HA_MQTT_Enabled_On_Boot  = IsTrue(Value);        return true;  break;
     //==============================
     //Tasks
     //==============================
@@ -147,6 +162,10 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 35:  return String(MinAudioBrightness);                                                break;
     case 36:  return String(MaxAudioBrightness);                                                break;
     case 37:  return String(AmountAudioAverageEnd);                                             break;
+    case 38:  return IpAddress2String(HA_BROKER_ADDR);                                          break;
+    case 39:  return HA_BROKER_USERNAME;                                                        break;
+    case 40:  return HA_BROKER_PASSWORD;                                                        break;
+    case 41:  return Convert ? IsTrueToString(HA_MQTT_Enabled_On_Boot) : String(HA_MQTT_Enabled_On_Boot); break;
     //==============================
     //Tasks
     //==============================

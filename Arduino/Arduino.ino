@@ -19,6 +19,7 @@
 #define     OTA_SerialEnabled                                   //OTA:
 #define     RGBL_SerialEnabled                                  //RG:
 #define     Animation_SerialEnabled                             //AN
+#define     HomeAssistant_SerialEnabled                         //HA
 //#define     Audio_SerialEnabled                               //AU:
 //#define     LoopTime_SerialEnabled                            //LT:
 //#define     TimeExtra_SerialEnabled                           //TME:
@@ -100,6 +101,7 @@ StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 StableAnalog AUDIO = StableAnalog(PAO_MIC);
 
 #include "Functions.h"
+#include "MQTT_HA.h"
 #include "time.h"                                               //We need this for the clock function to get the time (Time library)
 #include "Task.h"
 #include "WiFiManagerLater.h"                                   //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest)
@@ -176,6 +178,8 @@ void setup() {
 #endif //SerialEnabled
   loopLEDS();
   UpdateBrightness(true);                                       //Force Update the brightness
+  if (HA_MQTT_Enabled_On_Boot)
+    HA_MQTT_Enabled = true;
 #ifdef SetupTime_SerialEnabled                                  //Just a way to measure setup speed, so the performance can be checked
   Serial.println("ST: Setup took ms:\t" + String(millis()));
 #endif //SetupTime_SerialEnabled
@@ -194,6 +198,12 @@ void loop() {
   ExecuteTask();
   if (AnimationCounter != 0)                                    //Animation needs to be shown
     ShowAnimation(false);
+  if (HA_MQTT_Enabled) {                                        //If we need to talk to MQTT
+    if (HA_MQTT_Enabled_old != HA_MQTT_Enabled)                 //If this is the first time
+      HaSetup();
+    HaLoop();
+  }
+  HA_MQTT_Enabled_old = HA_MQTT_Enabled;
   EVERY_N_MILLISECONDS(1000 / 60) {                             //Limit to 60FPS
     Button_Time Value = ButtonsA.CheckButton();                 //Read buttonstate
 #ifdef SerialEnabled                                            //DEBUG, print button state to serial

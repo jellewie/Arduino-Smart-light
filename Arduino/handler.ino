@@ -20,8 +20,10 @@
 #define PreFixSetClockHourAnalog "a"
 #define PreFixSetLEDOffset "o"
 #define PreFixSetClockAnalog "c"
-#define PreFixSection "s"           //''or'0'=All, 1=TotalLEDsClock, 2=!(TotalLEDsClock)
+#define PreFixSection "s"                                       //''or'0'=All, 1=TotalLEDsClock, 2=!(TotalLEDsClock)
 #define PreFixAudioLink "d"
+#define PreFixHAMQTT "h"
+#define PreFixHAMQTTOnBoot "he"
 
 //<ip>/time[?PreFix=Value][&....]                               //These are currently HARDCODED into the HTML page, so shouldn't be changed if you want to use the webpage
 #define PreFixTimeHour "h"
@@ -104,6 +106,11 @@ void handle_Set() {
       DoWriteToEEPROM = true;
     } else if (ArguName == PreFixSection) {
       Section = ArgValue.toInt();
+    } else if (ArguName == PreFixHAMQTT) {
+      HA_MQTT_Enabled = IsTrue(ArgValue);
+    } else if (ArguName == PreFixHAMQTTOnBoot) {
+      HA_MQTT_Enabled_On_Boot = IsTrue(ArgValue);
+      DoWriteToEEPROM = true;
     } else
       ERRORMSG += "Unknown arg '" + ArguName + "' with value '" + ArgValue + "'\n";
   }
@@ -151,7 +158,7 @@ void handle_Set() {
       FromLED   = TotalLEDsClock + 1;
       AmountLED = TotalLEDs - FromLED;
     }
-    fill_solid(&(LEDs[FromLED]), AmountLED, RGBColor); //Change the whole LED strip to have the color of the last set LED
+    LED_Fill(FromLED, AmountLED, RGBColor);                     //Change the whole LED strip to have the color of the last set LED
   } else if (Mode == RESET) {
     server.send(200, "text/plain", "OK");
     for (int i = 0; i < 100; i++) {                             //Just wait for a few ms to make sure the "reset command recieved" has been send
@@ -180,7 +187,9 @@ void handle_Getcolors() {
                "\"hl\":\"" + ClockHourLines + "\","
                "\"a\":\"" + IsTrueToString(ClockHourAnalog) + "\","
                "\"c\":\"" + IsTrueToString(ClockAnalog) + "\","
-               "\"d\":\"" + IsTrueToString(AudioLink) + "\",";
+               "\"d\":\"" + IsTrueToString(AudioLink) + "\","
+               "\"h\":\"" + IsTrueToString(HA_MQTT_Enabled) + "\","
+               "\"he\":\"" + IsTrueToString(HA_MQTT_Enabled_On_Boot) + "\",";
   byte r = LEDs[TotalLEDs - 1].r, g = LEDs[TotalLEDs - 1].g, b = LEDs[TotalLEDs - 1].b; //Set RGB to be the color of the last LED
   if (AnimationCounter != 0) {                                  //Animation needs to be shown (this is used to show the set animation color)
     r = AnimationRGB[0];
@@ -268,6 +277,9 @@ void handle_Main() {
                       "let Dhl=new DropDown({name:'Hourly lines',setParamName:'hl',possibleValues:['FALSE','1','2','4','8','16','32']});"        //This one is actually a Byte
                       "let Da=new DropDown({name:'Analog hours',setParamName:'a',possibleValues:['FALSE','TRUE']});"
                       "let Dc=new DropDown({name:'Analog clock',setParamName:'c',possibleValues:['FALSE','TRUE']});"
+                      "let Dq=new DropDown({name:'HA MQTT',setParamName:'h',possibleValues:['FALSE','TRUE']});"
+                      "let De=new DropDown({name:'HA MQTT after boot',setParamName:'he',possibleValues:['FALSE','TRUE']});"
+                      
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "new Button('Tasks', _ =>{setSettingsVisibility(false); setTasksVisibility(true);});"
@@ -313,6 +325,9 @@ void handle_Main() {
                       "Dhl.value=json.hl;"
                       "Da.value=json.a;"
                       "Dc.value=json.c;"
+                      "Dq.value=json.h;"
+                      "De.value=json.he;"
+                      
                       "let col=json.RGBL[0];Sr.value=col.R;Sg.value=col.G;Sb.value=col.B;Sl.value=col.L;}"
 
                       "async function updateTaskList(){let response=await fetch('/gettasks');if(response.ok){await updateTaskListFromResponse(response);}else{doToastMessage(await response.text(),true);}}let currentTaskListTimeItems=[];async function updateTaskListFromResponse(response){if(!response.ok)return;const json=await response.json();taskListEl.innerHTML='';currentTaskListTimeItems=[];for(const task of json.tasks){const liEl=document.createElement('li');liEl.classList.add('taskItem');taskListEl.appendChild(liEl);const timeEl=document.createElement('div');timeEl.classList.add('taskTime');timeEl.innerText=task.time;liEl.appendChild(timeEl);if(task.timeFromNow){currentTaskListTimeItems.push({el:timeEl,fireTime:performance.now()+task.timeFromNow,});}const typeEl=document.createElement('div');typeEl.classList.add('taskType');typeEl.innerText=task.type;liEl.appendChild(typeEl);const varEl=document.createElement('div');varEl.classList.add('taskVar');if(task.var){varEl.innerText='Var: '+task.var;}liEl.appendChild(varEl);const closeBtn=document.createElement('div');closeBtn.classList.add('taskCloseBtn');liEl.appendChild(closeBtn);closeBtn.addEventListener('click',async _=>{const response=await fetch('/settask?o=2&i='+task.id);doToastMessage(await response.text(), !response.ok);await updateTaskList();});}}function updateTaskTimes(){for(const timeItem of currentTaskListTimeItems){const dt=timeItem.fireTime-performance.now();let str='';if(dt<0){str='now';}else{const dtSeconds=dt/1000;const dtMinutes=dtSeconds/60;const dtHours=dtMinutes/60;const hours=Math.floor(dtHours);const minutes=Math.floor(dtMinutes-hours*60);const seconds=Math.floor(dtSeconds-hours*60*60-minutes*60);str=(''+seconds).padStart(2,'0');if(hours>0){str=(''+minutes).padStart(2,'0')+':'+str;str=hours+':'+str;}else{str=minutes+':'+str;}}timeItem.el.textContent=str;}}setInterval(updateTaskTimes,100);const addTaskBtn=new Button('add',async _=>{const params={i:addTaskTypeEl.value,a:addTaskVarEl.value,};if(addTaskTimeTypeEl.value==\"ABSOLUTE\"){params.h=addTaskTimeEl.valueAsDate.getUTCHours();params.m=addTaskTimeEl.valueAsDate.getUTCMinutes();params.s=addTaskTimeEl.valueAsDate.getUTCSeconds();}else{const ticks=addTaskTimeEl.valueAsNumber;params.t=ticks;}let searchParams=new URLSearchParams(params);try{let response=await fetch('/settask?o=1&'+searchParams);doToastMessage(await response.text(),!response.ok);}catch(e){doToastMessage('Failed to add task',true);}updateTaskList();});addTaskVarEl.parentElement.appendChild(addTaskBtn.el);"
