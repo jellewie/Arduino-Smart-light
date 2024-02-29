@@ -141,7 +141,7 @@ bool UpdateTime() {
     LastMode = -1;                                              //Re-init the mode
     return false;
   }
-  
+
 #ifdef Time_SerialEnabled
   Serial.println(&timeinfo, "TM: UTC: %A, %B %d %Y %H:%M:%S");
 #endif //Time_SerialEnabled

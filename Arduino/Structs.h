@@ -23,7 +23,7 @@ IPAddress String2IpAddress(String ipString) {
   IPAddress result;
   if (result.fromString(ipString))
     return result;
-  return IPAddress(0,0,0,0);
+  return IPAddress(0, 0, 0, 0);
 }
 bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
 bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {

@@ -34,8 +34,8 @@ void onStateCommand1(bool state, HALight* sender) {
     LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));                      //Change the whole LED strip
     //Mode = LastMode;
     //LastMode = -1;
-     Mode = CLOCK;
-     AutoBrightness = true;
+    Mode = CLOCK;
+    AutoBrightness = true;
   }
   UpdateLEDs = true;
   sender->setState(state);                                      //Report state back to the Home Assistant
