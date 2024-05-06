@@ -174,6 +174,7 @@ void UpdateColor(bool ForceUpdate) {
       if (!ForceUpdate and Mode != ON)
         Mode = ON;
       fill_solid(&(LEDs[0]), TotalLEDs, CRGB(R.Value, G.Value, B.Value));
+      HAUpdateLED(true);
       UpdateLEDs = true;
 #ifdef RGBL_SerialEnabled
       String MSG = "Manual";
@@ -256,6 +257,7 @@ void UpdateBrightness(bool ForceUpdate) {
   POT Brightness = BRIGH.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   if (Brightness.Changed or ForceUpdate) {
     if (Brightness.Value == 0) Brightness.Value = 1;
+    HAUpdateLED(true);
     FastLED.setBrightness(Brightness.Value);
     AutoBrightness = false;
     UpdateLEDs = true;
@@ -334,4 +336,13 @@ void ShowIP() {
   ShowIPnumber(MyIp[2]);
   MyDelay(30000, 500, true);
   ShowIPnumber(MyIp[3]);
+}
+bool TickEveryXms(unsigned long * _LastTime, unsigned long _Delay) {
+  static unsigned long _Middle = -1;
+  if (_Middle == -1) _Middle = _Middle / 2;
+  if (millis() - (*_LastTime + _Delay + 1) < _Middle) {
+    *_LastTime = millis();
+    return true;
+  }
+  return false;
 }

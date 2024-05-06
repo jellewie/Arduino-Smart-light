@@ -100,6 +100,7 @@ StableAnalog BRIGH = StableAnalog(PAI_Brightness);
 StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 StableAnalog AUDIO = StableAnalog(PAO_MIC);
 
+extern void HAUpdateLED(bool Force = false);                    //We declair this funcion in "MQTT_HA.h"
 #include "Functions.h"
 #include "MQTT_HA.h"
 #include "time.h"                                               //We need this for the clock function to get the time (Time library)

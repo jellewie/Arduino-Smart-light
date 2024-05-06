@@ -170,6 +170,7 @@ void handle_Set() {
     }
     ESP.restart();                                              //Restart the ESP
   }
+  HAUpdateLED(true);
   if (ERRORMSG == "") {
     UpdateLEDs = true;
     loopLEDS();

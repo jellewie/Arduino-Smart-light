@@ -40,7 +40,7 @@
 const String WiFiManager_VariableNames[] = {"SSID", "Password", "BootMode", "HourlyAnimationS", "DoublePressMode", "AutoBrightness", "AutoBrightnessN", "AutoBrightnessP", "AutoBrightnessO", "ClockHourLines", "ClockHourAnalog", "LEDOffset", "ClockAnalog", "timeZone", "AudioLink", "PotMinChange", "PotStick", "PotMin", "Name",
                                             "Task0", "Task1", "Task2", "Task3", "Task4", "Task5", "Task6", "Task7", "Task8", "Task9", "Task10", "Task11", "Task12", "Task13", "Task14", "Task15",
                                             "AudioMultiplier", "AudioAddition", "MinAudioBrightness", "MaxAudioBrightness", "AmountAudioAverageEnd",
-                                            "HABrokerIP", "HABrokerUser", "HABrokerPass", "HABrokerEnabledOnBoot"
+                                            "HABrokerIP", "HABrokerUser", "HABrokerPass", "HABrokerEnabledOnBoot", "HA_EveryXmsReconnect"
                                            };
 const int EEPROM_size = 512;
 

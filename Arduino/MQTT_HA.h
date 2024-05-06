@@ -5,6 +5,9 @@ bool HA_MQTT_Enabled_On_Boot = false;
 IPAddress HA_BROKER_ADDR = IPAddress(0, 0, 0, 0);
 String HA_BROKER_USERNAME = "";
 String HA_BROKER_PASSWORD = "";
+byte RestoreToMode = Mode;
+bool RestoreToAutoBrightness = AutoBrightness;
+unsigned long HA_EveryXmsReconnect = 60 * 60 * 1000;            //On which interfall to check if WiFi still works
 
 #define HA_deviceSoftwareVersion "1.0"                          //Device info - Firmware:
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
@@ -18,25 +21,48 @@ HAMqtt mqtt(client, device);
 HALight light1("Smart-all", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 HALight light2("Smart-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 
+HALight::RGBColor HAConvertColor(CRGB in) {
+  HALight::RGBColor returnValue;
+  returnValue.red = in[0];
+  returnValue.green = in[1];
+  returnValue.blue = in[2];
+  return returnValue;
+}
+void HAUpdateLED(bool Force) {
+  if (!HA_MQTT_Enabled) return;                                 //Don't update if we don't need to
+  light1.setCurrentBrightness(FastLED.getBrightness());
+  light1.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
+  light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
+  light2.setCurrentBrightness(FastLED.getBrightness());
+  light2.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
+  light2.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
+}
 void onBrightnessCommand(uint8_t brightness, HALight* sender) {
+  if (brightness == 0)
+    AutoBrightness = true;
   FastLED.setBrightness(brightness);
   UpdateLEDs = true;
-  sender->setBrightness(brightness); // report brightness back to the Home Assistant
+  sender->setBrightness(brightness);                            //report brightness back to the Home Assistant
 #ifdef HomeAssistant_SerialEnabled                              //Just a way to measure setup speed, so the performance can be checked
   Serial.println("HA: Change light1 brightness = " + String(brightness));
 #endif //HomeAssistant_SerialEnabled
 }
 void onStateCommand1(bool state, HALight* sender) {
+  if (RGBColor == CRGB(0, 0, 0)) RGBColor = CRGB(255, 255, 255);//Set default color
+  static bool OLDstate = state;
   if (state) {
     LED_Fill(0, TotalLEDs, RGBColor);                           //Change the whole LED strip
+    if (OLDstate != state)
+      RestoreToMode = Mode;
+    //    RestoreToAutoBrightness = AutoBrightness;
     Mode = WIFI;
   } else {
     LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));                      //Change the whole LED strip
-    //Mode = LastMode;
-    //LastMode = -1;
-    Mode = CLOCK;
-    AutoBrightness = true;
+    if (OLDstate != state)
+      Mode = RestoreToMode;
+    //    AutoBrightness = RestoreToAutoBrightness;
   }
+  OLDstate = state;
   UpdateLEDs = true;
   sender->setState(state);                                      //Report state back to the Home Assistant
 #ifdef HomeAssistant_SerialEnabled                              //Just a way to measure setup speed, so the performance can be checked
@@ -44,6 +70,7 @@ void onStateCommand1(bool state, HALight* sender) {
 #endif //HomeAssistant_SerialEnabled
 }
 void onStateCommand2(bool state, HALight* sender) {
+  if (RGBColor == CRGB(0, 0, 0)) RGBColor = CRGB(255, 255, 255);//Set default color
   if (state) {
     LED_Fill(TotalLEDsClock, TotalLEDs - TotalLEDsClock, RGBColor);//Change all NON-Clock LEDs
   } else {
@@ -75,13 +102,19 @@ void onRGBColorCommand2(HALight::RGBColor color, HALight* sender) {
 
 void HaLoop() {
   mqtt.loop();
+  static unsigned long LastTime;
+  if (TickEveryXms(&LastTime, HA_EveryXmsReconnect)) {
+    if (WiFiManager.CheckAndReconnectIfNeeded(false))           //Try to connect to WiFi, but dont start ApMode
+      light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
+  }
 }
 void HaSetup() {
   device.setName(Name);
   device.setSoftwareVersion(HA_deviceSoftwareVersion);
   device.setManufacturer(HA_deviceManufacturer);
   device.setModel(HA_deviceModel);
-  //device.setConfigurationUrl(IpAddress2String(WiFi.localIP()).c_str());
+  String URL = "http://" + IpAddress2String(WiFi.localIP());
+  device.setConfigurationUrl(URL.c_str());
 
   light1.setName(HA_lightName1);
   light1.onStateCommand(onStateCommand1);
@@ -93,10 +126,10 @@ void HaSetup() {
   light2.onBrightnessCommand(onBrightnessCommand);
   light2.onRGBColorCommand(onRGBColorCommand2);
 
+  HAUpdateLED(true);
+
   mqtt.begin(HA_BROKER_ADDR, HA_BROKER_USERNAME.c_str(), HA_BROKER_PASSWORD.c_str());
   HaLoop();
-  light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true); //When booting, inform HA about the light state
-  light2.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true); //When booting, inform HA about the light state
 #ifdef HomeAssistant_SerialEnabled                              //Just a way to measure setup speed, so the performance can be checked
   Serial.println("HA: Informed HA about our pressence");
 #endif //HomeAssistant_SerialEnabled
