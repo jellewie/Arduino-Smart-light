@@ -391,13 +391,19 @@ void handle_Info() {
   POT L = LIGHT.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
   byte MicRaw = analogRead(PAO_MIC) / 4;
+  byte AudioRawLowest = 255;
+  byte AudioRawHighest = 0;
   byte AudioLowest = 255;
   byte AudioHighest = 0;
-  for (byte i = 0; i < AudioLog_Amount ; i++) {
-    if (AudioRawLog[i] < AudioLowest)
-      AudioLowest = AudioRawLog[i];
-    if (AudioRawLog[i] > AudioHighest)
-      AudioHighest = AudioRawLog[i];
+  for (byte i = 0; i < AudioLog_Amount; i++) {
+    if (AudioRawLog[i] < AudioRawLowest)
+      AudioRawLowest = AudioRawLog[i];
+    if (AudioRawLog[i] > AudioRawHighest)
+      AudioRawHighest = AudioRawLog[i];
+    if (AudioLog[i] < AudioLowest)
+      AudioLowest = AudioLog[i];
+    if (AudioLog[i] > AudioHighest)
+      AudioHighest = AudioLog[i];
   }
   char TimeMessage[100] = {0};
   strftime(TimeMessage, sizeof(TimeMessage), "%Ec zone %Z %z ", &timeinfo); //https://cplusplus.com/reference/ctime/strftime/
@@ -419,9 +425,10 @@ void handle_Info() {
   Message += "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
-  Message += "\nAUDIO LOG RAW: L=" + String(AudioLowest) + " A=" + String(D.Value)  + " H=" + String(AudioHighest) + "\n";
+  Message += "\nAUDIO LOG RAW: L=" + String(AudioRawLowest) + " H=" + String(AudioRawHighest) + " A=" + String(D.Value) + "\n"
+             "AUDIO LOG: L=" + String(AudioLowest) +  " H=" + String(AudioHighest) + "\n";
   for (byte i = 0; i < AudioLog_Amount ; i++)
-    Message += String(i) + " = " + String(AudioRawLog[i]) + "\n";
+    Message += String(i) + " R= " + String(AudioRawLog[i]) + " = " + String(AudioLog[i]) + "\n";
   server.send(200, "text/plain", Message);
 #ifdef Server_SerialEnabled
   Serial.println("SV: 200 Info" + Message);

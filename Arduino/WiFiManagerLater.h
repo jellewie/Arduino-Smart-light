@@ -116,9 +116,12 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 42: {
         int Val = Value.toInt();
         if (Val < 0 or Val > 86400000)                        return false;
-        HA_EveryXmsReconnect = Val;                           return true;
+        HAEveryXmsReconnect = Val;                            return true;
       } break;
-
+    case 43: {
+        if (not StringIsDigit(Value))                         return false;  //No number given
+        EveryXmsMic              = Value.toInt();             return true;
+      } break;
     //==============================
     //Tasks
     //==============================
@@ -172,7 +175,8 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 39:  return HA_BROKER_USERNAME;                                                        break;
     case 40:  return HA_BROKER_PASSWORD;                                                        break;
     case 41:  return Convert ? IsTrueToString(HA_MQTT_Enabled_On_Boot) : String(HA_MQTT_Enabled_On_Boot); break;
-    case 42:  return String(HA_EveryXmsReconnect);                                              break;
+    case 42:  return String(HAEveryXmsReconnect);                                              break;
+    case 43:  return String(EveryXmsMic);                                                    break;
     //==============================
     //Tasks
     //==============================

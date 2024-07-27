@@ -188,52 +188,6 @@ void UpdateColor(bool ForceUpdate) {
     }
   }
 }
-byte ConvertAudioVolume(byte Average, byte Reading) {           //Just do the math and convert it to the number we use
-  float Answer = abs(Reading - Average) ;
-  Answer = round(Answer * AudioMultiplier);                     //Round to nearest instead of just down
-  //Just return an average of this value
-  static byte Point[255];                                       //Set this to byte size, so the user can adjust it with SOFT_SETTING
-  static byte Counter = 0;
-  static int Total = 0;
-  Total -= Point[Counter];   //Remove old measurement
-  Point[Counter] = Answer;
-  Total += Point[Counter];   //Add new measurement
-  byte AverageValue = Total / AmountAudioAverageEnd;
-  Counter = Counter + 1;
-  if (Counter >= AmountAudioAverageEnd) Counter  = 0;
-#ifdef Audio_SerialEnabled
-  Serial.println("AU: avg=" + String(Average) + " raw=" + String(Reading) + " ans=" + String(byte(round(Answer))) + " avg(ans)=" + String(AverageValue));
-#endif //Audio_SerialEnabled
-  return constrain(AverageValue + AudioAddition, MinAudioBrightness, MaxAudioBrightness);
-}
-void LogAudio(byte Value) {                                     //Save the last measurements in a log, so we can debug log it to the user
-  static int i = 0;
-  AudioRawLog[i] = Value;
-  i = i + 1;
-  if (i > AudioLog_Amount) i = 0;
-}
-byte GetAutoVolume() {                                          //Take a new measurement and return the convertion
-  byte Value = analogRead(PAO_MIC) / 4;
-  LogAudio(Value);
-  static byte SensorValue = 0;
-  EVERY_N_MILLISECONDS(200) {                                   //Delay the amount where the average is based on, this results in 16*200ms= the last 3.2 seconds
-    POT D = AUDIO.ReadStable(PotMinChange, PotStick, StableAnalog_AverageAmount);
-    SensorValue = D.Value;
-  }
-  byte Answer = ConvertAudioVolume(SensorValue, Value);
-  return Answer;
-}
-void UpdateAudio(bool ForceUpdate) {
-  static byte oldBrightness = 0;
-  if (!AudioLink) return;                                       //If AudioLink is disabled, dont continue
-  if (digitalRead(PAI_DisablePOTs) == HIGH) return;             //If the POTs are enabled, return
-  byte Brightness = GetAutoVolume();
-  if (oldBrightness != Brightness) {
-    oldBrightness = Brightness;
-    FastLED.setBrightness(Brightness);
-    UpdateLEDs = true;
-  }
-}
 byte GetAutoBrightness(byte Value) {
   float Answer = AutoBrightnessP * (Value - AutoBrightnessN) - AutoBrightnessO;
   Answer = round(Answer);                                       //Round to nearest instead of down
@@ -337,12 +291,68 @@ void ShowIP() {
   MyDelay(30000, 500, true);
   ShowIPnumber(MyIp[3]);
 }
-bool TickEveryXms(unsigned long * _LastTime, unsigned long _Delay) {
-  static unsigned long _Middle = -1;
-  if (_Middle == -1) _Middle = _Middle / 2;
-  if (millis() - (*_LastTime + _Delay + 1) < _Middle) {
-    *_LastTime = millis();
+bool TickEveryXms(unsigned long* _LastTime, unsigned long _Delay) {
+  unsigned long currentMillis = millis();
+  if (currentMillis - *_LastTime >= _Delay) {
+    *_LastTime = currentMillis;
     return true;
   }
   return false;
+}
+byte ConvertAudioVolume(byte Average, byte Reading) {           //Just do the math and convert it to the number we use
+  float Answer = abs(Reading - Average) ;
+  Answer = round(Answer * AudioMultiplier);                     //Round to nearest instead of just down
+  //Just return an average of this value
+  static byte Point[255];                                       //Set this to byte size, so the user can adjust it with SOFT_SETTING
+  static byte Counter = 0;
+  static int Total = 0;
+  Total -= Point[Counter];   //Remove old measurement
+  Point[Counter] = Answer;
+  Total += Point[Counter];   //Add new measurement
+  byte AverageValue = Total / AmountAudioAverageEnd;
+  Counter = Counter + 1;
+  if (Counter >= AmountAudioAverageEnd) Counter  = 0;
+#ifdef Audio_SerialEnabled
+  Serial.println("AU: avg=" + String(Average) + " raw=" + String(Reading) + " ans=" + String(byte(round(Answer))) + " avg(ans)=" + String(AverageValue));
+#endif //Audio_SerialEnabled
+  return constrain(AverageValue + AudioAddition, MinAudioBrightness, MaxAudioBrightness);
+}
+
+void LogAudio(byte RawValue, byte Value) {                      //Save the last measurements in a log, so we can debug log it to the user
+  static int i = 0;
+  AudioRawLog[i] = RawValue;
+  AudioLog[i] = Value;
+  i = i + 1;
+  if (i > AudioLog_Amount) i = 0;
+}
+byte GetAutoVolume() {                                          //Take a new measurement and return the convertion
+  byte Value = analogRead(PAO_MIC) / 4;
+  static byte SensorValue = 0;
+  static byte OldAnswer = 0;
+  byte Answer = 0;
+  Answer = OldAnswer;
+  static unsigned long LastTimeMic;
+  if (TickEveryXms(&LastTimeMic, EveryXmsMic)) {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    POT D = AUDIO.ReadStable(1, 1, StableAnalog_AverageAmount); //Change, stick
+    SensorValue = D.Value;
+    byte Answer = ConvertAudioVolume(SensorValue, Value);
+    OldAnswer = Answer;
+    LogAudio(Value, Answer);
+#ifdef Audio_SerialEnabled
+    Serial.println("v=" + String(Value) + "a=" + String(Answer));
+#endif //Audio_SerialEnabled
+  }
+  return Answer;
+}
+void UpdateAudio(bool ForceUpdate) {
+  static byte oldBrightness = 0;
+  if (!AudioLink) return;                                       //If AudioLink is disabled, dont continue
+  if (digitalRead(PAI_DisablePOTs) == HIGH) return;             //If the POTs are enabled, return
+  byte Brightness = GetAutoVolume();
+  if (oldBrightness != Brightness) {
+    oldBrightness = Brightness;
+    FastLED.setBrightness(Brightness);
+    UpdateLEDs = true;
+  }
 }

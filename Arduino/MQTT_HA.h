@@ -7,7 +7,7 @@ String HA_BROKER_USERNAME = "";
 String HA_BROKER_PASSWORD = "";
 byte RestoreToMode = Mode;
 bool RestoreToAutoBrightness = AutoBrightness;
-unsigned long HA_EveryXmsReconnect = 60 * 60 * 1000;            //On which interfall to check if WiFi still works
+unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;            //On which interfall to check if WiFi still works
 
 #define HA_deviceSoftwareVersion "1.0"                          //Device info - Firmware:
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
@@ -103,7 +103,7 @@ void onRGBColorCommand2(HALight::RGBColor color, HALight* sender) {
 void HaLoop() {
   mqtt.loop();
   static unsigned long LastTime;
-  if (TickEveryXms(&LastTime, HA_EveryXmsReconnect)) {
+  if (TickEveryXms(&LastTime, HAEveryXmsReconnect)) {
     if (WiFiManager.CheckAndReconnectIfNeeded(false))           //Try to connect to WiFi, but dont start ApMode
       light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
   }

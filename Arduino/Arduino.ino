@@ -65,8 +65,10 @@ int AudioAddition = 0;                                          //SOFT_SETTING H
 byte MinAudioBrightness = 1;                                    //SOFT_SETTING Minimum amount of brighness that will be applied with Audiolink
 byte MaxAudioBrightness = 255;                                  //SOFT_SETTING Maximum amount of brighness that can be applied with Audiolink
 byte AmountAudioAverageEnd = 6;                                 //SOFT_SETTING howmuch to smooth the LEDs responoce (Its after the math)(Max 64! recomended to keep low like 3-5)
-byte AudioRawLog[255];                                          //Used to log audio sensory data in
+byte AudioRawLog[255];                                          //Used to log raw audio sensory data in
 const byte AudioLog_Amount = sizeof(AudioRawLog) / sizeof(AudioRawLog[0]);//Why filling this in if we can automate that? :)
+byte AudioLog[AudioLog_Amount];                                 //Used to log audio sensory data in
+int EveryXmsMic = 200;                                          //SOFT_SETTING Pulling rate of MIC, Delay the amount where the average is based on, this results in 16*200ms= the last 3.2 seconds
 bool UpdateLEDs;                                                //If we need to physically update the LEDs
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
