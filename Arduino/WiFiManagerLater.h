@@ -173,7 +173,16 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 37:  return String(AmountAudioAverageEnd);                                             break;
     case 38:  return IpAddress2String(HA_BROKER_ADDR);                                          break;
     case 39:  return HA_BROKER_USERNAME;                                                        break;
-    case 40:  return HA_BROKER_PASSWORD;                                                        break;
+    case 40: {
+        String Return_Value = "";
+        if (Safe)                                                 //If's it's safe to return password.
+          Return_Value += String(HA_BROKER_PASSWORD);
+        else {
+          for (byte i = 0; i < String(HA_BROKER_PASSWORD).length(); i++)
+            Return_Value += "*";
+        }
+        return Return_Value;
+      }
     case 41:  return Convert ? IsTrueToString(HA_MQTT_Enabled_On_Boot) : String(HA_MQTT_Enabled_On_Boot); break;
     case 42:  return String(HAEveryXmsReconnect);                                              break;
     case 43:  return String(EveryXmsMic);                                                    break;
