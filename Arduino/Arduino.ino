@@ -68,7 +68,7 @@ byte AmountAudioAverageEnd = 6;                                 //SOFT_SETTING h
 byte AudioRawLog[255];                                          //Used to log raw audio sensory data in
 const byte AudioLog_Amount = sizeof(AudioRawLog) / sizeof(AudioRawLog[0]);//Why filling this in if we can automate that? :)
 byte AudioLog[AudioLog_Amount];                                 //Used to log audio sensory data in
-int EveryXmsMic = 200;                                          //SOFT_SETTING Pulling rate of MIC, Delay the amount where the average is based on, this results in 16*200ms= the last 3.2 seconds
+int EveryXmsMic = 10;                                           //SOFT_SETTING Pulling rate of MIC, Delay the amount where the average is based on, this results in 16*10ms = the last 0.16 seconds
 bool UpdateLEDs;                                                //If we need to physically update the LEDs
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
