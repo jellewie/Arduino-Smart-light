@@ -7,7 +7,7 @@ String HA_BROKER_USERNAME = "";
 String HA_BROKER_PASSWORD = "";
 byte RestoreToMode = Mode;
 bool RestoreToAutoBrightness = AutoBrightness;
-unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;            //On which interfall to check if WiFi still works
+unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which interfall to check if WiFi still works
 
 #define HA_deviceSoftwareVersion "1.0"                          //Device info - Firmware:
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
@@ -99,7 +99,7 @@ void onRGBColorCommand2(HALight::RGBColor color, HALight* sender) {
   Serial.println("HA: Change light2 color = " + String(color.red) + "," + String(color.green) + "," + String(color.blue));
 #endif //HomeAssistant_SerialEnabled
 }
-
+extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
   mqtt.loop();
   static unsigned long LastTime;
