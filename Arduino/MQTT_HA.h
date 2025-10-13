@@ -106,15 +106,19 @@ void HaLoop() {
   if (TickEveryXms(&LastTime, HAEveryXmsReconnect)) {
     if (WiFiManager.CheckAndReconnectIfNeeded(false))           //Try to connect to WiFi, but dont start ApMode
       light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
+    HaSetup();
   }
 }
-void HaSetup() {
+void HaSetup(bool LoopAfter) {
   device.setName(Name);
   device.setSoftwareVersion(HA_deviceSoftwareVersion);
   device.setManufacturer(HA_deviceManufacturer);
   device.setModel(HA_deviceModel);
-  String URL = "http://" + IpAddress2String(WiFi.localIP());
-  device.setConfigurationUrl(URL.c_str());
+  //String URL = "http://" + IpAddress2String(WiFi.localIP());
+  //static String URL = "http://192.168.50.205";
+  //static char configUrl[30];  // Adjust size as needed, large enough to hold the URL
+  //URL.toCharArray(configUrl, sizeof(configUrl));
+  //device.setConfigurationUrl(configUrl);
 
   light1.setName(HA_lightName1);
   light1.onStateCommand(onStateCommand1);
@@ -129,7 +133,8 @@ void HaSetup() {
   HAUpdateLED(true);
 
   mqtt.begin(HA_BROKER_ADDR, HA_BROKER_USERNAME.c_str(), HA_BROKER_PASSWORD.c_str());
-  HaLoop();
+  if (LoopAfter)
+    HaLoop();
 #ifdef HomeAssistant_SerialEnabled                              //Just a way to measure setup speed, so the performance can be checked
   Serial.println("HA: Informed HA about our pressence");
 #endif //HomeAssistant_SerialEnabled
