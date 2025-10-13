@@ -83,6 +83,7 @@ extern byte TotalAnimations;                                    //^ Required for
 extern void StartAnimation(byte ID, int Time);                  //^ Required for Clock.h
 struct tm timeinfo;                                             //https://www.cplusplus.com/reference/ctime/tm/ (Blobal here to make accesable for debug '/info' page)
 
+#include <WiFi.h>
 #include "WiFiManagerBefore.h"                                  //Define what options to use/include or to hook into WiFiManager
 #include "WiFiManager/WiFiManager.h"                            //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed      https://github.com/jellewie/Arduino-WiFiManager
 
@@ -103,7 +104,7 @@ StableAnalog LIGHT = StableAnalog(PAI_LIGHT);
 StableAnalog AUDIO = StableAnalog(PAO_MIC);
 
 extern void HAUpdateLED(bool Force = false);                    //We declair this funcion in "MQTT_HA.h"
-#include "Functions.h"
+#include "functions.h"
 #include "MQTT_HA.h"
 #include "time.h"                                               //We need this for the clock function to get the time (Time library)
 #include "Task.h"
