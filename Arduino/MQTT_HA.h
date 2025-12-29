@@ -21,6 +21,7 @@ HALight HAlight1("smart-clock-all", HALight::BrightnessFeature | HALight::RGBFea
 HALight HAlight2("smart-clock-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 HASensorNumber HALDR("smart-clock-ldr");                        //unique SensorNumberID used to send the LDR data to HA
 HASelect HAMode("smart-clock-Mode");                            //Dropdown menu to select mode
+HASelect HABootMode("smart-clock-BootMode");                    //Dropdown menu to select bootmode
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
@@ -157,6 +158,10 @@ void HaSetup(bool LoopAfter) {
   HAMode.setName("Mode");
   HAMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
   HAMode.onCommand(onModeCommand);
+
+  HABootMode.setName("BootMode");
+  HABootMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HABootMode.onCommand(onBootModeCommand);
 
   HAUpdateLED(true);
 
