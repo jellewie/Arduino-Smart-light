@@ -22,6 +22,7 @@ HALight HAlight2("smart-clock-Outer", HALight::BrightnessFeature | HALight::RGBF
 HASensorNumber HALDR("smart-clock-ldr");                        //unique SensorNumberID used to send the LDR data to HA
 HASelect HAMode("smart-clock-Mode");                            //Dropdown menu to select mode
 HASelect HABootMode("smart-clock-BootMode");                    //Dropdown menu to select bootmode
+HASelect HADoublepressMode("smart-clock-doublepressmode");     //Dropdown menu to select doublepress mode
 HASwitch HAAutoBrightness("smart-clock-autobrightness");
 HASwitch HAAnalogHours("smart-clock-analoghours");
 HASwitch HAClockAnalog("smart-clock-analogclock");
@@ -112,6 +113,13 @@ void onBootModeCommand(int8_t index, HASelect* sender) {
   Mode = index;
   sender->setState(index);                                      //report the selected option back to the HA
 }
+void onDoubplepressModeCommand(int8_t index, HASelect* sender) {
+  if (index < 0 or index >= Modes_Amount)                       //Sanity check
+    return;
+  LastMode = -1;                                                //Make sure we init the new mode
+  Mode = index;
+  sender->setState(index);                                      //report the selected option back to the HA
+}
 void onAutoBrightnessCommand(bool state, HASwitch* sender){
     AutoBrightness = state;
     if (AutoBrightness) AudioLink = false;
@@ -150,6 +158,11 @@ void HaLoop() {
   if (HALastBootMode != BootMode) {                             //If the HA mode is not the same as the current mode
     HALastBootMode = BootMode;
     HABootMode.setState(BootMode);
+  }
+  static int8_t HALastDoublePressMode = -1;
+  if (HALastDoublePressMode != DoublePressMode) {               //If the HA mode is not the same as the current mode
+    HALastDoublePressMode = DoublePressMode;
+    HADoublepressMode.setState(DoublePressMode);
   }
   static int8_t HALastAutoBrightness = !AutoBrightness;
   if (HALastAutoBrightness != AutoBrightness) {                 //If the HA mode is not the same as the current mode
@@ -199,6 +212,10 @@ void HaSetup(bool LoopAfter) {
   HABootMode.setName("BootMode");
   HABootMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
   HABootMode.onCommand(onBootModeCommand);
+
+  HADoublepressMode.setName("DoubplepressMode");
+  HADoublepressMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HADoublepressMode.onCommand(onDoubplepressModeCommand); 
 
   HAAutoBrightness.setName("Auto Brightness");
   HAAutoBrightness.onCommand(onAutoBrightnessCommand);
