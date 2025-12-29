@@ -15,7 +15,7 @@ unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which inter
 #define HA_lightName2 "Outer"                                   //Entity ID
 #define HA_ModeName "Mode"                                      //Entity ID
 #define HA_LDRName "Light"                                      //Entity ID
-#define HA_EveryXmsUpdate 1000                             //How often to send the LDR sensor value to HA
+#define HA_EveryXmsUpdate 60 * 1000                             //How often to send the LDR sensor value to HA
 byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};
 WiFiClient client;
 HADevice device(mac, sizeof(mac));
