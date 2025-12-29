@@ -121,13 +121,18 @@ void HaLoop() {
   }
   static unsigned long LastTime2;
   if (TickEveryXms(&LastTime2, HA_EveryXmsUpdate)) {
-    int16_t ReadHALDR = 4096 - (analogRead(PAI_LIGHT) * 4);       //Inverse so dark=0 and bright=4096
+    int16_t ReadHALDR = 4096 - (analogRead(PAI_LIGHT) * 4);     //Inverse so dark=0 and bright=4096
     HALDR.setValue(ReadHALDR);                
   }
   static int8_t HALastMode = -1;
   if (HALastMode != Mode) {                                     //If the HA mode is not the same as the current mode
     HALastMode = Mode;
     HAMode.setState(Mode);
+  }
+  static int8_t HALastBootMode = -1;
+  if (HALastBootMode != BootMode) {                             //If the HA mode is not the same as the current mode
+    HALastBootMode = BootMode;
+    HABootMode.setState(BootMode);
   }
 }
 void HaSetup(bool LoopAfter) {
