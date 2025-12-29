@@ -14,12 +14,15 @@ unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which inter
 #define HA_lightName1 "All"                                     //Entity ID
 #define HA_lightName2 "Outer"                                   //Entity ID
 #define HA_ModeName "Mode"                                      //Entity ID
+#define HA_LDRName "Light"                                      //Entity ID
+#define HA_EveryXmsUpdate 1000                             //How often to send the LDR sensor value to HA
 byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};
 WiFiClient client;
 HADevice device(mac, sizeof(mac));
 HAMqtt mqtt(client, device);
 HALight light1("Smart-all", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 HALight light2("Smart-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
+HASensorNumber numbersensor("smart-clock-ldr");                 //unique SensorNumberID used to send the LDR data to HA
 HASelect mySelect("Mode");                                      //Dropdown menu to select mode
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
@@ -111,6 +114,11 @@ void HaLoop() {
        light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
     }
   }
+  static unsigned long LastTime2;
+  if (TickEveryXms(&LastTime2, HA_EveryXmsUpdate)) {
+    int16_t ReadLDR = 4096 - (analogRead(PAI_LIGHT) * 4);       //Inverse so dark=0 and bright=4096
+    numbersensor.setValue(ReadLDR);                
+  }
   static int8_t HALastMode = -1;
   if (HALastMode != Mode) {                                     //If the HA mode is not the same as the current mode
     HALastMode = Mode;
@@ -137,6 +145,10 @@ void HaSetup(bool LoopAfter) {
   light2.onStateCommand(onStateCommand2);
   light2.onBrightnessCommand(onBrightnessCommand);
   light2.onRGBColorCommand(onRGBColorCommand2);
+
+  numbersensor.setName(HA_LDRName);
+  numbersensor.setUnitOfMeasurement("lx");
+  numbersensor.setIcon("mdi:brightness-5");
 
   mySelect.setName(HA_ModeName);
   mySelect.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
