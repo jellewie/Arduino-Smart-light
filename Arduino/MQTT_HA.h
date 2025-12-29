@@ -11,31 +11,28 @@ unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which inter
 #define HA_deviceSoftwareVersion "1.0"                          //Device info - Firmware:
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
 #define HA_deviceModel "Smart-light"                            //Model
-#define HA_lightName1 "All"                                     //Entity ID
-#define HA_lightName2 "Outer"                                   //Entity ID
-#define HA_ModeName "Mode"                                      //Entity ID
-#define HA_LDRName "Light"                                      //Entity ID
-#define HA_EveryXmsUpdate 60 * 1000                             //How often to send the LDR sensor value to HA
+#define HA_EveryXmsUpdate 60 * 1000                             //How often to send updates to HA
 byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};
 WiFiClient client;
 HADevice device(mac, sizeof(mac));
 HAMqtt mqtt(client, device);
-HALight light1("Smart-all", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
-HALight light2("Smart-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
-HASensorNumber numbersensor("smart-clock-ldr");                 //unique SensorNumberID used to send the LDR data to HA
-HASelect mySelect("Mode");                                      //Dropdown menu to select mode
+
+HALight HAlight1("smart-clock-all", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
+HALight HAlight2("smart-clock-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
+HASensorNumber HALDR("smart-clock-ldr");                        //unique SensorNumberID used to send the LDR data to HA
+HASelect HAMode("smart-clock-Mode");                            //Dropdown menu to select mode
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
 }
 void HAUpdateLED(bool Force) {
   if (!HA_MQTT_Enabled) return;                                 //Don't update if we don't need to
-  light1.setCurrentBrightness(FastLED.getBrightness());
-  light1.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
-  light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
-  light2.setCurrentBrightness(FastLED.getBrightness());
-  light2.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
-  light2.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
+  HAlight1.setCurrentBrightness(FastLED.getBrightness());
+  HAlight1.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
+  HAlight1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
+  HAlight2.setCurrentBrightness(FastLED.getBrightness());
+  HAlight2.setCurrentRGBColor(HAConvertColor(LEDs[TotalLEDs - 1]));
+  HAlight2.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, Force);
 }
 void onBrightnessCommand(uint8_t brightness, HALight* sender) {
   if (brightness == 0)
@@ -97,7 +94,14 @@ void onRGBColorCommand2(HALight::RGBColor color, HALight* sender) {
   Serial.println("HA: Change light2 color = " + String(color.red) + "," + String(color.green) + "," + String(color.blue));
 #endif //HomeAssistant_SerialEnabled
 }
-void onSelectCommand(int8_t index, HASelect* sender) {
+void onModeCommand(int8_t index, HASelect* sender) {
+  if (index < 0 or index >= Modes_Amount)                        //Sanity check
+    return;
+  LastMode = -1;                                                //Make sure we init the new mode
+  Mode = index;
+  sender->setState(index);                                      //report the selected option back to the HA
+}
+void onBootModeCommand(int8_t index, HASelect* sender) {
   if (index < 0 or index >= Modes_Amount)                        //Sanity check
     return;
   LastMode = -1;                                                //Make sure we init the new mode
@@ -111,18 +115,18 @@ void HaLoop() {
   if (TickEveryXms(&LastTime, HAEveryXmsReconnect)) {
     if (WiFiManager.CheckAndReconnectIfNeeded(false)){          //Try to connect to WiFi, but dont start ApMode
        HaSetup();
-       light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
+       HAlight1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
     }
   }
   static unsigned long LastTime2;
   if (TickEveryXms(&LastTime2, HA_EveryXmsUpdate)) {
-    int16_t ReadLDR = 4096 - (analogRead(PAI_LIGHT) * 4);       //Inverse so dark=0 and bright=4096
-    numbersensor.setValue(ReadLDR);                
+    int16_t ReadHALDR = 4096 - (analogRead(PAI_LIGHT) * 4);       //Inverse so dark=0 and bright=4096
+    HALDR.setValue(ReadHALDR);                
   }
   static int8_t HALastMode = -1;
   if (HALastMode != Mode) {                                     //If the HA mode is not the same as the current mode
     HALastMode = Mode;
-    mySelect.setState(Mode);
+    HAMode.setState(Mode);
   }
 }
 void HaSetup(bool LoopAfter) {
@@ -136,23 +140,23 @@ void HaSetup(bool LoopAfter) {
   //URL.toCharArray(configUrl, sizeof(configUrl));
   //device.setConfigurationUrl(configUrl);
 
-  light1.setName(HA_lightName1);
-  light1.onStateCommand(onStateCommand1);
-  light1.onBrightnessCommand(onBrightnessCommand);
-  light1.onRGBColorCommand(onRGBColorCommand1);
+  HAlight1.setName("All");
+  HAlight1.onStateCommand(onStateCommand1);
+  HAlight1.onBrightnessCommand(onBrightnessCommand);
+  HAlight1.onRGBColorCommand(onRGBColorCommand1);
 
-  light2.setName(HA_lightName2);
-  light2.onStateCommand(onStateCommand2);
-  light2.onBrightnessCommand(onBrightnessCommand);
-  light2.onRGBColorCommand(onRGBColorCommand2);
+  HAlight2.setName("Outer");
+  HAlight2.onStateCommand(onStateCommand2);
+  HAlight2.onBrightnessCommand(onBrightnessCommand);
+  HAlight2.onRGBColorCommand(onRGBColorCommand2);
 
-  numbersensor.setName(HA_LDRName);
-  numbersensor.setUnitOfMeasurement("lx");
-  numbersensor.setIcon("mdi:brightness-5");
+  HALDR.setName("Light");
+  HALDR.setUnitOfMeasurement("lx");
+  HALDR.setIcon("mdi:brightness-5");
 
-  mySelect.setName(HA_ModeName);
-  mySelect.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
-  mySelect.onCommand(onSelectCommand);
+  HAMode.setName("Mode");
+  HAMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HAMode.onCommand(onModeCommand);
 
   HAUpdateLED(true);
 
