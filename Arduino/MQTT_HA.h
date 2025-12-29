@@ -51,13 +51,11 @@ void onStateCommand1(bool state, HALight* sender) {
     LED_Fill(0, TotalLEDs, RGBColor);                           //Change the whole LED strip
     if (OLDstate != state)
       RestoreToMode = Mode;
-    //    RestoreToAutoBrightness = AutoBrightness;
     Mode = WIFI;
   } else {
     LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));                      //Change the whole LED strip
     if (OLDstate != state)
       Mode = RestoreToMode;
-    //    AutoBrightness = RestoreToAutoBrightness;
   }
   OLDstate = state;
   UpdateLEDs = true;
@@ -108,9 +106,11 @@ void HaLoop() {
   mqtt.loop();
   static unsigned long LastTime;
   if (TickEveryXms(&LastTime, HAEveryXmsReconnect)) {
-    if (WiFiManager.CheckAndReconnectIfNeeded(false))           //Try to connect to WiFi, but dont start ApMode
-      light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
-    HaSetup();
+    if (WiFiManager.CheckAndReconnectIfNeeded(false)){          //Try to connect to WiFi, but dont start ApMode
+       HaSetup();
+       light1.setState(LEDs[TotalLEDs - 1] == CRGB(0, 0, 0) ? false : true, true);
+    }
+  }
   static int8_t HALastMode = -1;
   if (HALastMode != Mode) {                                     //If the HA mode is not the same as the current mode
     HALastMode = Mode;
