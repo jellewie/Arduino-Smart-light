@@ -22,6 +22,7 @@ HALight HAlight2("smart-clock-Outer", HALight::BrightnessFeature | HALight::RGBF
 HASensorNumber HALDR("smart-clock-ldr");                        //unique SensorNumberID used to send the LDR data to HA
 HASelect HAMode("smart-clock-Mode");                            //Dropdown menu to select mode
 HASelect HABootMode("smart-clock-BootMode");                    //Dropdown menu to select bootmode
+HASwitch HAAutoBrightness("smart-clock-autobrightness");
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
@@ -96,18 +97,24 @@ void onRGBColorCommand2(HALight::RGBColor color, HALight* sender) {
 #endif //HomeAssistant_SerialEnabled
 }
 void onModeCommand(int8_t index, HASelect* sender) {
-  if (index < 0 or index >= Modes_Amount)                        //Sanity check
+  if (index < 0 or index >= Modes_Amount)                       //Sanity check
     return;
   LastMode = -1;                                                //Make sure we init the new mode
   Mode = index;
   sender->setState(index);                                      //report the selected option back to the HA
 }
 void onBootModeCommand(int8_t index, HASelect* sender) {
-  if (index < 0 or index >= Modes_Amount)                        //Sanity check
+  if (index < 0 or index >= Modes_Amount)                       //Sanity check
     return;
   LastMode = -1;                                                //Make sure we init the new mode
   Mode = index;
   sender->setState(index);                                      //report the selected option back to the HA
+}
+void onAutoBrightnessCommand(bool state, HASwitch* sender){
+    AutoBrightness = state;
+    if (AutoBrightness) AudioLink = false;
+    UpdateBrightness(true);
+    sender->setState(state); // report state back to the Home Assistant
 }
 extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
@@ -133,6 +140,11 @@ void HaLoop() {
   if (HALastBootMode != BootMode) {                             //If the HA mode is not the same as the current mode
     HALastBootMode = BootMode;
     HABootMode.setState(BootMode);
+  }
+  static int8_t HALastAutoBrightness = !AutoBrightness;
+  if (HALastAutoBrightness != AutoBrightness) {                 //If the HA mode is not the same as the current mode
+    HALastAutoBrightness = AutoBrightness;
+    HAAutoBrightness.setState(true);
   }
 }
 void HaSetup(bool LoopAfter) {
@@ -167,6 +179,9 @@ void HaSetup(bool LoopAfter) {
   HABootMode.setName("BootMode");
   HABootMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
   HABootMode.onCommand(onBootModeCommand);
+
+  HAAutoBrightness.setName("Auto Brightness");
+  HAAutoBrightness.onCommand(onAutoBrightnessCommand);
 
   HAUpdateLED(true);
 
