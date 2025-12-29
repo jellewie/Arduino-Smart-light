@@ -21,12 +21,8 @@ HAMqtt mqtt(client, device);
 HALight light1("Smart-all", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 HALight light2("Smart-Outer", HALight::BrightnessFeature | HALight::RGBFeature); //unique LighID
 
-HALight::RGBColor HAConvertColor(CRGB in) {
-  HALight::RGBColor returnValue;
-  returnValue.red = in[0];
-  returnValue.green = in[1];
-  returnValue.blue = in[2];
-  return returnValue;
+HALight::RGBColor HAConvertColor(const CRGB& in) {
+  return HALight::RGBColor(in[0], in[1], in[2]);
 }
 void HAUpdateLED(bool Force) {
   if (!HA_MQTT_Enabled) return;                                 //Don't update if we don't need to
