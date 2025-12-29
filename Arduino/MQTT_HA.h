@@ -27,6 +27,7 @@ HASwitch HAAutoBrightness("smart-clock-autobrightness");
 HASwitch HAAnalogHours("smart-clock-analoghours");
 HASwitch HAClockAnalog("smart-clock-analogclock");
 HANumber HAHourlyAnimation("smart-clock-hourlyanimation");
+HANumber HAHourlyLines("smart-clock-hourlylines");
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
@@ -141,7 +142,15 @@ void onHourlyAnimationSCommand(HANumeric number, HANumber* sender){
   } else {
     HourlyAnimationS = number.toInt8();
   }
-  sender->setState(number); // report the selected option back to the HA panel
+  sender->setState(number); 
+}
+void onClockHourLinesCommand(HANumeric number, HANumber* sender){
+  if (!number.isSet()) {
+      // the reset command was send by Home Assistant
+  } else {
+    ClockHourLines = number.toInt8();
+  }
+  sender->setState(number); 
 }
 extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
@@ -193,7 +202,11 @@ void HaLoop() {
     HALastHourlyAnimationS = HourlyAnimationS;
     HAHourlyAnimation.setState(HourlyAnimationS);
   }
-
+  static int8_t HALastClockHourLines = !ClockHourLines;
+  if (HALastClockHourLines != ClockHourLines) {             //If the HA mode is not the same as the current mode
+    HALastClockHourLines = ClockHourLines;
+    HAHourlyLines.setState(ClockHourLines);
+  }
 }
 void HaSetup(bool LoopAfter) {
   device.setName(Name);
@@ -246,6 +259,12 @@ void HaSetup(bool LoopAfter) {
   HAHourlyAnimation.setMin(1);
   HAHourlyAnimation.setMax(255);
   HAHourlyAnimation.setStep(1);
+
+  HAHourlyLines.setName("ClockHourLines");
+  HAHourlyLines.onCommand(onClockHourLinesCommand);
+  HAHourlyLines.setMin(1);
+  HAHourlyLines.setMax(255);
+  HAHourlyLines.setStep(1);
 
   HAUpdateLED(true);
 
