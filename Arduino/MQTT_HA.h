@@ -114,7 +114,7 @@ void onAutoBrightnessCommand(bool state, HASwitch* sender){
     AutoBrightness = state;
     if (AutoBrightness) AudioLink = false;
     UpdateBrightness(true);
-    sender->setState(state); // report state back to the Home Assistant
+    sender->setState(state);
 }
 extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
@@ -144,7 +144,7 @@ void HaLoop() {
   static int8_t HALastAutoBrightness = !AutoBrightness;
   if (HALastAutoBrightness != AutoBrightness) {                 //If the HA mode is not the same as the current mode
     HALastAutoBrightness = AutoBrightness;
-    HAAutoBrightness.setState(true);
+    HAAutoBrightness.setState(AutoBrightness);
   }
 }
 void HaSetup(bool LoopAfter) {
