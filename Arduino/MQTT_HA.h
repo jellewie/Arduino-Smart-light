@@ -26,6 +26,7 @@ HASelect HADoublepressMode("smart-clock-doublepressmode");     //Dropdown menu t
 HASwitch HAAutoBrightness("smart-clock-autobrightness");
 HASwitch HAAnalogHours("smart-clock-analoghours");
 HASwitch HAClockAnalog("smart-clock-analogclock");
+HANumber HAHourlyAnimation("smart-clock-hourlyanimation");
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
@@ -134,6 +135,14 @@ void onClockAnalogCommand(bool state, HASwitch* sender){
     ClockAnalog = state;
     sender->setState(state);
 }
+void onHourlyAnimationSCommand(HANumeric number, HANumber* sender){
+  if (!number.isSet()) {
+      // the reset command was send by Home Assistant
+  } else {
+    HourlyAnimationS = number.toInt8();
+  }
+  sender->setState(number); // report the selected option back to the HA panel
+}
 extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
   mqtt.loop();
@@ -179,6 +188,12 @@ void HaLoop() {
     HALastClockAnalog = ClockAnalog;
     HAClockAnalog.setState(ClockAnalog);
   }
+  static int8_t HALastHourlyAnimationS = !HourlyAnimationS;
+  if (HALastHourlyAnimationS != HourlyAnimationS) {             //If the HA mode is not the same as the current mode
+    HALastHourlyAnimationS = HourlyAnimationS;
+    HAHourlyAnimation.setState(HourlyAnimationS);
+  }
+
 }
 void HaSetup(bool LoopAfter) {
   device.setName(Name);
@@ -225,6 +240,12 @@ void HaSetup(bool LoopAfter) {
 
   HAClockAnalog.setName("Analog clock");
   HAClockAnalog.onCommand(onClockAnalogCommand);
+
+  HAHourlyAnimation.setName("Hourly Animation");
+  HAHourlyAnimation.onCommand(onHourlyAnimationSCommand);
+  HAHourlyAnimation.setMin(1);
+  HAHourlyAnimation.setMax(255);
+  HAHourlyAnimation.setStep(1);
 
   HAUpdateLED(true);
 
