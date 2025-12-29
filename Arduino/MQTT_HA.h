@@ -24,6 +24,7 @@ HASelect HAMode("smart-clock-Mode");                            //Dropdown menu 
 HASelect HABootMode("smart-clock-BootMode");                    //Dropdown menu to select bootmode
 HASwitch HAAutoBrightness("smart-clock-autobrightness");
 HASwitch HAAnalogHours("smart-clock-analoghours");
+HASwitch HAClockAnalog("smart-clock-analogclock");
 
 HALight::RGBColor HAConvertColor(const CRGB& in) {
   return HALight::RGBColor(in[0], in[1], in[2]);
@@ -121,6 +122,10 @@ void onAnalogHoursCommand(bool state, HASwitch* sender){
     ClockHourAnalog = state;
     sender->setState(state);
 }
+void onClockAnalogCommand(bool state, HASwitch* sender){
+    ClockAnalog = state;
+    sender->setState(state);
+}
 extern void HaSetup(bool LoopAfter = false);
 void HaLoop() {
   mqtt.loop();
@@ -155,6 +160,11 @@ void HaLoop() {
   if (HALastClockHourAnalog != ClockHourAnalog) {               //If the HA mode is not the same as the current mode
     HALastClockHourAnalog = ClockHourAnalog;
     HAAnalogHours.setState(ClockHourAnalog);
+  }
+  static int8_t HALastClockAnalog = !ClockAnalog;
+  if (HALastClockAnalog != ClockAnalog) {                       //If the HA mode is not the same as the current mode
+    HALastClockAnalog = ClockAnalog;
+    HAClockAnalog.setState(ClockAnalog);
   }
 }
 void HaSetup(bool LoopAfter) {
@@ -195,6 +205,9 @@ void HaSetup(bool LoopAfter) {
 
   HAAnalogHours.setName("Analog hours");
   HAAnalogHours.onCommand(onAnalogHoursCommand);
+
+  HAClockAnalog.setName("Analog clock");
+  HAClockAnalog.onCommand(onClockAnalogCommand);
 
   HAUpdateLED(true);
 
