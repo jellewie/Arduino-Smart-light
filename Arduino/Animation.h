@@ -6,9 +6,8 @@
                 'Start' Can be used to detect the start of the animation
                 Note that 'UpdateLEDs = true;' must be set to update the leds
   Animation.h:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
-  =====To add it as a new mode (and not just animation)=====
-  Structs.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
-              Also add to 'enum Modes {'
+  Structs.h:    Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
+                Also add to 'enum Modes {'
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */

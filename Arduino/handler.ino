@@ -373,6 +373,7 @@ void handle_UpdateTime() {
       ERRORMSG += "Could not get updated time from the server\n";
   }
   if (TimeUpdated) {                                            //If time has updated
+    TimeSet = true;
     message = "Time has updated from " + message + " to " + String(TimeCurrent.HH) + ":" + String(TimeCurrent.MM) + ":" + String(TimeCurrent.SS);
   } else {
     if (ERRORMSG == "")

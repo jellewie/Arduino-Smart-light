@@ -233,16 +233,23 @@ void HaSetup(bool LoopAfter) {
   HALDR.setUnitOfMeasurement("lx");
   HALDR.setIcon("mdi:brightness-5");
 
+  String AvailableModes;
+  for (size_t i = 0; i < Modes_Amount; i++) {
+    if (i > 0) {
+        AvailableModes += ';';
+    }
+    AvailableModes += ModesString[i];
+  }
   HAMode.setName("Mode");
-  HAMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HAMode.setOptions(AvailableModes.c_str());
   HAMode.onCommand(onModeCommand);
 
   HABootMode.setName("BootMode");
-  HABootMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HABootMode.setOptions(AvailableModes.c_str());
   HABootMode.onCommand(onBootModeCommand);
 
   HADoublepressMode.setName("DoubplepressMode");
-  HADoublepressMode.setOptions("OFF;ON;WIFI;RESET;CLOCK;BLINK;BPM;CONFETTI;FLASH;GLITTER;JUGGLE;MOVE;RAINBOW;SINELON;SINELON2;SMILEY;FLASH2;PACMAN;PHYSICS;STANDALONE"); // use semicolons as separator of options
+  HADoublepressMode.setOptions(AvailableModes.c_str());
   HADoublepressMode.onCommand(onDoubplepressModeCommand); 
 
   HAAutoBrightness.setName("Auto Brightness");

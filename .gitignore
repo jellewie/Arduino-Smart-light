@@ -6,5 +6,7 @@
 *.lck
 ##Output files
 *.bin
+*.elf
+*.map
 ##Local files
 _Local/

@@ -2,6 +2,12 @@
   TODO:  https://github.com/jellewie/Arduino-Smart-light/issues
 
   2023-07-24 PAO_MIC is on the SAME pin as PAI_B, so both can not be active at the same time. We need ADC1 if we also use WiFi
+
+  These are  my verions, you can try your own/newer ones
+  Arduino IDE 2.3.4     https://www.arduino.cc/en/software/
+  DOIT ESP32 DEVKIT V1  https://dl.espressif.com/dl/package_esp32_index.json"
+  FastLED 3.10.3        https://github.com/FastLED/FastLED
+  ArduinoHA 2.10.0      https://github.com/dawidchyrzynski/arduino-home-assistant/tree/main
 */
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
