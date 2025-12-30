@@ -1,13 +1,12 @@
 /* Written by JelleWho https://github.com/jellewie
 
   =====How to add an animation=====
-  Animation.ino:  Add the funtion to 'ShowAnimation::switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
-                  'AnimationRGB' can be used for the user set RGB color
-                  'Start' Can be used to detect the start of the animation
-                  Note that 'UpdateLEDs = true;' must be set to update the leds
-  Animation.ino:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
-  =====To add it as a new mode (and not just animation)=====
-  functions.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
+  Animation.h:  Add the funtion to 'ShowAnimation::switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
+                'AnimationRGB' can be used for the user set RGB color
+                'Start' Can be used to detect the start of the animation
+                Note that 'UpdateLEDs = true;' must be set to update the leds
+  Animation.h:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
+  Structs.h:    Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
                 Also add to 'enum Modes {'
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
