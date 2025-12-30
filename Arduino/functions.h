@@ -15,6 +15,12 @@ int LEDtoPosition(signed int LEDID) {
     LEDID -= TotalLEDsClock;
   return LEDID;
 }
+int DegreesToLedPosition(int degrees) {
+  //Maps values between the range 0-360 to a led position.
+  //Values larger than 360 or smaller than 0 are wrapped around.
+  float ledPos = degrees / 360.0 * TotalLEDsClock;
+  return ((int)round(ledPos) % TotalLEDsClock + TotalLEDsClock) % TotalLEDsClock;
+}
 //==================================================
 //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
 //==================================================

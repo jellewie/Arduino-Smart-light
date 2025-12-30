@@ -303,6 +303,7 @@ void loopLEDS() {
     case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
     case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
     case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
+    case SPINNER:     if (LastMode != Mode) StartAnimation(14, -2); break;
     case STANDALONE:
       if (LastMode != Mode)
         StandAlone = true;

@@ -1,19 +1,19 @@
 /* Written by JelleWho https://github.com/jellewie
 
   =====How to add an animation=====
-  Animation.ino:  Add the funtion to 'ShowAnimation::switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
-                  'AnimationRGB' can be used for the user set RGB color
-                  'Start' Can be used to detect the start of the animation
-                  Note that 'UpdateLEDs = true;' must be set to update the leds
-  Animation.ino:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
+  Animation.h:  Add the funtion to 'ShowAnimation::switch (CurrentAnimation)' as a new case 'case x+1: {the code}  break;'.
+                'AnimationRGB' can be used for the user set RGB color
+                'Start' Can be used to detect the start of the animation
+                Note that 'UpdateLEDs = true;' must be set to update the leds
+  Animation.h:  Update 'TotalAnimations' to be x+1 (Note the SwitchCase counts from 0, not 1)
   =====To add it as a new mode (and not just animation)=====
-  functions.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
-                Also add to 'enum Modes {'
+  Structs.h:  Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
+              Also add to 'enum Modes {'
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
-byte TotalAnimations = 14;
+byte TotalAnimations = 15;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -284,6 +284,34 @@ void ShowAnimation(bool Start) {                                //This would be 
             signed int _Pos = round(Position[i]);
             LED_Add(LEDtoPosition(_Pos), 1, Saved_Color[i], TotalLEDsClock); //Draw the LED
           }
+          UpdateLEDs = true;
+        }
+      } break;
+    case 14: {                                                  //SPINNER
+        // keyframes are in degrees and automatically wrap around once 360 is reached
+        const int keyFrames[] = {0, 0, -2, -6, -12, -20, -28, -33, -36, -37, -9, 67, 139, 209, 275, 339, 400, 458, 513, 565, 614, 660, 703, 743, 779, 811, 840, 864, 884, 900, 918, 941, 969, 1000, 1035, 1068, 1097, 1117, 1131, 1138, 1140, 1137, 1130, 1118, 1103, 1087, 1072, 1060, 1052, 1049, 1050, 1052, 1057, 1062, 1068, 1072, 1075, 1077, 1079, 1080};
+        const int numKeyFrames = sizeof(keyFrames)/sizeof(keyFrames[0]);
+        const int interpolatedFrameCountPerKeyFrame = 4;
+        const int totalFrames = numKeyFrames * interpolatedFrameCountPerKeyFrame;
+        static int frame = 0;
+        EVERY_N_MILLISECONDS(10) {
+          frame++;
+          if (frame >= totalFrames) {
+            frame = 0;
+          }
+          const int keyFrame = frame / interpolatedFrameCountPerKeyFrame;
+          const int currentIndex = keyFrame % numKeyFrames;
+          const int nextIndex = (currentIndex + 1 < numKeyFrames) ? currentIndex + 1 : currentIndex;
+          int frac = frame % interpolatedFrameCountPerKeyFrame;
+          float t = (float)frac / interpolatedFrameCountPerKeyFrame;
+          int ledPos = keyFrames[currentIndex] + (keyFrames[nextIndex] - keyFrames[currentIndex]) * t;
+          LED_Fill(0, TotalLEDsClock, CRGB(0, 0, 0), TotalLEDsClock);
+          int degreesPos = DegreesToLedPosition(ledPos);
+          LED_Fill(LEDtoPosition(degreesPos), 4 * LEDSections, CRGB(255, 255, 255), TotalLEDsClock);
+          LED_Fill(LEDtoPosition(degreesPos - 4 * LEDSections), 2 * LEDSections, CRGB(255, 0, 0), TotalLEDsClock);
+          LED_Fill(LEDtoPosition(degreesPos - 2 * LEDSections), 2 * LEDSections, CRGB(255, 255, 0), TotalLEDsClock);
+          LED_Fill(LEDtoPosition(degreesPos + 4 * LEDSections), 2 * LEDSections, CRGB(0, 255, 255), TotalLEDsClock);
+          LED_Fill(LEDtoPosition(degreesPos + 6 * LEDSections), 2 * LEDSections, CRGB(0, 0, 255), TotalLEDsClock);
           UpdateLEDs = true;
         }
       } break;
