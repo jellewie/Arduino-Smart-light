@@ -9,7 +9,6 @@
   Structs.h:    Add to 'String ModesString[] = {', it needs a uniquee name! and needs to be in CAPS!
                 Also add to 'enum Modes {'
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
-  Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
 byte TotalAnimations = 16;
