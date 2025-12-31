@@ -11,7 +11,7 @@
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
-byte TotalAnimations = 16;
+byte TotalAnimations = 17;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -340,7 +340,42 @@ void ShowAnimation(bool Start) {                                //This would be 
             UpdateLEDs = true;
           }
         } break;
-
+    case 16: {                                                //LOADING
+        static int8_t _Direction = 1;
+        static int8_t _LOADING_A = 0;
+        static int8_t _LOADING_B = 0;
+        if (Start) {
+          SetNewColor();
+          _LOADING_A = random8(0, TotalLEDsClock);
+          _LOADING_B = random8(0, TotalLEDsClock);
+          _Direction = random8(0, 2) ? 1 : -1;   // shared direction
+          UpdateLEDs = true;
+        }
+        #define ANIMATION_LOADING_A 3600 / 60 / LEDSections
+        EVERY_N_MILLISECONDS(ANIMATION_LOADING_A) {
+          _LOADING_A += _Direction;
+          if (_LOADING_A >= TotalLEDsClock) _LOADING_A = 0;
+          if (_LOADING_A < 0) _LOADING_A = TotalLEDsClock - 1;
+          UpdateLEDs = true;
+        }
+        #define ANIMATION_LOADING_B 2000 / 60 / LEDSections
+        EVERY_N_MILLISECONDS(ANIMATION_LOADING_B) {
+          _LOADING_B += _Direction;
+          if (_LOADING_B >= TotalLEDsClock) _LOADING_B = 0;
+          if (_LOADING_B < 0) _LOADING_B = TotalLEDsClock - 1;
+          UpdateLEDs = true;
+        }
+        if (UpdateLEDs) {
+          ClockClear();
+          uint8_t _Length = 0;
+          if (_LOADING_A == _LOADING_B)       //Avoid the rushing error when they are both together, make the swap faster
+            _LOADING_B += _Direction;
+          if (_LOADING_B < _LOADING_A)        //f we need to paint the other side
+            _Length = TotalLEDsClock;
+          _Length = _Length + _LOADING_B - _LOADING_A;
+          LED_Fill(_LOADING_A, _Length, AnimationRGB, TotalLEDsClock);
+        }
+      } break;
     default:
       AnimationCounter = 0;                                     //Stop animation
 #ifdef Animation_SerialEnabled
