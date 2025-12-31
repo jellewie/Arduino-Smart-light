@@ -299,22 +299,6 @@ void loopLEDS() {
         if (AnimationCounter == 0)                              //If no (hourly) animation is playing
           UpdateAndShowClock(true);
       } break;
-    case BLINK:       if (LastMode != Mode) StartAnimation(0,  -2); break;
-    case BPM:         if (LastMode != Mode) StartAnimation(1,  -2); break;
-    case CONFETTI:    if (LastMode != Mode) StartAnimation(2,  -2); break;
-    case FLASH:       if (LastMode != Mode) StartAnimation(3,  -2); break;
-    case GLITTER:     if (LastMode != Mode) StartAnimation(4,  -2); break;
-    case JUGGLE:      if (LastMode != Mode) StartAnimation(5,  -2); break;
-    case MOVE:        if (LastMode != Mode) StartAnimation(6,  -2); break;
-    case RAINBOW:     if (LastMode != Mode) StartAnimation(7,  -2); break;
-    case SINELON:     if (LastMode != Mode) StartAnimation(8,  -2); break;
-    case SINELON2:    if (LastMode != Mode) StartAnimation(9,  -2); break;
-    case SMILEY:      if (LastMode != Mode) StartAnimation(10, -2); break;
-    case FLASH2:      if (LastMode != Mode) StartAnimation(11, -2); break;
-    case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
-    case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
-    case SPINNER:     if (LastMode != Mode) StartAnimation(14, -2); break;
-    case METEOR:      if (LastMode != Mode) StartAnimation(15, -2); break;
     case STANDALONE:
       if (LastMode != Mode)
         StandAlone = true;
@@ -323,12 +307,17 @@ void loopLEDS() {
       StartAnimation(7,  -2);
       break;
     default:
+      uint8_t AnimationID = Mode - 5;
+      if (AnimationID < TotalAnimations){
+        if (LastMode != Mode) StartAnimation(AnimationID, -2); break;
+      } else {
 #ifdef SerialEnabled
-      Serial.println("mode with ID " + String(Mode) + " not found");
+        Serial.println("mode with ID " + String(Mode) + " not found");
 #endif //SerialEnabled
-      Mode = ON;
-      AnimationCounter = 0;                                     //Stop animation
-      break;
+        Mode = ON;
+        AnimationCounter = 0;                                   //Stop animation
+        break;
+      }
   }
   LastMode = Mode;
   UpdateLED();
