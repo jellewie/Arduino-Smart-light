@@ -12,7 +12,7 @@
   Arduino.ino:  Add the caller to 'switch (Mode) {'  as a new case 'case ###: if (LastMode != Mode) StartAnimation(xxx, -2); break;'. where ### is the enum name and xxx ths ID in the 'switch (CurrentAnimation)'
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
-byte TotalAnimations = 15;
+byte TotalAnimations = 16;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -314,6 +314,33 @@ void ShowAnimation(bool Start) {                                //This would be 
           UpdateLEDs = true;
         }
       } break;
+    case 15: {                                                //METEOR
+          static int pos;
+          static int direction;
+          static byte tailLength;
+          static byte fadeAmount;
+          if (Start) {
+            ClockClear();
+            pos = random8(0, TotalLEDsClock);
+            direction = random8(0, 2) ? 1 : -1;
+            tailLength = random8(6, 14);
+            fadeAmount = random8(20, 60);
+            UpdateLEDs = true;
+          }
+#define ANIMATION_TIME_METEOR 1000 / 90
+          EVERY_N_MILLISECONDS(ANIMATION_TIME_METEOR) {
+            fadeToBlackBy(LEDs, TotalLEDsClock, fadeAmount);
+            for (byte i = 0; i < tailLength; i++) {
+              int p = pos - (i * direction);
+              LED_Add(LEDtoPosition(p), 1, AnimationRGB, TotalLEDsClock);
+            }
+            pos += direction;
+            if (pos >= TotalLEDsClock || pos < 0) {
+              pos = (direction > 0) ? 0 : TotalLEDsClock - 1;
+            }
+            UpdateLEDs = true;
+          }
+        } break;
 
     default:
       AnimationCounter = 0;                                     //Stop animation

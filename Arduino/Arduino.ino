@@ -79,8 +79,12 @@ bool UpdateLEDs;                                                //If we need to 
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
 byte LastMode = -1;                                             //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
-const int TotalLEDs = 60;                                       //The total amounts of LEDs in the strip
-#define LEDSections TotalLEDs / 60                              //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
+
+//const int TotalLEDs = 60;                                       //The total amounts of LEDs in the strip
+//#define LEDSections TotalLEDs / 60                              //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
+const int16_t TotalLEDs = 300;                                  //The total amounts of LEDs in the strip
+#define LEDSections 2                                           //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
+
 const int TotalLEDsClock = LEDSections * 60;                    //The amount of LEDs in the clock
 int AnimationCounter;                                           //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                              //Where we save the time to
@@ -310,6 +314,7 @@ void loopLEDS() {
     case PACMAN:      if (LastMode != Mode) StartAnimation(12, -2); break;
     case PHYSICS:     if (LastMode != Mode) StartAnimation(13, -2); break;
     case SPINNER:     if (LastMode != Mode) StartAnimation(14, -2); break;
+    case METEOR:      if (LastMode != Mode) StartAnimation(15, -2); break;
     case STANDALONE:
       if (LastMode != Mode)
         StandAlone = true;
