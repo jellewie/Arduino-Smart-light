@@ -8,5 +8,9 @@
 *.bin
 *.elf
 *.map
+*.json
+*.csv
+*flash_args
+*sdkconfig
 ##Local files
 _Local/
