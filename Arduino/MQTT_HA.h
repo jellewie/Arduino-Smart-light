@@ -244,15 +244,15 @@ void HaSetup(bool LoopAfter) {
   HAMode.setOptions(AvailableModes.c_str());
   HAMode.onCommand(onModeCommand);
 
-  HABootMode.setName("BootMode");
+  HABootMode.setName("Boot mode");
   HABootMode.setOptions(AvailableModes.c_str());
   HABootMode.onCommand(onBootModeCommand);
 
-  HADoublepressMode.setName("DoubplepressMode");
+  HADoublepressMode.setName("Doubplepress mode");
   HADoublepressMode.setOptions(AvailableModes.c_str());
   HADoublepressMode.onCommand(onDoubplepressModeCommand); 
 
-  HAAutoBrightness.setName("Auto Brightness");
+  HAAutoBrightness.setName("Auto brightness");
   HAAutoBrightness.onCommand(onAutoBrightnessCommand);
 
   HAAnalogHours.setName("Analog hours");
@@ -261,13 +261,13 @@ void HaSetup(bool LoopAfter) {
   HAClockAnalog.setName("Analog clock");
   HAClockAnalog.onCommand(onClockAnalogCommand);
 
-  HAHourlyAnimation.setName("Hourly Animation");
+  HAHourlyAnimation.setName("Hourly animation");
   HAHourlyAnimation.onCommand(onHourlyAnimationSCommand);
   HAHourlyAnimation.setMin(1);
   HAHourlyAnimation.setMax(255);
   HAHourlyAnimation.setStep(1);
 
-  HAHourlyLines.setName("ClockHourLines");
+  HAHourlyLines.setName("Hour lines");
   HAHourlyLines.onCommand(onClockHourLinesCommand);
   HAHourlyLines.setMin(1);
   HAHourlyLines.setMax(255);
