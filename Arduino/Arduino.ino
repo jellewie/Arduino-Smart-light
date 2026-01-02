@@ -48,9 +48,9 @@ const byte PAI_DisablePOTs = 4;                                 //Intern pulled 
 const byte PAI_OtherDefault  = 5;                               //Intern pulled up, when pulled down disableds reading of POTS
 
 #include "Structs.h"
-byte BootMode = OFF;                                            //SOFT_SETTING In which mode to start in
+byte BootMode = CHRISTMAS;                                      //SOFT_SETTING In which mode to start in
 byte HourlyAnimationS = 10;                                     //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
-byte DoublePressMode = RAINBOW;                                 //SOFT_SETTING What mode to change to if the button is double pressed
+byte DoublePressMode = CHRISTMAS;                               //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = true;                                     //SOFT_SETTING If the auto brightness is enabled
 bool AudioLink = false;                                         //SOFT_SETTING If the AudioLink is enabled
 bool StandAlone = false;                                        //SOFT_SETTING If the StandAlone is enabled
@@ -65,7 +65,7 @@ String timeZone = "CET-1CEST,M3.5.0,M10.5.0/3";                 //SOFT_SETTING S
 byte PotMinChange = 2;                                          //SOFT_SETTING How much the pot_value needs to change before we process it
 byte PotStick = PotMinChange + 1;                               //SOFT_SETTING If this close to HIGH or LOW stick to it
 byte PotMin = PotMinChange + 2;                                 //SOFT_SETTING On how much pot_value_change need to change, to set mode to manual
-char Name[16] = "smart-clock";                                  //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
+char Name[16] = "smart-tree";                                  //SOFT_SETTING The mDNS, WIFI APmode SSID name. This requires a restart to apply, can only be 16 characters long, and special characters are not recommended.
 float AudioMultiplier = 2;                                      //SOFT_SETTING Howmuch to amplify the input signal (Idealy when loud the ouput should be 255)
 int AudioAddition = 0;                                          //SOFT_SETTING Howmuch to add to the input signal
 byte MinAudioBrightness = 1;                                    //SOFT_SETTING Minimum amount of brighness that will be applied with Audiolink
@@ -79,8 +79,8 @@ bool UpdateLEDs;                                                //If we need to 
 bool TimeSet = false;                                           //If the time has been set or synced, is used to tasked based on time
 byte Mode;                                                      //Holds in which mode the light is currently in
 byte LastMode = -1;                                             //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
-const int TotalLEDs = 60;                                       //The total amounts of LEDs in the strip
-#define LEDSections TotalLEDs / 60                              //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
+const int TotalLEDs = 150;
+#define LEDSections 2
 const int TotalLEDsClock = LEDSections * 60;                    //The amount of LEDs in the clock
 int AnimationCounter;                                           //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                              //Where we save the time to
@@ -302,6 +302,19 @@ void loopLEDS() {
       Mode = RAINBOW;
       StartAnimation(7,  -2);
       break;
+      case CHRISTMAS: {
+        if (LastMode != Mode) {                                 //If mode changed
+          AnimationCounter = 0;
+          if (WiFi.status() != WL_CONNECTED) {                  //If no WiFi has been set-up
+            if (!TimeSet)                                       //If the time has not been set before
+              WiFiManager.Start();                              //Start WIFI if we haven't
+            else
+              WiFiManager.CheckAndReconnectIfNeeded(false);     //Try to connect to WiFi, but dont start ApMode
+          }
+        }
+        if (AnimationCounter == 0)                              //If no (hourly) animation is playing
+          StartAnimation(Mode - 5, -2);
+      } break;   
     default:
       uint8_t AnimationID = Mode - 5;
       if (AnimationID < TotalAnimations){

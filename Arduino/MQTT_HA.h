@@ -10,9 +10,9 @@ unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which inter
 
 #define HA_deviceSoftwareVersion "1.0"                          //Device info - Firmware:
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
-#define HA_deviceModel "Smart-light"                            //Model
+#define HA_deviceModel "smart-tree"                             //Model
 #define HA_EveryXmsUpdate 60 * 1000                             //How often to send updates to HA
-byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};
+byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4D};              //We need to tel HA we are a new device
 WiFiClient client;
 HADevice device(mac, sizeof(mac));
 HAMqtt mqtt(client, device);
