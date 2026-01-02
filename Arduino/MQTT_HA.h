@@ -12,7 +12,7 @@ unsigned long HAEveryXmsReconnect = 60 * 60 * 1000;             //On which inter
 #define HA_deviceManufacturer "JelleWho"                        //Manufacturer
 #define HA_deviceModel "Smart-light"                            //Model
 #define HA_EveryXmsUpdate 60 * 1000                             //How often to send updates to HA
-byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};
+byte mac[] = {0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4B};              //We need to tell HA we are a new device
 WiFiClient client;
 HADevice device(mac, sizeof(mac));
 HAMqtt mqtt(client, device);
@@ -263,13 +263,13 @@ void HaSetup(bool LoopAfter) {
 
   HAHourlyAnimation.setName("Hourly animation");
   HAHourlyAnimation.onCommand(onHourlyAnimationSCommand);
-  HAHourlyAnimation.setMin(1);
+  HAHourlyAnimation.setMin(0);
   HAHourlyAnimation.setMax(255);
   HAHourlyAnimation.setStep(1);
 
   HAHourlyLines.setName("Hour lines");
   HAHourlyLines.onCommand(onClockHourLinesCommand);
-  HAHourlyLines.setMin(1);
+  HAHourlyLines.setMin(0);
   HAHourlyLines.setMax(255);
   HAHourlyLines.setStep(1);
 
