@@ -11,7 +11,7 @@
   handler.ino:  Add to webinterface by 'let Dm=.....possibleValues:['   (This is a to long string to automate it, sorry)
 */
 byte CurrentAnimation;                                          //Which AnimationCounter Animation is selected
-byte TotalAnimations = 17;
+byte TotalAnimations = 18;
 CRGB AnimationRGB = {0, 0, 0};
 
 //==================================================
@@ -374,6 +374,37 @@ void ShowAnimation(bool Start) {                                //This would be 
             _Length = TotalLEDsClock;
           _Length = _Length + _LOADING_B - _LOADING_A;
           LED_Fill(_LOADING_A, _Length, AnimationRGB, TotalLEDsClock);
+        }
+      } break;
+    case 17: {            
+#define ChristmasDimEvery 70                                    //Dim every x ms
+#define ChristmasDimAmount 3                                    //Dim x/255
+#define ChristmasGreenMin 64                                    //Min level of green
+#define ChristmasTopLength 3                                    //Length of the peak on top
+#define ChristmasTopColor CRGB::Yellow                          //Color of the peak
+#define ChristmasBottomLength 5                                 //Length of the bottom
+#define ChristmasBottomColor CRGB(165, 42, 42)                  //Color of the bottom
+        if (HourlyAnimationS > 0){                              //If we still want to 
+          if (TimeCurrent.MM == 0 and TimeCurrent.SS == 0) {
+            StartAnimation(random8(0, TotalAnimations), HourlyAnimationS); //Start a random Animation
+          }
+        }
+        EVERY_N_MILLISECONDS(ChristmasDimEvery) {
+          fadeToBlackBy(&LEDs[0], TotalLEDs, ChristmasDimAmount); //Dim x-y by (Z/256)%  (X,Y,Z)
+          for (int i = ChristmasBottomLength; i < TotalLEDs - ChristmasTopLength; i++) { //Make the tree green again (counter the dimming)
+            if (LEDs[i].green < ChristmasGreenMin)
+              LEDs[i].green = ChristmasGreenMin;
+          }
+          fill_solid(&(LEDs[TotalLEDs - ChristmasTopLength]), ChristmasTopLength, ChristmasTopColor);  //Color the top
+          fill_solid(&(LEDs[0]), ChristmasBottomLength, ChristmasBottomColor);                         //Color the bottom
+          UpdateLEDs = true;
+        }
+        static unsigned long LastTime;
+        static int DelayB;
+        if (TickEveryXms(&LastTime, DelayB)) {                  //Add balls (sparkles)
+          LEDs[random(TotalLEDs - ChristmasTopLength - ChristmasBottomLength) + ChristmasBottomLength] += CRGB(random(2) * 255, random(2) * 255, random(2) * 255);
+          DelayB = random(10800 / TotalLEDs, 270000 / TotalLEDs); //Add delay for next sparkels
+          UpdateLEDs = true;
         }
       } break;
     default:

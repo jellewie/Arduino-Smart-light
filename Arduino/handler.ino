@@ -268,9 +268,9 @@ void handle_Main() {
                       "let Sg=new Slider('Green');"
                       "let Sb=new Slider('Blue');"
 
-                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE','BLINK','BPM','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','LOADING','METEOR','MOVE','PACMAN','PHYSICS','SPINNER','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
-                      "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE']});"
-                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','STANDALONE','RAINBOW']});"
+                      "let Dm=new DropDown({name:'Mode',setParamName:'m',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE','BLINK','BPM','CHRISTMAS','CONFETTI','FLASH','FLASH2','GLITTER','JUGGLE','LOADING','METEOR','MOVE','PACMAN','PHYSICS','SPINNER','RAINBOW','SINELON','SINELON2','SMILEY'],modifySendParams:(oldParams)=>{if(Dm.value=='WIFI'){let extraData=this.getServerStateMessageData();return{...oldParams,...extraData};}},});"
+                      "let Dbm=new DropDown({name:'Bootmode',setParamName:'bm',possibleValues:['OFF','ON','WIFI','CLOCK','STANDALONE','CHRISTMAS']});"
+                      "let Ddm=new DropDown({name:'Doublepress mode',setParamName:'dm',possibleValues:['WIFI','CLOCK','STANDALONE','RAINBOW','CHRISTMAS']});"
 
                       "settingsContainer.appendChild(document.createElement('br'));"
                       "let Di=new DropDown({name:'Auto brightness',setParamName:'i',possibleValues:['FALSE','TRUE']});"
