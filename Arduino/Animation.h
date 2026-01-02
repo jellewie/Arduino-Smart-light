@@ -313,7 +313,7 @@ void ShowAnimation(bool Start) {                                //This would be 
           UpdateLEDs = true;
         }
       } break;
-    case 15: {                                                //METEOR
+    case 15: {                                                  //METEOR
           static int pos;
           static int direction;
           static byte tailLength;
@@ -340,7 +340,7 @@ void ShowAnimation(bool Start) {                                //This would be 
             UpdateLEDs = true;
           }
         } break;
-    case 16: {                                                //LOADING
+    case 16: {                                                  //LOADING
         static int8_t _Direction = 1;
         static int8_t _LOADING_A = 0;
         static int8_t _LOADING_B = 0;
@@ -368,9 +368,9 @@ void ShowAnimation(bool Start) {                                //This would be 
         if (UpdateLEDs) {
           ClockClear();
           uint8_t _Length = 0;
-          if (_LOADING_A == _LOADING_B)       //Avoid the rushing error when they are both together, make the swap faster
+          if (_LOADING_A == _LOADING_B)                         //Avoid the rushing error when they are both together, make the swap faster
             _LOADING_B += _Direction;
-          if (_LOADING_B < _LOADING_A)        //f we need to paint the other side
+          if (_LOADING_B < _LOADING_A)                          //f we need to paint the other side
             _Length = TotalLEDsClock;
           _Length = _Length + _LOADING_B - _LOADING_A;
           LED_Fill(_LOADING_A, _Length, AnimationRGB, TotalLEDsClock);

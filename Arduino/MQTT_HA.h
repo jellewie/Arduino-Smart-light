@@ -22,7 +22,7 @@ HALight HAlight2("smart-clock-Outer", HALight::BrightnessFeature | HALight::RGBF
 HASensorNumber HALDR("smart-clock-ldr");                        //unique SensorNumberID used to send the LDR data to HA
 HASelect HAMode("smart-clock-Mode");                            //Dropdown menu to select mode
 HASelect HABootMode("smart-clock-BootMode");                    //Dropdown menu to select bootmode
-HASelect HADoublepressMode("smart-clock-doublepressmode");     //Dropdown menu to select doublepress mode
+HASelect HADoublepressMode("smart-clock-doublepressmode");      //Dropdown menu to select doublepress mode
 HASwitch HAAutoBrightness("smart-clock-autobrightness");
 HASwitch HAAnalogHours("smart-clock-analoghours");
 HASwitch HAClockAnalog("smart-clock-analogclock");
@@ -203,7 +203,7 @@ void HaLoop() {
     HAHourlyAnimation.setState(HourlyAnimationS);
   }
   static int8_t HALastClockHourLines = !ClockHourLines;
-  if (HALastClockHourLines != ClockHourLines) {             //If the HA mode is not the same as the current mode
+  if (HALastClockHourLines != ClockHourLines) {                 //If the HA mode is not the same as the current mode
     HALastClockHourLines = ClockHourLines;
     HAHourlyLines.setState(ClockHourLines);
   }
