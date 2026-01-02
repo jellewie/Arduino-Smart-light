@@ -263,13 +263,13 @@ void HaSetup(bool LoopAfter) {
 
   HAHourlyAnimation.setName("Hourly animation");
   HAHourlyAnimation.onCommand(onHourlyAnimationSCommand);
-  HAHourlyAnimation.setMin(1);
+  HAHourlyAnimation.setMin(0);
   HAHourlyAnimation.setMax(255);
   HAHourlyAnimation.setStep(1);
 
   HAHourlyLines.setName("Hour lines");
   HAHourlyLines.onCommand(onClockHourLinesCommand);
-  HAHourlyLines.setMin(1);
+  HAHourlyLines.setMin(0);
   HAHourlyLines.setMax(255);
   HAHourlyLines.setStep(1);
 
