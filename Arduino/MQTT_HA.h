@@ -167,46 +167,14 @@ void HaLoop() {
     int16_t ReadHALDR = 4096 - (analogRead(PAI_LIGHT) * 4);     //Inverse so dark=0 and bright=4096
     HALDR.setValue(ReadHALDR);                
   }
-  static int8_t HALastMode = -1;
-  if (HALastMode != Mode) {                                     //If the HA mode is not the same as the current mode
-    HALastMode = Mode;
-    HAMode.setState(Mode);
-  }
-  static int8_t HALastBootMode = -1;
-  if (HALastBootMode != BootMode) {                             //If the HA mode is not the same as the current mode
-    HALastBootMode = BootMode;
-    HABootMode.setState(BootMode);
-  }
-  static int8_t HALastDoublePressMode = -1;
-  if (HALastDoublePressMode != DoublePressMode) {               //If the HA mode is not the same as the current mode
-    HALastDoublePressMode = DoublePressMode;
-    HADoublepressMode.setState(DoublePressMode);
-  }
-  static int8_t HALastAutoBrightness = !AutoBrightness;
-  if (HALastAutoBrightness != AutoBrightness) {                 //If the HA mode is not the same as the current mode
-    HALastAutoBrightness = AutoBrightness;
-    HAAutoBrightness.setState(AutoBrightness);
-  }
-  static int8_t HALastClockHourAnalog = !ClockHourAnalog;
-  if (HALastClockHourAnalog != ClockHourAnalog) {               //If the HA mode is not the same as the current mode
-    HALastClockHourAnalog = ClockHourAnalog;
-    HAAnalogHours.setState(ClockHourAnalog);
-  }
-  static int8_t HALastClockAnalog = !ClockAnalog;
-  if (HALastClockAnalog != ClockAnalog) {                       //If the HA mode is not the same as the current mode
-    HALastClockAnalog = ClockAnalog;
-    HAClockAnalog.setState(ClockAnalog);
-  }
-  static int8_t HALastHourlyAnimationS = !HourlyAnimationS;
-  if (HALastHourlyAnimationS != HourlyAnimationS) {             //If the HA mode is not the same as the current mode
-    HALastHourlyAnimationS = HourlyAnimationS;
-    HAHourlyAnimation.setState(HourlyAnimationS);
-  }
-  static int8_t HALastClockHourLines = !ClockHourLines;
-  if (HALastClockHourLines != ClockHourLines) {                 //If the HA mode is not the same as the current mode
-    HALastClockHourLines = ClockHourLines;
-    HAHourlyLines.setState(ClockHourLines);
-  }
+  HAMode.setState(Mode);
+  HABootMode.setState(BootMode);
+  HADoublepressMode.setState(DoublePressMode);
+  HAAutoBrightness.setState(AutoBrightness);
+  HAAnalogHours.setState(ClockHourAnalog);
+  HAClockAnalog.setState(ClockAnalog);
+  HAHourlyAnimation.setState(HourlyAnimationS);
+  HAHourlyLines.setState(ClockHourLines);
 }
 void HaSetup(bool LoopAfter) {
   device.setName(Name);
