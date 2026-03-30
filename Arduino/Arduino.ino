@@ -48,7 +48,7 @@ const byte PAI_DisablePOTs = 4;                                 //Intern pulled 
 const byte PAI_OtherDefault  = 5;                               //Intern pulled up, when pulled down disableds reading of POTS
 
 #include "Structs.h"
-byte BootMode = OFF;                                            //SOFT_SETTING In which mode to start in
+byte BootMode = CLOCK;                                          //SOFT_SETTING In which mode to start in
 byte HourlyAnimationS = 10;                                     //SOFT_SETTING If we need to show an animation every hour if we are in CLOCK mode, defined in time in seconds where 0=off
 byte DoublePressMode = RAINBOW;                                 //SOFT_SETTING What mode to change to if the button is double pressed
 bool AutoBrightness = true;                                     //SOFT_SETTING If the auto brightness is enabled
@@ -81,6 +81,8 @@ byte Mode;                                                      //Holds in which
 byte LastMode = -1;                                             //Just to keep track if we are stepping into a new mode, and need to init that mode. -1 to force init
 const int TotalLEDs = 60;                                       //The total amounts of LEDs in the strip
 #define LEDSections TotalLEDs / 60                              //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
+//const int16_t TotalLEDs = 300;                                  //The total amounts of LEDs in the strip
+//#define LEDSections 2                                           //Amount of sections of LEDs for the Clock (2=each step is 2 LEDs so 12h=120+121 LED, 1=Default 12h=60th LED)
 const int TotalLEDsClock = LEDSections * 60;                    //The amount of LEDs in the clock
 int AnimationCounter;                                           //Time in seconds that a AnimationCounter Animation needs to be played
 TimeS TimeCurrent;                                              //Where we save the time to
